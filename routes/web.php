@@ -13,5 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::get('/customizer', function () {
+    return Inertia::render('Customizer');
+})->name('customizer');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
