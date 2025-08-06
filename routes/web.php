@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomizerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,9 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('/customizer', function () {
-    return Inertia::render('Customizer');
-})->name('customizer');
+Route::get('/customizer', [CustomizerController::class, 'index'])->name('customizer');
+Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,8 @@ return new class extends Migration
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('type', ['sword', 'bow', 'axe']);
+            $table->integer(column: 'rate_of_fire');
+            $table->enum('type', ['handgun', 'smg', 'shotgun', 'blade']);
             $table->integer('power');
             $table->timestamps();
         });
@@ -22,16 +22,17 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('area', [
-                'muzzle',      // suppressor, compensator, etc.
-                'scope',       // red dot, acog, etc.
-                'magazine',    // extended, drum, etc.
-                'grip',        // vertical, angled, etc.
-                'stock',       // tactical, heavy, etc.
-                'barrel',      // long, short, etc.
-                'laser',       // laser sight
-                'flashlight',  // flashlight
-                'bipod',       // bipod
-                'other'        // fallback
+                'muzzle', // suppressor, compensator, etc.
+                'scope', // red dot, acog, etc.
+                'magazine', // extended, drum, etc.
+                'grip', // vertical, angled, etc.
+                'stock', // tactical, heavy, etc.
+                'barrel', // long, short, etc.
+                'laser', // laser sight
+                'flashlight', // flashlight
+                'bipod', // bipod
+                'underbarrel',
+                'other', // fallback
             ]);
             $table->timestamps();
         });
