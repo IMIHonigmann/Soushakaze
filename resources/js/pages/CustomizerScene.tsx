@@ -1,12 +1,33 @@
 import { MP5 } from '@/ModelDefinitions/MP5';
-import { ContactShadows, OrbitControls, Stage } from '@react-three/drei';
+import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import { Suspense } from 'react';
+import { memo, Suspense, useRef } from 'react';
+import * as THREE from 'three';
 
-export default function CustomizerScene() {
+function CustomizerScene() {
+    const cameraControls = useRef<CameraControls>(null);
+
+    function setCameraControls(target: THREE.Vector3, pos: THREE.Vector3) {
+        if (!cameraControls.current) return;
+
+        cameraControls.current.setTarget(target.x, target.y, target.z, true);
+        cameraControls.current.setPosition(pos.x, pos.y, pos.z, true);
+    }
+
     return (
         <>
+            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-5, 0, 3))}>
+                Stock
+            </button>
+            <br />
+            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(0, -0.35, 0), new THREE.Vector3(0, 0, 5))}>
+                Main
+            </button>
+            <br />
+            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(1.5, -0.75, 0), new THREE.Vector3(0, -1, 3))}>
+                Mag
+            </button>
             <div style={{ width: '1920px', height: '1080px', margin: 'auto', backgroundColor: '#151515' }}>
                 <Canvas shadows camera={{ position: [0, 0, 20], fov: 50 }}>
                     <Suspense fallback={null}>
@@ -16,7 +37,13 @@ export default function CustomizerScene() {
 
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 
-                        <OrbitControls minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.8} enableZoom={true} enablePan={false} />
+                        <CameraControls
+                            ref={cameraControls}
+                            minDistance={0.2}
+                            maxDistance={5}
+                            minPolarAngle={Math.PI / 4}
+                            maxPolarAngle={Math.PI / 1.8}
+                        />
                         <EffectComposer>
                             <SMAA />
                             <Bloom intensity={0.2} luminanceThreshold={0.8} luminanceSmoothing={0.9} />
@@ -29,3 +56,5 @@ export default function CustomizerScene() {
         </>
     );
 }
+
+export default memo(CustomizerScene);

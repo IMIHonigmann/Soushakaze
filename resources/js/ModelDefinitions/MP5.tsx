@@ -7,7 +7,7 @@ Title: MP5 Submachine Gun
 */
 
 import { useGLTF } from '@react-three/drei';
-import { JSX, useEffect } from 'react';
+import { JSX, useMemo } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 
@@ -30,7 +30,7 @@ type GLTFResult = GLTF & {
 
 export function MP5(props: JSX.IntrinsicElements['group']) {
     const { nodes, materials } = useGLTF('/3DModels/MP5/scene.gltf') as unknown as GLTFResult;
-    useEffect(() => {
+    useMemo(() => {
         if (materials.material) {
             if (materials.material.normalMap) {
                 materials.material.normalScale.set(0.5, 0.5);
