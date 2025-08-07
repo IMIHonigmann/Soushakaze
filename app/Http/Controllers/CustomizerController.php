@@ -1,18 +1,26 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Attachment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use App\Models\YourModel; // Replace with your actual model
 
 class CustomizerController extends Controller
 {
     // GET: Fetch data from the database
-    public function index()
+    public function index($weaponId)
     {
-        $data = Attachment::all(); // Adjust query as needed
-        return Inertia::render('Customizer', ['data' => $data]);
+        $weapon = DB::table('weapons')
+        ->where('id', $weaponId)
+        ->first();
+        $attachments = DB::table('weapons_attachments')
+            ->where('weapon_id', $weaponId)
+            ->join('attachments', 'weapons_attachments.attachment_id', '=', 'attachments.id')
+            ->select('attachments.*')
+            ->get();
+        return Inertia::render('Customizer', [
+            'weaponName' => $weapon->name,
+            'attachments' => $attachments]);
     }
 
     // POST: Handle data sent from the customizer

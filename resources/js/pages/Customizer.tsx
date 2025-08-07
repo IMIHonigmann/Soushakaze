@@ -7,11 +7,12 @@ type Attachment = {
 };
 
 interface Props {
-    data: Attachment[];
+    weaponName: string;
+    attachments: Attachment[];
 }
 
-export default function Customizer({ data }: Props) {
-    const grouped = data.reduce<Record<string, Attachment[]>>((acc, att) => {
+export default function Customizer({ weaponName, attachments }: Props) {
+    const grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
         acc[att.area] = acc[att.area] || [];
         acc[att.area].push(att);
         return acc;
@@ -35,6 +36,7 @@ export default function Customizer({ data }: Props) {
 
     return (
         <>
+            <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">
                     {Object.entries(grouped).map(([area, attachments]) => (
