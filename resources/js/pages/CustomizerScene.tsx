@@ -12,7 +12,14 @@ function CustomizerScene({ cameraControlsRef }: { cameraControlsRef: React.RefOb
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
                             <MP5 scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
-                            <Html scale={1} rotation={[-Math.PI / 8, 0, 0]} position={[-2.25, 0.75, 0.2]} transform>
+                            <Html
+                                scale={1}
+                                rotation={[-Math.PI / 8, 0, 0]}
+                                position={[-2.25, 0.75, 0.2]}
+                                transform
+                                zIndexRange={[0, 9]}
+                                occlude={true}
+                            >
                                 <div
                                     className="annotation"
                                     style={{
@@ -27,12 +34,6 @@ function CustomizerScene({ cameraControlsRef }: { cameraControlsRef: React.RefOb
                                 </div>
                             </Html>
                         </Stage>
-                        <Html scale={100} rotation={[Math.PI / 2, 0, 0]} position={[180, -350, 50]} transform occlude>
-                            <div className="annotation">
-                                6.550 $ <span style={{ fontSize: '1.5em' }}>🥲</span>
-                            </div>
-                        </Html>
-
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 
                         <CameraControls

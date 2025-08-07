@@ -1,5 +1,6 @@
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import CustomizerScene from './CustomizerScene';
 
@@ -9,7 +10,7 @@ export type Attachment = {
     area: string;
 };
 
-export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other';
+export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
 
 interface Props {
     weaponName: string;
@@ -24,7 +25,7 @@ export default function Customizer({ weaponName, attachments }: Props) {
         return acc;
     }, {});
 
-    const [currentAreaSelection, setCurrentAreaSelection] = useState<Area>('other');
+    const [currentAreaSelection, setCurrentAreaSelection] = useState<Area>('all');
     const [selected, setSelected] = useState<Record<string, number>>(() => {
         const initial: Record<string, number> = {};
         Object.entries(grouped).forEach(([area, attachments]) => {
@@ -61,6 +62,9 @@ export default function Customizer({ weaponName, attachments }: Props) {
             case 'magazine':
                 cameraTransform = [new THREE.Vector3(1.5, -0.75, 0), new THREE.Vector3(0, -1, 3)];
                 break;
+            case 'all':
+                cameraTransform = [new THREE.Vector3(0, -0.35, 0), new THREE.Vector3(0, 0, 5)];
+                break;
             default:
                 cameraTransform = undefined;
         }
@@ -72,13 +76,17 @@ export default function Customizer({ weaponName, attachments }: Props) {
 
     return (
         <>
-            <CustomizerScene cameraControlsRef={cameraControlsRef} />
+            <MdOutlineCameraswitch
+                className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125'}`}
+                onClick={() => setCurrentAreaSelection('all')}
+            />
+            <CustomizerScene cameraControlsRef={cameraControlsRef}></CustomizerScene>
             <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">
                     {Object.entries(grouped).map(([area, attachments]) => (
                         <div key={area}>
-                            <strong className="select-none">{area}</strong>
+                            <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                             <ul>
                                 <li
                                     key={`standard-${area}`}
