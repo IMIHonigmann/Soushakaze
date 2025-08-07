@@ -1,26 +1,75 @@
 import { useState } from 'react';
 
-export default function Customizer() {
-    const [selected, setSelected] = useState(0);
+type Attachment = {
+    id: number;
+    name: string;
+    area: string;
+};
+
+interface Props {
+    data: Attachment[];
+}
+
+export default function Customizer({ data }: Props) {
+    const grouped = data.reduce<Record<string, Attachment[]>>((acc, att) => {
+        acc[att.area] = acc[att.area] || [];
+        acc[att.area].push(att);
+        return acc;
+    }, {});
+
+    const [selected, setSelected] = useState<Record<string, number>>(() => {
+        const initial: Record<string, number> = {};
+        Object.entries(grouped).forEach(([area, attachments]) => {
+            // Default to first attachment's id in each area
+            initial[area] = attachments[0]?.id ?? 0;
+        });
+        return initial;
+    });
+
+    const handleSelect = (area: string, id: number) => {
+        setSelected((prev) => ({
+            ...prev,
+            [area]: id,
+        }));
+    };
+
     return (
         <>
-            <ul>
-                {['None (Ironsights)', 'Red Dot Sight', 'Holographic Sight', 'ACOG Scope'].map((option, idx) => {
-                    return (
-                        <li
-                            key={option}
-                            className="cursor-pointer"
-                            style={{
-                                fontWeight: selected === idx ? 'bold' : 'normal',
-                                background: selected === idx ? '#FF0000' : 'transparent',
-                            }}
-                            onClick={() => setSelected(idx)}
-                        >
-                            {option}
-                        </li>
-                    );
-                })}
-            </ul>
+            <div className="flex justify-center">
+                <div className="absolute bottom-10 flex justify-center gap-8">
+                    {Object.entries(grouped).map(([area, attachments]) => (
+                        <div key={area}>
+                            <strong>{area}</strong>
+                            <ul>
+                                <li
+                                    key={`standard-${area}`}
+                                    style={{
+                                        fontWeight: selected[area] === 0 ? 'bold' : 'normal',
+                                        background: selected[area] === 0 ? '#FF0000' : 'transparent',
+                                    }}
+                                    onClick={() => handleSelect(area, 0)}
+                                    className="cursor-pointer"
+                                >
+                                    Factory issue
+                                </li>
+                                {attachments.map((a) => (
+                                    <li
+                                        key={a.id}
+                                        style={{
+                                            fontWeight: selected[area] === a.id ? 'bold' : 'normal',
+                                            background: selected[area] === a.id ? '#FF0000' : 'transparent',
+                                        }}
+                                        onClick={() => handleSelect(area, a.id)}
+                                        className="cursor-pointer"
+                                    >
+                                        {a.name}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </>
     );
 }
