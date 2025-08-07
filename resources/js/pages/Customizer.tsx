@@ -77,7 +77,7 @@ export default function Customizer({ weaponName, attachments }: Props) {
     return (
         <>
             <MdOutlineCameraswitch
-                className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125'}`}
+                className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => setCurrentAreaSelection('all')}
             />
             <CustomizerScene cameraControlsRef={cameraControlsRef}></CustomizerScene>
