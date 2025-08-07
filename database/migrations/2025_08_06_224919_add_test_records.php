@@ -61,7 +61,15 @@ return new class extends Migration {
                 'updated_at' => now(),
             ],
         ]);
-        $attachments = [['name' => 'Red Dot Sight', 'area' => 'scope'], ['name' => 'Suppressor', 'area' => 'barrel'], ['name' => 'Extended Magazine', 'area' => 'magazine'], ['name' => 'Laser Sight', 'area' => 'underbarrel'], ['name' => 'Foregrip', 'area' => 'underbarrel']];
+        $attachments = [
+            ['name' => 'Red Dot Sight', 'area' => 'scope'],
+            ['name' => 'Suppressor', 'area' => 'barrel'],
+            ['name' => 'Extended Magazine', 'area' => 'magazine'],
+            ['name' => 'Laser Sight', 'area' => 'underbarrel'],
+            ['name' => 'Foregrip', 'area' => 'underbarrel'],
+            ['name' => 'Collapsible Stock', 'area' => 'stock'],
+            ['name' => 'Fixed Stock', 'area' => 'stock'],
+        ];
 
         foreach ($attachments as $attachment) {
             DB::table('attachments')->insert([
@@ -91,6 +99,18 @@ return new class extends Migration {
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 4, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 6, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
         ]);
     }
 

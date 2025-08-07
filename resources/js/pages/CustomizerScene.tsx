@@ -2,32 +2,11 @@ import { MP5 } from '@/ModelDefinitions/MP5';
 import { CameraControls, ContactShadows, Html, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import { memo, Suspense, useRef } from 'react';
-import * as THREE from 'three';
+import { memo, Suspense } from 'react';
 
-function CustomizerScene() {
-    const cameraControls = useRef<CameraControls>(null);
-
-    function setCameraControls(target: THREE.Vector3, pos: THREE.Vector3) {
-        if (!cameraControls.current) return;
-
-        cameraControls.current.setTarget(target.x, target.y, target.z, true);
-        cameraControls.current.setPosition(pos.x, pos.y, pos.z, true);
-    }
-
+function CustomizerScene({ cameraControlsRef }: { cameraControlsRef: React.RefObject<CameraControls | null> }) {
     return (
         <>
-            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-5, 0, 3))}>
-                Stock
-            </button>
-            <br />
-            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(0, -0.35, 0), new THREE.Vector3(0, 0, 5))}>
-                Main
-            </button>
-            <br />
-            <button className="cursor-pointer" onClick={() => setCameraControls(new THREE.Vector3(1.5, -0.75, 0), new THREE.Vector3(0, -1, 3))}>
-                Mag
-            </button>
             <div style={{ width: '1920px', height: '1080px', margin: 'auto', backgroundColor: '#151515' }}>
                 <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
                     <Suspense fallback={null}>
@@ -57,7 +36,7 @@ function CustomizerScene() {
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 
                         <CameraControls
-                            ref={cameraControls}
+                            ref={cameraControlsRef}
                             minDistance={0.2}
                             maxDistance={5}
                             minPolarAngle={Math.PI / 4}
