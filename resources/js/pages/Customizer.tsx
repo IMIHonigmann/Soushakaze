@@ -53,25 +53,18 @@ export default function Customizer({ weaponName, attachments }: Props) {
         [cameraControlsRef],
     );
 
+    const vec3 = (x: number, y: number, z: number): THREE.Vector3 => new THREE.Vector3(x, y, z);
     useMemo(() => {
-        let cameraTransform: [target: THREE.Vector3, position: THREE.Vector3] | undefined;
-        switch (currentAreaSelection) {
-            case 'stock':
-                cameraTransform = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(-5, 0, 3)];
-                break;
-            case 'magazine':
-                cameraTransform = [new THREE.Vector3(1.5, -0.75, 0), new THREE.Vector3(0, -1, 3)];
-                break;
-            case 'all':
-                cameraTransform = [new THREE.Vector3(0, -0.35, 0), new THREE.Vector3(0, 0, 5)];
-                break;
-            default:
-                cameraTransform = undefined;
-        }
+        const CAMERA_POSITIONS: Partial<Record<Area, [THREE.Vector3, THREE.Vector3]>> = {
+            stock: [vec3(0, 0, 0), vec3(-5, 0, 3)],
+            magazine: [vec3(1.5, -0.75, 0), vec3(0, -1, 3)],
+            scope: [vec3(0.75, 1, 0), vec3(-1, 1.75, 1)],
+            underbarrel: [vec3(2, 0.45, 0), vec3(3.5, -0.4, 2)],
+            all: [vec3(0, -0.35, 0), vec3(0, 0, 5)],
+        };
 
-        if (cameraTransform) {
-            setCameraControls(cameraTransform[0], cameraTransform[1]);
-        }
+        const [target, position] = CAMERA_POSITIONS[currentAreaSelection] ?? CAMERA_POSITIONS.all!;
+        setCameraControls(target, position);
     }, [currentAreaSelection, setCameraControls]);
 
     return (
