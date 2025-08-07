@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import CustomizerScene from './CustomizerScene';
 
 type Attachment = {
     id: number;
@@ -36,6 +37,7 @@ export default function Customizer({ weaponName, attachments }: Props) {
 
     return (
         <>
+            <CustomizerScene />
             <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">
