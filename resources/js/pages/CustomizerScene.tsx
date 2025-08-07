@@ -1,5 +1,5 @@
 import { MP5 } from '@/ModelDefinitions/MP5';
-import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
+import { CameraControls, ContactShadows, Html, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import { memo, Suspense, useRef } from 'react';
@@ -29,11 +29,30 @@ function CustomizerScene() {
                 Mag
             </button>
             <div style={{ width: '1920px', height: '1080px', margin: 'auto', backgroundColor: '#151515' }}>
-                <Canvas shadows camera={{ position: [0, 0, 20], fov: 50 }}>
+                <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
                             <MP5 scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
+                            <Html scale={1} rotation={[-Math.PI / 8, 0, 0]} position={[-2.25, 0.75, 0.2]} transform>
+                                <div
+                                    className="annotation"
+                                    style={{
+                                        background: 'rgba(0, 0, 0, 0.8)',
+                                        color: 'white',
+                                        padding: '5px 10px',
+                                        borderRadius: '5px',
+                                        fontSize: '0.04em',
+                                    }}
+                                >
+                                    6.550 $
+                                </div>
+                            </Html>
                         </Stage>
+                        <Html scale={100} rotation={[Math.PI / 2, 0, 0]} position={[180, -350, 50]} transform occlude>
+                            <div className="annotation">
+                                6.550 $ <span style={{ fontSize: '1.5em' }}>🥲</span>
+                            </div>
+                        </Html>
 
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 
