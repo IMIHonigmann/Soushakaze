@@ -1,17 +1,36 @@
-import { MP5 } from '@/ModelDefinitions/MP5';
 import { CameraControls, ContactShadows, Html, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import { memo, Suspense } from 'react';
+import React, { memo, Suspense, useEffect, useState } from 'react';
 
-function CustomizerScene({ cameraControlsRef }: { cameraControlsRef: React.RefObject<CameraControls | null> }) {
+type Props = { cameraControlsRef: React.RefObject<CameraControls | null>; weaponId: number };
+const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
+
+function CustomizerScene({ cameraControlsRef, weaponId }: Props) {
+    const [WeaponModel, setWeaponModel] = useState<React.ComponentType<any> | null>(null);
+    useEffect(() => {
+        if (!weaponId) return;
+
+        const path = `../ModelDefinitions/${weaponId}.tsx`;
+        const loader = weaponModules[path];
+
+        if (loader) {
+            loader()
+                .then((model) => {
+                    setWeaponModel(() => model.default || model[weaponId]);
+                })
+                .catch(() => setWeaponModel(null));
+        } else {
+            setWeaponModel(null);
+        }
+    }, [weaponId]);
     return (
         <>
             <div style={{ width: '1920px', height: '1080px', margin: 'auto', backgroundColor: '#151515' }}>
                 <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
-                            <MP5 scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
+                            {WeaponModel && <WeaponModel scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} />}
                             <Html
                                 scale={1}
                                 rotation={[-Math.PI / 8, 0, 0]}

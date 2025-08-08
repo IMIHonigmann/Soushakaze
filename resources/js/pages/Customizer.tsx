@@ -14,10 +14,11 @@ export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel'
 
 interface Props {
     weaponName: string;
+    weaponId: number;
     attachments: Attachment[];
 }
 
-export default function Customizer({ weaponName, attachments }: Props) {
+export default function Customizer({ weaponName, weaponId, attachments }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
     const grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
         acc[att.area] = acc[att.area] || [];
@@ -73,7 +74,7 @@ export default function Customizer({ weaponName, attachments }: Props) {
                 className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => setCurrentAreaSelection('all')}
             />
-            <CustomizerScene cameraControlsRef={cameraControlsRef}></CustomizerScene>
+            <CustomizerScene weaponId={weaponId} cameraControlsRef={cameraControlsRef}></CustomizerScene>
             <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">

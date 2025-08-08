@@ -53,10 +53,10 @@ return new class extends Migration {
                 'updated_at' => now(),
             ],
             [
-                'name' => 'AK-47',
+                'name' => 'PPSH41',
                 'type' => 'smg',
                 'rate_of_fire' => 90,
-                'power' => 600,
+                'power' => 1200,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -101,13 +101,37 @@ return new class extends Migration {
             ],
             [
                 'weapon_id' => 2, // H&K MP5
-                'attachment_id' => 4, // Extended Magazine
+                'attachment_id' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'weapon_id' => 2, // H&K MP5
                 'attachment_id' => 6, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6,
+                'attachment_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6,
+                'attachment_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6,
+                'attachment_id' => 4,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6,
+                'attachment_id' => 6,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

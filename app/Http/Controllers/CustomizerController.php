@@ -20,6 +20,7 @@ class CustomizerController extends Controller
             ->get();
         return Inertia::render('Customizer', [
             'weaponName' => $weapon->name,
+            'weaponId' => $weapon->id,
             'attachments' => $attachments]);
     }
 

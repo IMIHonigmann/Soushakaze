@@ -14,7 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('/customizer/{weapon}', [CustomizerController::class, 'index'])->name('customizer');
+Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
 require __DIR__.'/settings.php';
