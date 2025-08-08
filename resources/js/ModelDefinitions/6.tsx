@@ -77,7 +77,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
         }
     }, [materials]);
     return (
-        <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.075} position={[0, 0, 0]}>
+        <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
             <group rotation={[-1.583, -0.175, 0.201]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
                     <group position={[0, 5.011, -11.913]} rotation={[-0.211, 0, 0]} scale={100}>

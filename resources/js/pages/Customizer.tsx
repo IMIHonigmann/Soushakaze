@@ -65,6 +65,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         };
 
         const [target, position] = CAMERA_POSITIONS[currentAreaSelection] ?? CAMERA_POSITIONS.all!;
+        if (currentAreaSelection === 'other') return;
         setCameraControls(target, position);
     }, [currentAreaSelection, setCameraControls]);
 
@@ -74,7 +75,11 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => setCurrentAreaSelection('all')}
             />
-            <CustomizerScene weaponId={weaponId} cameraControlsRef={cameraControlsRef}></CustomizerScene>
+            <CustomizerScene
+                weaponId={weaponId}
+                setCurrentAreaSelection={setCurrentAreaSelection}
+                cameraControlsRef={cameraControlsRef}
+            ></CustomizerScene>
             <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">

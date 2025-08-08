@@ -2,11 +2,12 @@ import { CameraControls, ContactShadows, Html, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { memo, Suspense, useEffect, useState } from 'react';
+import { Area } from './Customizer';
 
-type Props = { cameraControlsRef: React.RefObject<CameraControls | null>; weaponId: number };
+type Props = { cameraControlsRef: React.RefObject<CameraControls | null>; weaponId: number; setCurrentAreaSelection: React.Dispatch<Area> };
 const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
 
-function CustomizerScene({ cameraControlsRef, weaponId }: Props) {
+function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection }: Props) {
     const [WeaponModel, setWeaponModel] = useState<React.ComponentType<any> | null>(null);
     useEffect(() => {
         if (!weaponId) return;
@@ -27,7 +28,7 @@ function CustomizerScene({ cameraControlsRef, weaponId }: Props) {
     return (
         <>
             <div style={{ width: '1920px', height: '1080px', margin: 'auto', backgroundColor: '#151515' }}>
-                <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
+                <Canvas shadows>
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
                             {WeaponModel && <WeaponModel />}
@@ -59,8 +60,9 @@ function CustomizerScene({ cameraControlsRef, weaponId }: Props) {
                             ref={cameraControlsRef}
                             minDistance={0.2}
                             maxDistance={5}
-                            minPolarAngle={Math.PI / 4}
+                            minPolarAngle={Math.PI / 6}
                             maxPolarAngle={Math.PI / 1.8}
+                            onControlEnd={() => setCurrentAreaSelection('other')}
                         />
                         <EffectComposer>
                             <SMAA />
