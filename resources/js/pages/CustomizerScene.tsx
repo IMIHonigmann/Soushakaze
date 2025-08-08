@@ -30,7 +30,7 @@ function CustomizerScene({ cameraControlsRef, weaponId }: Props) {
                 <Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
-                            {WeaponModel && <WeaponModel scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} />}
+                            {WeaponModel && <WeaponModel />}
                             <Html
                                 scale={1}
                                 rotation={[-Math.PI / 8, 0, 0]}
