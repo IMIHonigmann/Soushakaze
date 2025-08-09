@@ -6,8 +6,9 @@ Source: https://sketchfab.com/3d-models/ppsh-41-tactical-d7d785b781a94df5b9a4956
 Title: PPSH-41 TACTICAL
 */
 
+import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { useGLTF } from '@react-three/drei';
-import { JSX, useMemo } from 'react';
+import { JSX, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 
@@ -67,6 +68,13 @@ type GLTFResult = GLTF & {
 
 export default function Model(props: JSX.IntrinsicElements['group']) {
     const { nodes, materials } = useGLTF('/3DModels/PPSH41/scene.gltf') as unknown as GLTFResult;
+
+    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
+
+    useEffect(() => {
+        console.log(selected);
+    }, [selected]);
+
     useMemo(() => {
         if (materials.material) {
             if (materials.material.normalMap) {
@@ -81,114 +89,122 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
             <group rotation={[-1.583, -0.175, 0.201]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
                     <group position={[0, 5.011, -11.913]} rotation={[-0.211, 0, 0]} scale={100}>
-                        <mesh castShadow receiveShadow geometry={nodes.defaultMaterial_14.geometry} material={materials.linza} />
-                        <mesh
-                            castShadow
-                            receiveShadow
-                            geometry={nodes.defaultMaterial_15.geometry}
-                            material={materials.material}
-                            position={[0, 0, -0.001]}
-                        />
+                        {selected.scope === 1 && (
+                            <group>
+                                <mesh castShadow receiveShadow geometry={nodes.defaultMaterial_14.geometry} material={materials.linza} />
+                                <mesh
+                                    castShadow
+                                    receiveShadow
+                                    geometry={nodes.defaultMaterial_15.geometry}
+                                    material={materials.material}
+                                    position={[0, 0, -0.001]}
+                                />
+                            </group>
+                        )}
                     </group>
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial.geometry}
-                        material={materials.perst}
-                        position={[4.404, 1.914, 7.192]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_1.geometry}
-                        material={materials.perst}
-                        position={[4.399, -2.064, 6.142]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_2.geometry}
-                        material={materials.perst}
-                        position={[5.625, -0.408, 9.008]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_3.geometry}
-                        material={materials.perst}
-                        position={[5.542, 2.019, 10.4]}
-                        rotation={[-Math.PI / 2, Math.PI / 2, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_4.geometry}
-                        material={materials.perst}
-                        position={[-4.926, 1.36, 16.519]}
-                        rotation={[-1.589, -1.559, 1.557]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_5.geometry}
-                        material={materials.perst}
-                        position={[4.404, -0.361, -6.925]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_6.geometry}
-                        material={materials.material_12}
-                        position={[4.449, -0.361, -7.12]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_7.geometry}
-                        material={materials.perst}
-                        position={[4.449, -0.361, -6.925]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_8.geometry}
-                        material={materials.perst}
-                        position={[-2.729, 1.98, 10.217]}
-                        rotation={[-0.005, 0, 3.13]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_9.geometry}
-                        material={materials.perst}
-                        position={[-3.377, -1.99, 12.799]}
-                        rotation={[3.137, 0, -3.13]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_10.geometry}
-                        material={materials.perst}
-                        position={[4.449, -0.376, -6.925]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
+                    {selected.underbarrel === 4 && (
+                        <group>
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial.geometry}
+                                material={materials.perst}
+                                position={[4.404, 1.914, 7.192]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_1.geometry}
+                                material={materials.perst}
+                                position={[4.399, -2.064, 6.142]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_2.geometry}
+                                material={materials.perst}
+                                position={[5.625, -0.408, 9.008]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_3.geometry}
+                                material={materials.perst}
+                                position={[5.542, 2.019, 10.4]}
+                                rotation={[-Math.PI / 2, Math.PI / 2, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_4.geometry}
+                                material={materials.perst}
+                                position={[-4.926, 1.36, 16.519]}
+                                rotation={[-1.589, -1.559, 1.557]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_5.geometry}
+                                material={materials.perst}
+                                position={[4.404, -0.361, -6.925]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_6.geometry}
+                                material={materials.material_12}
+                                position={[4.449, -0.361, -7.12]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_7.geometry}
+                                material={materials.perst}
+                                position={[4.449, -0.361, -6.925]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_8.geometry}
+                                material={materials.perst}
+                                position={[-2.729, 1.98, 10.217]}
+                                rotation={[-0.005, 0, 3.13]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_9.geometry}
+                                material={materials.perst}
+                                position={[-3.377, -1.99, 12.799]}
+                                rotation={[3.137, 0, -3.13]}
+                                scale={100}
+                            />
+                            <mesh
+                                castShadow
+                                receiveShadow
+                                geometry={nodes.defaultMaterial_10.geometry}
+                                material={materials.perst}
+                                position={[4.449, -0.376, -6.925]}
+                                rotation={[-Math.PI / 2, 0, 0]}
+                                scale={100}
+                            />
+                        </group>
+                    )}
                     <mesh
                         castShadow
                         receiveShadow
@@ -207,15 +223,17 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                         rotation={[-2.268, 0, 0]}
                         scale={100}
                     />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_13.geometry}
-                        material={materials.scope}
-                        position={[0, -9.161, -10.393]}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
+                    {selected.scope === 1 && (
+                        <mesh
+                            castShadow
+                            receiveShadow
+                            geometry={nodes.defaultMaterial_13.geometry}
+                            material={materials.scope}
+                            position={[0, -9.161, -10.393]}
+                            rotation={[-Math.PI / 2, 0, 0]}
+                            scale={100}
+                        />
+                    )}
                     <mesh
                         castShadow
                         receiveShadow
@@ -241,23 +259,27 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                         rotation={[-Math.PI / 2, 0, 0]}
                         scale={100}
                     />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_19.geometry}
-                        material={materials.text_set2}
-                        position={[1.04, -4.248, 6.575]}
-                        rotation={[-Math.PI / 2, -0.764, 0]}
-                        scale={100}
-                    />
-                    <mesh
-                        castShadow
-                        receiveShadow
-                        geometry={nodes.defaultMaterial_20.geometry}
-                        material={materials.text_set3}
-                        rotation={[-Math.PI / 2, 0, 0]}
-                        scale={100}
-                    />
+                    {selected.underbarrel === 5 && (
+                        <mesh
+                            castShadow
+                            receiveShadow
+                            geometry={nodes.defaultMaterial_19.geometry}
+                            material={materials.text_set2}
+                            position={[1.04, -4.248, 6.575]}
+                            rotation={[-Math.PI / 2, -0.764, 0]}
+                            scale={100}
+                        />
+                    )}
+                    {selected.underbarrel !== 0 && (
+                        <mesh
+                            castShadow
+                            receiveShadow
+                            geometry={nodes.defaultMaterial_20.geometry}
+                            material={materials.text_set3}
+                            rotation={[-Math.PI / 2, 0, 0]}
+                            scale={100}
+                        />
+                    )}
                     <mesh
                         castShadow
                         receiveShadow

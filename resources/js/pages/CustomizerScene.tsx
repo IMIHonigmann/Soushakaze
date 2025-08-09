@@ -1,4 +1,4 @@
-import { CameraControls, ContactShadows, Html, Stage } from '@react-three/drei';
+import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { memo, Suspense, useEffect, useState } from 'react';
@@ -32,27 +32,6 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                     <Suspense fallback={null}>
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
                             {WeaponModel && <WeaponModel />}
-                            <Html
-                                scale={1}
-                                rotation={[-Math.PI / 8, 0, 0]}
-                                position={[-2.25, 0.75, 0.2]}
-                                transform
-                                zIndexRange={[0, 9]}
-                                occlude={true}
-                            >
-                                <div
-                                    className="annotation"
-                                    style={{
-                                        background: 'rgba(0, 0, 0, 0.8)',
-                                        color: 'white',
-                                        padding: '5px 10px',
-                                        borderRadius: '5px',
-                                        fontSize: '0.04em',
-                                    }}
-                                >
-                                    6.550 $
-                                </div>
-                            </Html>
                         </Stage>
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 

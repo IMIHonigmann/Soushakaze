@@ -131,7 +131,7 @@ return new class extends Migration {
             ],
             [
                 'weapon_id' => 6,
-                'attachment_id' => 6,
+                'attachment_id' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]

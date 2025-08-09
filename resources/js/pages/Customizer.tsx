@@ -1,5 +1,6 @@
+import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { CameraControls } from '@react-three/drei';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import CustomizerScene from './CustomizerScene';
@@ -26,21 +27,15 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         return acc;
     }, {});
 
-    const [currentAreaSelection, setCurrentAreaSelection] = useState<Area>('all');
-    const [selected, setSelected] = useState<Record<string, number>>(() => {
-        const initial: Record<string, number> = {};
-        Object.entries(grouped).forEach(([area, attachments]) => {
-            // Default to first attachment's id in each area
-            initial[area] = attachments[0]?.id ?? 0;
-        });
-        return initial;
-    });
+    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
+
+    // Initialize selections when component mounts
+    useEffect(() => {
+        initializeSelections(grouped);
+    }, []);
 
     const handleSelect = (area: Area, id: number) => {
-        setSelected((prev) => ({
-            ...prev,
-            [area]: id,
-        }));
+        setSelected(area, id);
         setCurrentAreaSelection(area);
     };
 
@@ -59,8 +54,8 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         const CAMERA_POSITIONS: Partial<Record<Area, [THREE.Vector3, THREE.Vector3]>> = {
             stock: [vec3(0, 0, 0), vec3(-5, 0, 3)],
             magazine: [vec3(1.5, -0.75, 0), vec3(0, -1, 3)],
-            scope: [vec3(0.75, 1, 0), vec3(-1, 1.75, 1)],
-            underbarrel: [vec3(2, 0.45, 0), vec3(3.5, -0.4, 2)],
+            scope: [vec3(0.75, 1, 0), vec3(-1.5, 1.75, 1.5)],
+            underbarrel: [vec3(2, 0.45, 0), vec3(3.5, 2, -2)],
             all: [vec3(0, -0.35, 0), vec3(0, 0, 5)],
         };
 
