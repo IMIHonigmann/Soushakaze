@@ -13,7 +13,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
         if (!weaponId) return;
 
         const path = `../ModelDefinitions/${weaponId}.tsx`;
-        const loader = weaponModules[path];
+        const loader: () => Promise<any> = weaponModules[path];
 
         if (loader) {
             loader()
