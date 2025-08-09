@@ -75,7 +75,6 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 setCurrentAreaSelection={setCurrentAreaSelection}
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
-            <div className="text-5xl">{weaponName}</div>
             <div className="flex justify-center">
                 <div className="absolute bottom-10 flex justify-center gap-8">
                     {Object.entries(grouped).map(([area, attachments]) => (
