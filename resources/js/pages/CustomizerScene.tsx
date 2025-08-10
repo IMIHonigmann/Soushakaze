@@ -42,8 +42,8 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
 
                         <CameraControls
                             ref={cameraControlsRef}
-                            minDistance={0.2}
-                            maxDistance={5}
+                            minDistance={2}
+                            maxDistance={7}
                             minPolarAngle={Math.PI / 6}
                             maxPolarAngle={Math.PI / 1.8}
                             onControlEnd={() => setCurrentAreaSelection('other')}

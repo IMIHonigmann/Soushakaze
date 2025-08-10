@@ -45,7 +45,7 @@ export default function MP5(props: JSX.IntrinsicElements['group']) {
     }, [materials]);
 
     return (
-        <group {...props} dispose={null} scale={10} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <group {...props} dispose={null} scale={15} position={[0, -10, 0]} rotation={[0, Math.PI / 2, 0]}>
             <group name="Sketchfab_Scene">
                 <group name="Sketchfab_model" rotation={[-Math.PI / 2, 0, 0]}>
                     <group name="MP5fbx" rotation={[Math.PI / 2, 0, 0]} scale={0.01}>
