@@ -30,9 +30,9 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
 
-    // Initialize selections when component mounts
     useEffect(() => {
         initializeSelections(grouped);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSelect = (area: Area, id: number) => {
@@ -64,6 +64,13 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         if (currentAreaSelection === 'other') return;
         setCameraControls(target, position);
     }, [currentAreaSelection, setCameraControls]);
+
+    function addToCart(): void {
+        const localCartString = localStorage.getItem('cart');
+        const cartArray = localCartString ? JSON.parse(localCartString) : [];
+        cartArray.push({ weaponName, selectedAttachments: { ...selected } });
+        localStorage.setItem('cart', JSON.stringify(cartArray));
+    }
 
     return (
         <>
@@ -110,11 +117,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                         </div>
                     ))}
                 </div>
-                <Link
-                    className="cursor-pointer"
-                    onClick={() => localStorage.setItem('cart', JSON.stringify({ weaponName: weaponName, selectedAttachments: selected }))}
-                    href={route('cart')}
-                >
+                <Link className="cursor-pointer" onClick={() => addToCart()} href={route('cart')}>
                     ADD TO CART
                 </Link>
             </div>

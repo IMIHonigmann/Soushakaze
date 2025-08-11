@@ -1,18 +1,30 @@
-type Props = {};
+type CartItem = { weaponName: string; selectedAttachments: Record<string, number> };
 
-export default function Cart({}: Props) {
+export default function Cart() {
     const cartItem = localStorage.getItem('cart');
-    const cartObject: { weaponName: string; selectedAttachments: Record<string, number> } = cartItem ? JSON.parse(cartItem) : null;
+    const cartArray: CartItem[] = cartItem ? JSON.parse(cartItem) : [];
+
     return (
         <>
-            <div>{cartObject.weaponName}</div>
-            <div>
-                {Object.entries(cartObject.selectedAttachments).map(([area, id]) => (
-                    <div key={id}>
-                        {area}: {id}
-                    </div>
-                ))}
-            </div>
+            {cartArray.length > 0 ? (
+                <>
+                    {cartArray.map((item, idx) => (
+                        <div key={idx}>
+                            {item.weaponName} <br />
+                            {Object.entries(item.selectedAttachments).map(([area, id]) => (
+                                <div key={area}>
+                                    {area}: {id}
+                                </div>
+                            ))}
+                            <br />
+                        </div>
+                    ))}
+                    <button onClick={() => localStorage.removeItem('cart')}> Delete all elements from cart</button>
+                </>
+            ) : (
+                'Cart is empty'
+            )}
+            <br />
         </>
     );
 }
