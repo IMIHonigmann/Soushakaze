@@ -17,5 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
+Route::get('cart', function () {
+    return Inertia::render('Cart');
+})->name('cart');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -1,4 +1,5 @@
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
+import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { MdOutlineCameraswitch } from 'react-icons/md';
@@ -109,6 +110,13 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                         </div>
                     ))}
                 </div>
+                <Link
+                    className="cursor-pointer"
+                    onClick={() => localStorage.setItem('cart', JSON.stringify({ weaponName: weaponName, selectedAttachments: selected }))}
+                    href={route('cart')}
+                >
+                    ADD TO CART
+                </Link>
             </div>
         </>
     );
