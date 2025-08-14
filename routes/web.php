@@ -39,9 +39,10 @@ Route::post('placeOrder', function (Request $request) {
         $attachmentIds = $weapon['attachment_ids'];
 
         foreach ($attachmentIds as $attachmentId) {
+            $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
             $ordersToInsert[] = [
                 'custom_weapon_id' => $weaponId,
-                'attachment_id' => $attachmentId,
+                'attachment_id' => $attachmentIdOrNull,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
