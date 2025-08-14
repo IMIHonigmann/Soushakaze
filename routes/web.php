@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomizerController;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ProductsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -22,10 +22,7 @@ Route::get('cart', function () {
     return Inertia::render('Cart');
 })->name('cart');
 
-Route::get('products', function () {
-    $weapons = DB::table('weapons')->get();
-    return Inertia::render('Products', ['weapons' => $weapons]);
-})->name('products');
+Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
 Route::get('/products/{searchQuery}', function () {
     return Inertia::render('QueriedProducts');
@@ -37,5 +34,5 @@ Route::post('placeOrder', function () {
     ]);
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

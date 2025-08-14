@@ -7,7 +7,6 @@ use Inertia\Inertia;
 
 class CustomizerController extends Controller
 {
-    // GET: Fetch data from the database
     public function index($weaponId)
     {
         $weapon = DB::table('weapons')
@@ -24,14 +23,11 @@ class CustomizerController extends Controller
             'attachments' => $attachments]);
     }
 
-    // POST: Handle data sent from the customizer
     public function store(Request $request)
     {
-        // Validate and save data
         $validated = $request->validate([
             'field' => 'required', // Adjust validation rules
         ]);
-        // YourModel::create($validated);
 
         return redirect()->route('customizer');
     }
