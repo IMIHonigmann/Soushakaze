@@ -24,9 +24,7 @@ Route::get('cart', function () {
 
 Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
-Route::get('/products/{searchQuery}', function () {
-    return Inertia::render('QueriedProducts');
-})->name('queried-products');
+Route::get('/products/{searchQuery}', [ProductsController::class, 'getByQuery'])->name('queried-products');
 
 Route::post('placeOrder', function () {
     return view('order.confirmation', [

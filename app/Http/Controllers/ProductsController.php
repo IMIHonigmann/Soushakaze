@@ -17,4 +17,17 @@ class ProductsController extends Controller
             'message' => "Found {$count} products"
         ]);
     }
+    public function getByQuery($searchQuery)
+    {
+        $weapons = DB::table('weapons')
+            ->where('name', 'like', '%' . $searchQuery . '%')
+            ->get();
+        $count = $weapons->count();
+
+        return Inertia::render('QueriedProducts', [
+            'searchQuery' => $searchQuery,
+            'weapons' => $weapons,
+            'message' => "Found {$count} products for query '{$searchQuery}'"
+        ]);
+    }
 }
