@@ -15,7 +15,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-
 });
 
 
@@ -31,10 +30,13 @@ Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 Route::get('/products/{searchQuery}', [ProductsController::class, 'getByQuery'])->name('queried-products');
 
 
-    Route::post('placeOrder', function (Request $request) {
-        $ordersToInsert = [];
-        $weaponId = $request->weapon_id;
-        $attachmentIds = $request->attachment_ids;
+Route::post('placeOrder', function (Request $request) {
+    $customizedWeapons = $request->weaponid_attachments;
+    $ordersToInsert = [];
+
+    foreach ($customizedWeapons as $weapon) {
+        $weaponId = $weapon['weapon_id'];
+        $attachmentIds = $weapon['attachment_ids'];
 
         foreach ($attachmentIds as $attachmentId) {
             $ordersToInsert[] = [
@@ -44,13 +46,13 @@ Route::get('/products/{searchQuery}', [ProductsController::class, 'getByQuery'])
                 'updated_at' => now(),
             ];
         }
+    }
+    if (!empty($ordersToInsert)) {
+        DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
+    }
 
-        if (!empty($ordersToInsert)) {
-            DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
-        }
-
-        return Inertia::render('OrderPlaced', ['message' => 'Order has been processed successfully']);
-    })->name('place-order');
+    return Inertia::render('OrderPlaced', ['message' => 'Order has been processed successfully']);
+})->name('place-order');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

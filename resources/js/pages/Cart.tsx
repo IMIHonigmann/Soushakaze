@@ -6,10 +6,14 @@ type CartItem = { weaponId: number; weaponName: string; selectedAttachments: Rec
 export default function Cart() {
     const cartItem = localStorage.getItem('cart');
     const [cartArray, setCartArray] = useState<CartItem[]>(cartItem ? JSON.parse(cartItem) : []);
-    const attachmentIds = cartArray[0]?.selectedAttachments ? Object.values(cartArray[0].selectedAttachments) : [];
+    const weaponIdAttachments: { weapon_id: number; attachment_ids: number[] }[] = [];
+    for (let i = 0; i < cartArray.length; i++) {
+        const attachmentIds = cartArray[i]?.selectedAttachments ? Object.values(cartArray[i].selectedAttachments) : [];
+        weaponIdAttachments.push({ weapon_id: cartArray[i].weaponId, attachment_ids: attachmentIds });
+    }
 
     function placeOrder() {
-        router.post(route('place-order'), { weapon_id: cartArray[0].weaponId, attachment_ids: attachmentIds });
+        router.post(route('place-order'), { weaponid_attachments: weaponIdAttachments });
     }
 
     return (
