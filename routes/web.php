@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CustomizerController;
 use App\Http\Controllers\ProductsController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,7 +15,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
 });
+
 
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
@@ -26,11 +30,27 @@ Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
 Route::get('/products/{searchQuery}', [ProductsController::class, 'getByQuery'])->name('queried-products');
 
-Route::post('placeOrder', function () {
-    return view('order.confirmation', [
-        'data' => 'To be implemented*'
-    ]);
-});
+
+    Route::post('placeOrder', function (Request $request) {
+        $ordersToInsert = [];
+        $weaponId = $request->weapon_id;
+        $attachmentIds = $request->attachment_ids;
+
+        foreach ($attachmentIds as $attachmentId) {
+            $ordersToInsert[] = [
+                'custom_weapon_id' => $weaponId,
+                'attachment_id' => $attachmentId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        if (!empty($ordersToInsert)) {
+            DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
+        }
+
+        return Inertia::render('OrderPlaced', ['message' => 'Order has been processed successfully']);
+    })->name('place-order');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

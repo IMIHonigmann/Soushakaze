@@ -68,7 +68,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
     function addToCart(): void {
         const localCartString = localStorage.getItem('cart');
         const cartArray = localCartString ? JSON.parse(localCartString) : [];
-        cartArray.push({ weaponName, selectedAttachments: { ...selected } });
+        cartArray.push({ weaponId, weaponName, selectedAttachments: { ...selected } });
         localStorage.setItem('cart', JSON.stringify(cartArray));
     }
 

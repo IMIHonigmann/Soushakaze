@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 type Weapon = {
     id: number;
@@ -14,6 +14,11 @@ type Props = {
 
 export default function Products({ weapons }: Props) {
     console.log(weapons);
+
+    function logout() {
+        router.post(route('logout'));
+    }
+
     return (
         <>
             {weapons.map((weapon, id) => (
@@ -28,6 +33,9 @@ export default function Products({ weapons }: Props) {
                     <br />
                 </>
             ))}
+
+            <br />
+            <button onClick={() => logout()}> LOG OUT </button>
         </>
     );
 }
