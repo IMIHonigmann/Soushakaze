@@ -44,7 +44,8 @@ return new class extends Migration {
         });
         Schema::create('usercreated_weapons_attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('custom_weapon_id')->constrained('weapons')->onDelete('cascade');
+            $table->uuid(column: 'custom_weapon_id');
+            $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
             $table->foreignId('attachment_id')->nullable()->constrained('attachments')->onDelete('cascade');
             $table->timestamps();
         });

@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -37,11 +38,12 @@ Route::post('placeOrder', function (Request $request) {
     foreach ($customizedWeapons as $weapon) {
         $weaponId = $weapon['weapon_id'];
         $attachmentIds = $weapon['attachment_ids'];
-
+        $customWeaponId = Str::uuid()->toString();
         foreach ($attachmentIds as $attachmentId) {
             $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
             $ordersToInsert[] = [
-                'custom_weapon_id' => $weaponId,
+                'custom_weapon_id' => $customWeaponId,
+                'weapon_id' => $weaponId,
                 'attachment_id' => $attachmentIdOrNull,
                 'created_at' => now(),
                 'updated_at' => now(),
