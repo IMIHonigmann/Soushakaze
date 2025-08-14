@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomizerController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +21,21 @@ Route::post('/customizer', [CustomizerController::class, 'store'])->name('custom
 Route::get('cart', function () {
     return Inertia::render('Cart');
 })->name('cart');
+
+Route::get('products', function () {
+    $weapons = DB::table('weapons')->get();
+    return Inertia::render('Products', ['weapons' => $weapons]);
+})->name('products');
+
+Route::get('/products/{searchQuery}', function () {
+    return Inertia::render('QueriedProducts');
+})->name('queried-products');
+
+Route::post('placeOrder', function () {
+    return view('order.confirmation', [
+        'data' => 'To be implemented*'
+    ]);
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
