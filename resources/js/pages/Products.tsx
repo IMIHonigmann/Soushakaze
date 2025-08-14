@@ -17,10 +17,16 @@ export default function Products({ weapons }: Props) {
     return (
         <>
             {weapons.map((weapon, id) => (
-                <Link href={route('customizer', { weaponId: weapon.id })} key={id}>
-                    {weapon.name}
+                <>
+                    <Link
+                        className="inline-block origin-left scale-100 transition-transform hover:scale-110"
+                        href={route('customizer', { weaponId: weapon.id })}
+                        key={id}
+                    >
+                        {weapon.name}
+                    </Link>
                     <br />
-                </Link>
+                </>
             ))}
         </>
     );
