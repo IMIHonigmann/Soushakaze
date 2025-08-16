@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -17,17 +18,23 @@ class ProductsController extends Controller
             'message' => "Found {$count} products"
         ]);
     }
-    public function getByQuery($searchQuery)
+    public function getByQuery(Request $request)
     {
+        $qWeaponName = $request->query('name');
+        $qWeaponType = $request->query('type');
         $weapons = DB::table('weapons')
-            ->where('name', 'like', '%' . $searchQuery . '%')
+            ->when($qWeaponName !== '', function ($query) use ($qWeaponName) {
+                return $query->where('name', 'like', '%' . $qWeaponName . '%');
+            })
+            ->when($qWeaponType !== '', function ($query) use ($qWeaponType) {
+                return $query->where('type', 'like', '%' . $qWeaponType . '%');
+            })
             ->get();
         $count = $weapons->count();
 
         return Inertia::render('QueriedProducts', [
-            'searchQuery' => $searchQuery,
             'weapons' => $weapons,
-            'message' => "Found {$count} products for query '{$searchQuery}'"
+            'message' => "Found {$count} products for the query with the weapon name: '" . ($qWeaponName ? $qWeaponName : '') . "' and " . ($qWeaponType ? "the weapon of type '{$qWeaponType}'" : "no specific weapon type")
         ]);
     }
 }

@@ -28,7 +28,7 @@ Route::get('cart', function () {
 
 Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
-Route::get('/products/{searchQuery}', [ProductsController::class, 'getByQuery'])->name('queried-products');
+Route::get('/products/search', [ProductsController::class, 'getByQuery'])->name('queried-products');
 
 
 Route::post('placeOrder', function (Request $request) {
