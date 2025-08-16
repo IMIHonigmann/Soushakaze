@@ -20,15 +20,21 @@ class ProductsController extends Controller
     }
     public function getByQuery(Request $request)
     {
-        $qWeaponName = $request->query('name');
-        $qWeaponType = $request->query('type');
+
+        $qWeaponName = trim((string) $request->query('name', ''));
+        $qWeaponType = trim((string) $request->query('type', ''));
+        $qRofUpper = trim((string) $request->query('rate_of_fire_upperlimit', ''));
+        $qRofLower = trim((string) $request->query('rate_of_fire_lowerlimit', ''));
+        $qPowerUpper = trim((string) $request->query('power_upperlimit', ''));
+        $qPowerLower = trim((string) $request->query('power_lowerlimit', ''));
+
         $weapons = DB::table('weapons')
-            ->when($qWeaponName !== '', function ($query) use ($qWeaponName) {
-                return $query->where('name', 'like', '%' . $qWeaponName . '%');
-            })
-            ->when($qWeaponType !== '', function ($query) use ($qWeaponType) {
-                return $query->where('type', 'like', '%' . $qWeaponType . '%');
-            })
+            ->when($qWeaponName !== '', fn($query) => $query->where('name', 'like', "%{$qWeaponName}%"))
+            ->when($qWeaponType !== '', fn($query) => $query->where('type', 'like', "%{$qWeaponType}%"))
+            ->when($qRofLower !== '' && $qRofUpper === '', fn($query) => $query->where('rate_of_fire', '>=', $qRofLower))
+            ->when($qRofUpper !== '' && $qRofLower === '', fn($query) => $query->where('rate_of_fire', '<=', $qRofUpper))
+            ->when($qPowerLower !== '', fn($query) => $query->where('power', '>=', $qPowerLower))
+            ->when($qPowerUpper !== '', fn($query) => $query->where('power', '<=', $qPowerUpper))
             ->get();
         $count = $weapons->count();
 
