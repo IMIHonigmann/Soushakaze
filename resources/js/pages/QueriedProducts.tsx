@@ -24,17 +24,16 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
         if (!form) return;
         const fd = new FormData(form);
 
-        const wepTypesFilters: Record<Weapon['type'], boolean> = {};
-        Array.from(form.querySelectorAll<HTMLInputElement>('input[name="weaponTypes[]"]')).forEach((input) => {
-            wepTypesFilters[input.value] = input.checked;
-        });
+        const checkedTypes = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="weaponTypes[]"]'))
+            .filter((i) => i.checked)
+            .map((i) => i.value);
 
-        const params: Record<string, number> = {
+        const params: Record<string, number | string[]> = {
             power_lowerlimit: Number(fd.get('powerMin') ?? 1),
             power_upperlimit: Number(fd.get('powerMax') ?? maxPower),
             rate_of_fire_lowerlimit: Number(fd.get('rofMin') ?? 1),
             rate_of_fire_upperlimit: Number(fd.get('rofMax') ?? maxRof),
-            ...wepTypesFilters,
+            weaponTypes: checkedTypes,
         };
 
         const options = {
