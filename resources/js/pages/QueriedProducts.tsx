@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useRef } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 
 type Weapon = {
     id: number;
@@ -113,7 +113,7 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
             </form>
             <br />
             {weapons.map((weapon, id) => (
-                <>
+                <Fragment key={id}>
                     <Link
                         className="inline-block origin-left scale-100 transition-transform hover:scale-110"
                         href={route('customizer', { weaponId: weapon.id })}
@@ -122,7 +122,7 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                         {weapon.name}
                     </Link>
                     <br />
-                </>
+                </Fragment>
             ))}
         </>
     );
