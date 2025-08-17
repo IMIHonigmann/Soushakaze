@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import { useMemo } from 'react';
+import { Link, router } from '@inertiajs/react';
+import { useMemo, useRef } from 'react';
 
 type Weapon = {
     id: number;
@@ -16,6 +16,35 @@ type Props = {
 };
 
 export default function QueriedProducts({ searchQuery, weapons, message }: Props) {
+    const formRef = useRef<HTMLFormElement | null>(null);
+
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const form = formRef.current;
+        if (!form) return;
+        const fd = new FormData(form);
+
+        const wepTypesFilters: Record<Weapon['type'], boolean> = {};
+        Array.from(form.querySelectorAll<HTMLInputElement>('input[name="weaponTypes[]"]')).forEach((input) => {
+            wepTypesFilters[input.value] = input.checked;
+        });
+
+        const params: Record<string, number> = {
+            power_lowerlimit: Number(fd.get('powerMin') ?? 1),
+            power_upperlimit: Number(fd.get('powerMax') ?? maxPower),
+            rate_of_fire_lowerlimit: Number(fd.get('rofMin') ?? 1),
+            rate_of_fire_upperlimit: Number(fd.get('rofMax') ?? maxRof),
+            ...wepTypesFilters,
+        };
+
+        const options = {
+            preserveState: true,
+            preserveScroll: true,
+        };
+
+        router.get(route('queried-products'), params, options);
+    }
+
     const { maxPower, maxRof, weaponTypes } = useMemo(() => {
         let curMaxPower: number = 0;
         let curMaxRof: number = 0;
@@ -28,12 +57,10 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
             }),
         );
 
-        const weaponTypes = Array.from(weaponTypeSet);
-
         return {
-            maxPower: curMaxPower,
-            maxRof: curMaxRof,
-            weaponTypes,
+            maxPower: Math.max(curMaxPower, 1),
+            maxRof: Math.max(curMaxRof, 1),
+            weaponTypes: Array.from(weaponTypeSet),
         };
     }, [weapons]);
 
@@ -42,7 +69,7 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
             <h1>{searchQuery}</h1>
             <h2>{message}</h2>
             <br />
-            <div className="mb-0.5">
+            <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5">
                 <label>
                     Power Min:
                     <input type="number" name="powerMin" className="ml-2" defaultValue={1} />
@@ -66,13 +93,26 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                     <div style={{ marginLeft: '0.5rem' }}>
                         {weaponTypes.map((wepType, idx) => (
                             <label className="block" key={idx}>
-                                <input type="checkbox" className="mx-1" id={`weaponTypes_${wepType}`} name="weaponTypes[]" />
+                                <input
+                                    type="checkbox"
+                                    className="mx-1"
+                                    id={`weaponTypes_${wepType}`}
+                                    name="weaponTypes[]"
+                                    value={wepType}
+                                    defaultChecked
+                                />
                                 {wepType[0].toUpperCase() + wepType.substring(1)}
                             </label>
                         ))}
                     </div>
                 </div>
-            </div>
+                <div className="mt-2">
+                    <button type="submit" className="btn">
+                        Apply
+                    </button>
+                </div>
+            </form>
+            <br />
             {weapons.map((weapon, id) => (
                 <>
                     <Link
