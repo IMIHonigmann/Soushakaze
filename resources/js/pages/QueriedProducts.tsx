@@ -112,13 +112,18 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                     </div>
                 </form>
             </div>
-            <div className="col-span-3 col-start-2 grid grid-cols-3 text-5xl">
+            <div className="col-span-3 col-start-2 grid grid-cols-3 text-xl">
                 {weapons.map((weapon, id) => (
                     <Link className="group m-8 inline-block py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
-                        <div className="mb-4 flex scale-100 justify-center rounded-2xl border-2 py-32 transition-transform ease-out group-hover:scale-105">
+                        <div className="mb-4 flex scale-100 justify-center rounded-2xl border-2 p-32 transition-transform ease-out group-hover:scale-105">
                             <div className="backgroundcolor-[#e5e7eb] flex items-center justify-center">🖼️</div>
                         </div>
-                        <div className="translate-y-0 transition-transform group-hover:translate-y-1">{weapon.name}</div>
+                        <div className="mx-4 flex flex-col gap-2">
+                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{weapon.name}</div>
+
+                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">⭐⭐⭐⭐⭐ 4.5/5</div>
+                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
+                        </div>
                     </Link>
                 ))}
             </div>
