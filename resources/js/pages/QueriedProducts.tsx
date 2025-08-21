@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { useMemo, useRef } from 'react';
+import { FaCartShopping, FaUser } from 'react-icons/fa6';
 
 type Weapon = {
     id: number;
@@ -64,68 +65,79 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
     }, [weapons]);
 
     return (
-        <div className="grid grid-cols-4 items-center justify-items-center">
-            <div className="col-span-1">
-                <h1>{searchQuery}</h1>
-                <h2>{message}</h2>
-                <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5">
-                    <label>
-                        Power Min:
-                        <input type="number" name="powerMin" className="ml-2" defaultValue={1} />
-                    </label>
-                    <label>
-                        Power Max:
-                        <input type="number" name="powerMax" className="ml-2" defaultValue={maxPower} />
-                    </label>
-                    <br />
-                    <label>
-                        Rate of Fire Min:
-                        <input type="number" name="rofMin" className="ml-2" defaultValue={1} />
-                    </label>
-                    <label>
-                        Rate of Fire Max:
-                        <input type="number" name="rofMax" className="ml-2" defaultValue={maxRof} />
-                    </label>
-                    <br />
-                    <div>
-                        <label htmlFor="weaponTypes">Weapon Types:</label>
-                        <div style={{ marginLeft: '0.5rem' }}>
-                            {weaponTypes.map((wepType, idx) => (
-                                <label className="block" key={idx}>
-                                    <input
-                                        type="checkbox"
-                                        className="mx-1"
-                                        id={`weaponTypes_${wepType}`}
-                                        name="weaponTypes[]"
-                                        value={wepType}
-                                        defaultChecked
-                                    />
-                                    {wepType[0].toUpperCase() + wepType.substring(1)}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="mt-2">
-                        <button type="submit" className="btn">
-                            Apply
-                        </button>
-                    </div>
-                </form>
+        <div className="mx-32">
+            <div className="flex items-center justify-between gap-8 py-8 text-xl">
+                <span>SOUSHA.KAZE</span>
+                <span>On Sale</span>
+                <span>New Arrivals</span>
+                <span>Brands</span>
+                <input className="rounded border-2 p-4" placeholder="Search for weapons..." />
+                <FaCartShopping />
+                <FaUser />
             </div>
-            <div className="col-span-3 col-start-2 grid grid-cols-3 text-xl">
-                {weapons.map((weapon, id) => (
-                    <Link className="group m-8 inline-block py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
-                        <div className="mb-4 flex scale-100 justify-center rounded-2xl border-2 p-32 transition-transform ease-out group-hover:scale-105">
-                            <div className="backgroundcolor-[#e5e7eb] flex items-center justify-center">🖼️</div>
+            <div className="grid grid-cols-4 items-center justify-items-center">
+                <div className="col-span-1">
+                    <h1>{searchQuery}</h1>
+                    <h2>{message}</h2>
+                    <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5">
+                        <label>
+                            Power Min:
+                            <input type="number" name="powerMin" className="ml-2" defaultValue={1} />
+                        </label>
+                        <label>
+                            Power Max:
+                            <input type="number" name="powerMax" className="ml-2" defaultValue={maxPower} />
+                        </label>
+                        <br />
+                        <label>
+                            Rate of Fire Min:
+                            <input type="number" name="rofMin" className="ml-2" defaultValue={1} />
+                        </label>
+                        <label>
+                            Rate of Fire Max:
+                            <input type="number" name="rofMax" className="ml-2" defaultValue={maxRof} />
+                        </label>
+                        <br />
+                        <div>
+                            <label htmlFor="weaponTypes">Weapon Types:</label>
+                            <div style={{ marginLeft: '0.5rem' }}>
+                                {weaponTypes.map((wepType, idx) => (
+                                    <label className="block" key={idx}>
+                                        <input
+                                            type="checkbox"
+                                            className="mx-1"
+                                            id={`weaponTypes_${wepType}`}
+                                            name="weaponTypes[]"
+                                            value={wepType}
+                                            defaultChecked
+                                        />
+                                        {wepType[0].toUpperCase() + wepType.substring(1)}
+                                    </label>
+                                ))}
+                            </div>
                         </div>
-                        <div className="mx-4 flex flex-col gap-2">
-                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{weapon.name}</div>
+                        <div className="mt-2">
+                            <button type="submit" className="btn">
+                                Apply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div className="col-span-3 col-start-2 grid grid-cols-3 gap-8 text-xl">
+                    {weapons.map((weapon, id) => (
+                        <Link className="group inline-block py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
+                            <div className="flex scale-100 justify-center rounded-2xl border-2 px-44 py-40 transition-transform ease-out group-hover:scale-105">
+                                <div className="flex items-center justify-center">🖼️</div>
+                            </div>
+                            <div className="mt-4 ml-6 flex flex-col gap-2">
+                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{weapon.name}</div>
 
-                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">⭐⭐⭐⭐⭐ 4.5/5</div>
-                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
-                        </div>
-                    </Link>
-                ))}
+                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">⭐⭐⭐⭐⭐ 4.5/5</div>
+                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
     );
