@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { useMemo, useRef } from 'react';
+import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
 
 type Weapon = {
@@ -18,6 +19,7 @@ type Props = {
 
 export default function QueriedProducts({ searchQuery, weapons, message }: Props) {
     const formRef = useRef<HTMLFormElement | null>(null);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -29,7 +31,8 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
             .filter((i) => i.checked)
             .map((i) => i.value);
 
-        const params: Record<string, number | string[]> = {
+        const params: Record<string, string | number | string[]> = {
+            name: searchInputRef.current?.value ?? '',
             power_lowerlimit: Number(fd.get('powerMin') ?? 1),
             power_upperlimit: Number(fd.get('powerMax') ?? maxPower),
             rate_of_fire_lowerlimit: Number(fd.get('rofMin') ?? 1),
@@ -75,7 +78,22 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                         <span>New Arrivals</span>
                         <span>Brands</span>
                     </div>
-                    <input className="w-full rounded border-2 p-4" placeholder="Search for weapons..." />
+                    <div className="flex items-center justify-between gap-6">
+                        <input
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    formRef.current?.requestSubmit();
+                                }
+                            }}
+                            ref={searchInputRef}
+                            className="w-full rounded-4xl border-2 p-4"
+                            placeholder="🔎 Search for weapons..."
+                        />
+                        <FaSearch
+                            className="cursor-pointer text-4xl transition-[colors_transform] hover:scale-110 hover:text-lime-400"
+                            onClick={() => formRef.current?.requestSubmit()}
+                        />
+                    </div>
                     <div className="flex justify-between gap-6">
                         <FaCartShopping />
                         <FaUser />
