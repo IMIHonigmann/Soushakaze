@@ -66,16 +66,26 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
 
     return (
         <div className="mx-32">
-            <div className="flex items-center justify-between gap-8 py-8 text-xl">
-                <span>SOUSHA.KAZE</span>
-                <span>On Sale</span>
-                <span>New Arrivals</span>
-                <span>Brands</span>
-                <input className="rounded border-2 p-4" placeholder="Search for weapons..." />
-                <FaCartShopping />
-                <FaUser />
+            <div className="group">
+                <div className="grid grid-cols-[1fr_2fr_3fr_auto] items-center gap-16 py-8 text-xl">
+                    <span className="text-4xl font-extrabold">SOUSHA.KAZE</span>
+                    <div className="flex justify-between">
+                        <span>Shop</span>
+                        <span>On Sale</span>
+                        <span>New Arrivals</span>
+                        <span>Brands</span>
+                    </div>
+                    <input className="w-full rounded border-2 p-4" placeholder="Search for weapons..." />
+                    <div className="flex justify-between gap-6">
+                        <FaCartShopping />
+                        <FaUser />
+                    </div>
+                </div>
+                <div className="flex justify-center">
+                    <div className="mb-8 h-0.5 w-11/12 bg-gray-300 text-center opacity-50 transition-[width_opacity] group-hover:w-full group-hover:opacity-100" />
+                </div>
             </div>
-            <div className="grid grid-cols-4 items-center justify-items-center">
+            <div className="grid grid-cols-4 items-center justify-items-center gap-20">
                 <div className="col-span-1">
                     <h1>{searchQuery}</h1>
                     <h2>{message}</h2>
