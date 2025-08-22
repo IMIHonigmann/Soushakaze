@@ -1,8 +1,8 @@
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
-import { MdNavigateNext } from 'react-icons/md';
+import CategoryItem from './CategoryItem';
 import SeparatingLine from './SeparatingLine';
 
 type Weapon = {
@@ -21,9 +21,6 @@ type Props = {
 
 export default function QueriedProducts({ weapons, message }: Props) {
     const categories = ['Up Close And Personal', 'Wick and Run', 'For COD Enjoyers', 'Yard Counters', 'Flex Throws'];
-    const [clickedCategories, setClickedCategories] = useState<Record<string, boolean>>(() =>
-        Object.fromEntries(categories.map((c) => [c, false] as const)),
-    );
 
     const formRef = useRef<HTMLFormElement | null>(null);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -117,21 +114,13 @@ export default function QueriedProducts({ weapons, message }: Props) {
                     {message && <h1 className="mb-8 text-5xl">'{message}'</h1>}
                     <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5 flex flex-col gap-8">
                         <ul className="flex flex-col justify-between gap-2">
-                            {categories.map((category, index) => {
-                                return (
-                                    <li onClick={() => setClickedCategories((prev) => ({ ...prev, [category]: !prev[category] }))} key={index}>
-                                        <div className="flex -skew-x-12 cursor-pointer items-center justify-between border-2 p-2">
-                                            {category}
-                                            <MdNavigateNext className={`${clickedCategories[category] ? 'rotate-90' : ''} transition-transform`} />
-                                        </div>
-                                        <ul className={`ml-4 ${clickedCategories[category] ? '' : 'hidden'}`}>
-                                            {['Type1', 'Type2', 'Type3'].map((wepType, j) => (
-                                                <li key={j}>{wepType}</li>
-                                            ))}{' '}
-                                        </ul>
-                                    </li>
-                                );
-                            })}
+                            {categories.map((category) => (
+                                <CategoryItem key={category} label={category}>
+                                    {['Type1', 'Type2', 'Type3'].map((wepType, j) => (
+                                        <li key={j}>{wepType}</li>
+                                    ))}
+                                </CategoryItem>
+                            ))}
                         </ul>
                         <SeparatingLine />
                         <ul className="grid grid-cols-2 items-center justify-center gap-2 text-center">
@@ -189,9 +178,9 @@ export default function QueriedProducts({ weapons, message }: Props) {
                         </div>
                     </form>
                 </div>
-                <div className="col-span-3 col-start-2 grid grid-cols-3 gap-8 text-xl">
+                <div className="col-span-3 col-start-2 grid h-fit grid-cols-3 content-start gap-8 text-xl">
                     {weapons.map((weapon, id) => (
-                        <Link className="group inline-block py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
+                        <Link className="group inline-block h-fit py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
                             <div className="flex scale-100 justify-center rounded-2xl border-2 px-44 py-40 transition-transform ease-out group-hover:scale-105">
                                 <div className="flex items-center justify-center">🖼️</div>
                             </div>
