@@ -2,6 +2,8 @@ import { Link, router } from '@inertiajs/react';
 import { useMemo, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
+import { MdNavigateNext } from 'react-icons/md';
+import SeparatingLine from './SeparatingLine';
 
 type Weapon = {
     id: number;
@@ -17,7 +19,7 @@ type Props = {
     message: string;
 };
 
-export default function QueriedProducts({ searchQuery, weapons, message }: Props) {
+export default function QueriedProducts({ weapons, message }: Props) {
     const formRef = useRef<HTMLFormElement | null>(null);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -71,7 +73,9 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
         <div className="mx-32">
             <div className="group">
                 <div className="grid grid-cols-[1fr_2fr_3fr_auto] items-center gap-16 py-8 text-xl">
-                    <span className="text-4xl font-extrabold">SOUSHA.KAZE</span>
+                    <span onClick={() => router.get(route('queried-products'))} className="cursor-pointer text-4xl font-extrabold">
+                        SOUSHA.KAZE
+                    </span>
                     <div className="flex justify-between">
                         <span>Shop</span>
                         <span>On Sale</span>
@@ -103,11 +107,27 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                     <div className="mb-8 h-0.5 w-11/12 bg-gray-300 text-center opacity-50 transition-[width_opacity] group-hover:w-full group-hover:opacity-100" />
                 </div>
             </div>
-            <div className="grid grid-cols-4 items-center justify-items-center gap-20">
+            <div className="grid grid-cols-4 justify-items-center gap-20">
                 <div className="col-span-1">
-                    <h1>{searchQuery}</h1>
-                    <h2>{message}</h2>
-                    <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5">
+                    {message && <h1 className="mb-8 text-5xl">'{message}'</h1>}
+                    <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5 flex flex-col gap-8">
+                        <ul className="flex flex-col justify-between gap-2">
+                            {['Up Close And Personal', 'Wick and Run', 'For COD Enjoyers', 'Yard Counters', 'Flex Throws'].map((category, index) => (
+                                <li className="flex -skew-x-12 items-center justify-between border-2 p-2" key={index}>
+                                    {category}
+                                    <MdNavigateNext />
+                                </li>
+                            ))}
+                        </ul>
+                        <SeparatingLine />
+                        <ul className="grid grid-cols-2 items-center justify-center gap-2 text-center">
+                            {['Electric', 'CO₂', 'Gas Blowback', 'Schreckschuss'].map((category, index) => (
+                                <li className="-skew-x-12 border-2 p-4" key={index}>
+                                    {category}
+                                </li>
+                            ))}
+                        </ul>
+                        <SeparatingLine />
                         <label>
                             Power Min:
                             <input type="number" name="powerMin" className="ml-2" defaultValue={1} />
@@ -125,7 +145,7 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                             Rate of Fire Max:
                             <input type="number" name="rofMax" className="ml-2" defaultValue={maxRof} />
                         </label>
-                        <br />
+                        <SeparatingLine />
                         <div>
                             <label htmlFor="weaponTypes">Weapon Types:</label>
                             <div style={{ marginLeft: '0.5rem' }}>
@@ -144,6 +164,7 @@ export default function QueriedProducts({ searchQuery, weapons, message }: Props
                                 ))}
                             </div>
                         </div>
+                        <br />
                         <div className="mt-2">
                             <button type="submit" className="btn">
                                 Apply

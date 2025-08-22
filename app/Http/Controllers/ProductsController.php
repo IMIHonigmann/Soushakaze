@@ -44,7 +44,7 @@ class ProductsController extends Controller
 
         return Inertia::render('QueriedProducts', [
             'weapons' => $weapons,
-            'message' => "Found {$count} product" . ($count !== 1 ? 's' : '') . " for the query with the weapon name: " . ($qWeaponName ? $qWeaponName : '')
+            'message' => $qWeaponName
         ]);
     }
 }
