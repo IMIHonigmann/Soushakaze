@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
 import { MdNavigateNext } from 'react-icons/md';
@@ -20,6 +20,11 @@ type Props = {
 };
 
 export default function QueriedProducts({ weapons, message }: Props) {
+    const categories = ['Up Close And Personal', 'Wick and Run', 'For COD Enjoyers', 'Yard Counters', 'Flex Throws'];
+    const [clickedCategories, setClickedCategories] = useState<Record<string, boolean>>(() =>
+        Object.fromEntries(categories.map((c) => [c, false] as const)),
+    );
+
     const formRef = useRef<HTMLFormElement | null>(null);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -112,17 +117,29 @@ export default function QueriedProducts({ weapons, message }: Props) {
                     {message && <h1 className="mb-8 text-5xl">'{message}'</h1>}
                     <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5 flex flex-col gap-8">
                         <ul className="flex flex-col justify-between gap-2">
-                            {['Up Close And Personal', 'Wick and Run', 'For COD Enjoyers', 'Yard Counters', 'Flex Throws'].map((category, index) => (
-                                <li className="flex -skew-x-12 items-center justify-between border-2 p-2" key={index}>
-                                    {category}
-                                    <MdNavigateNext />
-                                </li>
-                            ))}
+                            {categories.map((category, index) => {
+                                return (
+                                    <li onClick={() => setClickedCategories((prev) => ({ ...prev, [category]: !prev[category] }))} key={index}>
+                                        <div className="flex -skew-x-12 cursor-pointer items-center justify-between border-2 p-2">
+                                            {category}
+                                            <MdNavigateNext className={`${clickedCategories[category] ? 'rotate-90' : ''} transition-transform`} />
+                                        </div>
+                                        <ul className={`ml-4 ${clickedCategories[category] ? '' : 'hidden'}`}>
+                                            {['Type1', 'Type2', 'Type3'].map((wepType, j) => (
+                                                <li key={j}>{wepType}</li>
+                                            ))}{' '}
+                                        </ul>
+                                    </li>
+                                );
+                            })}
                         </ul>
                         <SeparatingLine />
                         <ul className="grid grid-cols-2 items-center justify-center gap-2 text-center">
                             {['Electric', 'CO₂', 'Gas Blowback', 'Schreckschuss'].map((category, index) => (
-                                <li className="-skew-x-12 border-2 p-4" key={index}>
+                                <li
+                                    className="translate-0 -skew-x-12 cursor-pointer border-2 p-4 transition-transform hover:-translate-1"
+                                    key={index}
+                                >
                                     {category}
                                 </li>
                             ))}
