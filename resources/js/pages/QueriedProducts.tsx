@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
 import { Range, getTrackBackground } from 'react-range';
@@ -74,6 +74,11 @@ export default function QueriedProducts({ weapons, message }: Props) {
 
     const [powerValues, setPowerValues] = useState([1, maxPower]);
     const [rofValues, setRofValues] = useState([1, maxRof]);
+
+    useEffect(() => {
+        setPowerValues([1, maxPower]);
+        setRofValues([1, maxRof]);
+    }, [maxPower, maxRof]);
 
     return (
         <div className="mx-32">
