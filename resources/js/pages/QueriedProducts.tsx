@@ -163,20 +163,21 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             <label>
                                 Min:
                                 <input
-                                    min={0}
-                                    max={powerValues[1] - POWER_MIN_DIFF}
                                     type="number"
+                                    className="no-arrows ml-2 inline-block w-3/4"
+                                    min={0}
                                     value={powerValues[0]}
-                                    onChange={(e) => setPowerValues([Number(e.target.value), powerValues[1]])}
+                                    onChange={(e) => handlePowerChange([Number(e.target.value), powerValues[1]])}
                                 />
                             </label>
                             <br />
                             <label>
                                 Max:
                                 <input
+                                    type="number"
+                                    className="no-arrows ml-2 inline-block w-3/4"
                                     min={powerValues[0] + POWER_MIN_DIFF}
                                     max={maxPower}
-                                    type="number"
                                     value={powerValues[1]}
                                     onChange={(e) => setPowerValues([powerValues[0], Number(e.target.value)])}
                                 />
@@ -227,10 +228,10 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 Min:
                                 <input
                                     type="number"
+                                    className="no-arrows ml-2 inline-block w-3/4"
                                     min={0}
-                                    max={rofValues[1] - ROF_MIN_DIFF}
                                     value={rofValues[0]}
-                                    onChange={(e) => setRofValues([Number(e.target.value), rofValues[1]])}
+                                    onChange={(e) => handleRofChange([Number(e.target.value), rofValues[1]])}
                                 />
                             </label>
                             <br />
@@ -238,6 +239,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 Max:
                                 <input
                                     type="number"
+                                    className="no-arrows ml-2 inline-block w-3/4"
                                     min={rofValues[0] + ROF_MIN_DIFF}
                                     max={maxRof}
                                     value={rofValues[1]}
