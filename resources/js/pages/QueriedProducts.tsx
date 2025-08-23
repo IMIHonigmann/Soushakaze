@@ -73,6 +73,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
     }, [weapons]);
 
     const [powerValues, setPowerValues] = useState([1, maxPower]);
+    const [rofValues, setRofValues] = useState([1, maxRof]);
 
     return (
         <div className="mx-32">
@@ -137,6 +138,12 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             ))}
                         </ul>
                         <SeparatingLine />
+                        <div className="mt-4">
+                            <label className="block text-5xl">Power:</label>
+                            <label>Min: {powerValues[0]}</label>
+                            <br />
+                            <label>Max: {powerValues[1]}</label>
+                        </div>
                         <Range
                             values={powerValues}
                             step={5}
@@ -146,7 +153,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             renderTrack={({ props, children }) => (
                                 <div
                                     {...props}
-                                    className="mt-5 h-2 w-full rounded bg-gray-200"
+                                    className="mt-2 h-2 w-full rounded bg-gray-200"
                                     style={{
                                         background: getTrackBackground({
                                             values: powerValues,
@@ -174,21 +181,51 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 </div>
                             )}
                         />
-
-                        <div className="mt-4 flex justify-between">
-                            <label>Power: {powerValues[0]}</label>
-                            <label>{powerValues[1]}</label>
+                        <SeparatingLine />
+                        <div className="mt-4">
+                            <label className="block text-5xl">Rate of Fire:</label>
+                            <label>Min: {rofValues[0]}</label>
+                            <br />
+                            <label>Max: {rofValues[1]}</label>
                         </div>
+                        <Range
+                            values={rofValues}
+                            step={5}
+                            min={0}
+                            max={maxRof}
+                            onChange={(values) => setRofValues(values)}
+                            renderTrack={({ props, children }) => (
+                                <div
+                                    {...props}
+                                    className="mt-2 h-2 w-full rounded bg-gray-200"
+                                    style={{
+                                        background: getTrackBackground({
+                                            values: rofValues,
+                                            colors: ['#ccc', '#4F46E5', '#ccc'],
+                                            min: 0,
+                                            max: maxRof,
+                                        }),
+                                    }}
+                                >
+                                    {children}
+                                </div>
+                            )}
+                            renderThumb={({ props, isDragged, index }) => (
+                                <div
+                                    {...props}
+                                    className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
+                                        isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
+                                    }`}
+                                >
+                                    <div
+                                        className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
+                                    >
+                                        {rofValues[index]}
+                                    </div>
+                                </div>
+                            )}
+                        />
 
-                        <br />
-                        <label>
-                            Rate of Fire Min:
-                            <input type="number" name="rofMin" className="ml-2" defaultValue={1} />
-                        </label>
-                        <label>
-                            Rate of Fire Max:
-                            <input type="number" name="rofMax" className="ml-2" defaultValue={maxRof} />
-                        </label>
                         <SeparatingLine />
                         <div>
                             <label htmlFor="weaponTypes">Weapon Types:</label>
