@@ -83,6 +83,18 @@ export default function QueriedProducts({ weapons, message }: Props) {
     const POWER_MIN_DIFF = 50;
     const ROF_MIN_DIFF = 10;
 
+    const handlePowerChange = (values: number[]) => {
+        const newMinValue = Math.max(0, Math.min(values[0], maxPower - POWER_MIN_DIFF));
+        const newMaxValue = Math.max(newMinValue + POWER_MIN_DIFF, Math.min(values[1], maxPower));
+        setPowerValues([newMinValue, newMaxValue]);
+    };
+
+    const handleRofChange = (values: number[]) => {
+        const newMinValue = Math.max(0, Math.min(values[0], maxRof - ROF_MIN_DIFF));
+        const newMaxValue = Math.max(newMinValue + ROF_MIN_DIFF, Math.min(values[1], maxRof));
+        setRofValues([newMinValue, newMaxValue]);
+    };
+
     return (
         <div className="mx-32">
             <div className="group">
@@ -155,7 +167,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     max={powerValues[1] - POWER_MIN_DIFF}
                                     type="number"
                                     value={powerValues[0]}
-                                    onChange={(e) => setPowerValues((p) => [Number(e.target.value), p[1]])}
+                                    onChange={(e) => setPowerValues([Number(e.target.value), powerValues[1]])}
                                 />
                             </label>
                             <br />
@@ -166,7 +178,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     max={maxPower}
                                     type="number"
                                     value={powerValues[1]}
-                                    onChange={(e) => setPowerValues((p) => [p[0], Number(e.target.value)])}
+                                    onChange={(e) => setPowerValues([powerValues[0], Number(e.target.value)])}
                                 />
                             </label>
                         </div>
@@ -175,11 +187,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             step={5}
                             min={0}
                             max={maxPower}
-                            onChange={(values) => {
-                                if (values[1] - values[0] > POWER_MIN_DIFF) {
-                                    setPowerValues(values);
-                                }
-                            }}
+                            onChange={handlePowerChange}
                             renderTrack={({ props, children }) => (
                                 <div
                                     {...props}
@@ -222,7 +230,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     min={0}
                                     max={rofValues[1] - ROF_MIN_DIFF}
                                     value={rofValues[0]}
-                                    onChange={(e) => setRofValues((p) => [Number(e.target.value), p[1]])}
+                                    onChange={(e) => setRofValues([Number(e.target.value), rofValues[1]])}
                                 />
                             </label>
                             <br />
@@ -233,7 +241,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     min={rofValues[0] + ROF_MIN_DIFF}
                                     max={maxRof}
                                     value={rofValues[1]}
-                                    onChange={(e) => setRofValues((p) => [p[0], Number(e.target.value)])}
+                                    onChange={(e) => setRofValues([rofValues[0], Number(e.target.value)])}
                                 />
                             </label>
                         </div>
@@ -243,11 +251,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             step={5}
                             min={0}
                             max={maxRof}
-                            onChange={(values) => {
-                                if (values[1] - values[0] > ROF_MIN_DIFF) {
-                                    setRofValues(values);
-                                }
-                            }}
+                            onChange={handleRofChange}
                             renderTrack={({ props, children }) => (
                                 <div
                                     {...props}
