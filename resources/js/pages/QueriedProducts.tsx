@@ -80,6 +80,9 @@ export default function QueriedProducts({ weapons, message }: Props) {
         setRofValues([1, maxRof]);
     }, [maxPower, maxRof]);
 
+    const POWER_MIN_DIFF = 50;
+    const ROF_MIN_DIFF = 10;
+
     return (
         <div className="mx-32">
             <div className="group">
@@ -145,16 +148,38 @@ export default function QueriedProducts({ weapons, message }: Props) {
                         <SeparatingLine />
                         <div className="mt-4">
                             <label className="block text-5xl">Power:</label>
-                            <label>Min: {powerValues[0]}</label>
+                            <label>
+                                Min:
+                                <input
+                                    min={0}
+                                    max={powerValues[1] - POWER_MIN_DIFF}
+                                    type="number"
+                                    value={powerValues[0]}
+                                    onChange={(e) => setPowerValues((p) => [Number(e.target.value), p[1]])}
+                                />
+                            </label>
                             <br />
-                            <label>Max: {powerValues[1]}</label>
+                            <label>
+                                Max:
+                                <input
+                                    min={powerValues[0] + POWER_MIN_DIFF}
+                                    max={maxPower}
+                                    type="number"
+                                    value={powerValues[1]}
+                                    onChange={(e) => setPowerValues((p) => [p[0], Number(e.target.value)])}
+                                />
+                            </label>
                         </div>
                         <Range
                             values={powerValues}
                             step={5}
                             min={0}
                             max={maxPower}
-                            onChange={(values) => setPowerValues(values)}
+                            onChange={(values) => {
+                                if (values[1] - values[0] > POWER_MIN_DIFF) {
+                                    setPowerValues(values);
+                                }
+                            }}
                             renderTrack={({ props, children }) => (
                                 <div
                                     {...props}
@@ -187,18 +212,42 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             )}
                         />
                         <SeparatingLine />
+
                         <div className="mt-4">
                             <label className="block text-5xl">Rate of Fire:</label>
-                            <label>Min: {rofValues[0]}</label>
+                            <label>
+                                Min:
+                                <input
+                                    type="number"
+                                    min={0}
+                                    max={rofValues[1] - ROF_MIN_DIFF}
+                                    value={rofValues[0]}
+                                    onChange={(e) => setRofValues((p) => [Number(e.target.value), p[1]])}
+                                />
+                            </label>
                             <br />
-                            <label>Max: {rofValues[1]}</label>
+                            <label>
+                                Max:
+                                <input
+                                    type="number"
+                                    min={rofValues[0] + ROF_MIN_DIFF}
+                                    max={maxRof}
+                                    value={rofValues[1]}
+                                    onChange={(e) => setRofValues((p) => [p[0], Number(e.target.value)])}
+                                />
+                            </label>
                         </div>
+
                         <Range
                             values={rofValues}
                             step={5}
                             min={0}
                             max={maxRof}
-                            onChange={(values) => setRofValues(values)}
+                            onChange={(values) => {
+                                if (values[1] - values[0] > ROF_MIN_DIFF) {
+                                    setRofValues(values);
+                                }
+                            }}
                             renderTrack={({ props, children }) => (
                                 <div
                                     {...props}
