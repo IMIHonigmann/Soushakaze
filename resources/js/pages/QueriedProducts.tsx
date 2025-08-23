@@ -1,7 +1,8 @@
 import { Link, router } from '@inertiajs/react';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
+import { Range, getTrackBackground } from 'react-range';
 import CategoryItem from './CategoryItem';
 import SeparatingLine from './SeparatingLine';
 
@@ -71,6 +72,8 @@ export default function QueriedProducts({ weapons, message }: Props) {
         };
     }, [weapons]);
 
+    const [powerValues, setPowerValues] = useState([1, maxPower]);
+
     return (
         <div className="mx-32">
             <div className="group">
@@ -134,14 +137,45 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             ))}
                         </ul>
                         <SeparatingLine />
-                        <label>
-                            Power Min:
-                            <input type="number" name="powerMin" className="ml-2" defaultValue={1} />
-                        </label>
-                        <label>
-                            Power Max:
-                            <input type="number" name="powerMax" className="ml-2" defaultValue={maxPower} />
-                        </label>
+                        <Range
+                            values={powerValues}
+                            step={5}
+                            min={0}
+                            max={maxPower}
+                            onChange={(values) => setPowerValues(values)}
+                            renderTrack={({ props, children }) => (
+                                <div
+                                    {...props}
+                                    className="mt-5 h-2 w-full rounded bg-gray-200"
+                                    style={{
+                                        background: getTrackBackground({
+                                            values: powerValues,
+                                            colors: ['#ccc', '#4F46E5', '#ccc'],
+                                            min: 0,
+                                            max: maxPower,
+                                        }),
+                                    }}
+                                >
+                                    {children}
+                                </div>
+                            )}
+                            renderThumb={({ props, isDragged, index }) => (
+                                <div
+                                    {...props}
+                                    className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
+                                        isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
+                                    }`}
+                                >
+                                    <div className="absolute -top-7 -left-2 text-xs">{powerValues[index]}</div>
+                                </div>
+                            )}
+                        />
+
+                        <div className="mt-4 flex justify-between">
+                            <label>Power: {powerValues[0]}</label>
+                            <label>{powerValues[1]}</label>
+                        </div>
+
                         <br />
                         <label>
                             Rate of Fire Min:

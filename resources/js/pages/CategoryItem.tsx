@@ -22,6 +22,7 @@ export default function CategoryItem({ label, children }: Props) {
     return (
         <li>
             <button
+                type="button"
                 className="flex w-full -skew-x-12 items-center justify-between border-2 p-2"
                 aria-expanded={open}
                 onClick={() => setOpen((p) => !p)}
@@ -33,7 +34,7 @@ export default function CategoryItem({ label, children }: Props) {
                 }}
             >
                 <span>{label}</span>
-                <MdNavigateNext className={`transition-transform ${open ? 'rotate-90' : ''}`} />
+                <MdNavigateNext className={`text-2xl transition-transform ${open ? 'rotate-90' : ''}`} />
             </button>
             <ul
                 ref={contentRef}
@@ -41,7 +42,7 @@ export default function CategoryItem({ label, children }: Props) {
                 style={{
                     height: open ? `${measuredHeight}px` : '0px',
                 }}
-                className={`ml-4 overflow-hidden transition-[height] duration-[220ms] ease-out`}
+                className={`-skew-x-12 overflow-hidden transition-all ${open ? 'border-2' : ''} transition-[height] duration-[220ms] ease-out`}
             >
                 {children}
             </ul>
