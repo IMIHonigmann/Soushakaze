@@ -158,135 +158,141 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             ))}
                         </ul>
                         <SeparatingLine />
-                        <div className="mt-4">
-                            <label className="block text-5xl">Power:</label>
-                            <label>
-                                Min:
-                                <input
-                                    type="number"
-                                    className="no-arrows ml-2 inline-block w-3/4"
+                        {maxPower > POWER_MIN_DIFF && (
+                            <>
+                                <div className="mt-4">
+                                    <label className="block text-5xl">Power:</label>
+                                    <label>
+                                        Min:
+                                        <input
+                                            type="number"
+                                            className="no-arrows ml-2 inline-block w-3/4"
+                                            min={0}
+                                            value={powerValues[0]}
+                                            onChange={(e) => handlePowerChange([Number(e.target.value), powerValues[1]])}
+                                        />
+                                    </label>
+                                    <br />
+                                    <label>
+                                        Max:
+                                        <input
+                                            type="number"
+                                            className="no-arrows ml-2 inline-block w-3/4"
+                                            min={powerValues[0] + POWER_MIN_DIFF}
+                                            max={maxPower}
+                                            value={powerValues[1]}
+                                            onChange={(e) => setPowerValues([powerValues[0], Number(e.target.value)])}
+                                        />
+                                    </label>
+                                </div>
+                                <Range
+                                    values={powerValues}
+                                    step={5}
                                     min={0}
-                                    value={powerValues[0]}
-                                    onChange={(e) => handlePowerChange([Number(e.target.value), powerValues[1]])}
-                                />
-                            </label>
-                            <br />
-                            <label>
-                                Max:
-                                <input
-                                    type="number"
-                                    className="no-arrows ml-2 inline-block w-3/4"
-                                    min={powerValues[0] + POWER_MIN_DIFF}
                                     max={maxPower}
-                                    value={powerValues[1]}
-                                    onChange={(e) => setPowerValues([powerValues[0], Number(e.target.value)])}
+                                    onChange={handlePowerChange}
+                                    renderTrack={({ props, children }) => (
+                                        <div
+                                            {...props}
+                                            className="mt-2 h-2 w-full rounded bg-gray-200"
+                                            style={{
+                                                background: getTrackBackground({
+                                                    values: powerValues,
+                                                    colors: ['#ccc', '#4F46E5', '#ccc'],
+                                                    min: 0,
+                                                    max: maxPower,
+                                                }),
+                                            }}
+                                        >
+                                            {children}
+                                        </div>
+                                    )}
+                                    renderThumb={({ props, isDragged, index }) => (
+                                        <div
+                                            {...props}
+                                            className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
+                                                isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
+                                            }`}
+                                        >
+                                            <div
+                                                className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
+                                            >
+                                                {powerValues[index]}
+                                            </div>
+                                        </div>
+                                    )}
                                 />
-                            </label>
-                        </div>
-                        <Range
-                            values={powerValues}
-                            step={5}
-                            min={0}
-                            max={maxPower}
-                            onChange={handlePowerChange}
-                            renderTrack={({ props, children }) => (
-                                <div
-                                    {...props}
-                                    className="mt-2 h-2 w-full rounded bg-gray-200"
-                                    style={{
-                                        background: getTrackBackground({
-                                            values: powerValues,
-                                            colors: ['#ccc', '#4F46E5', '#ccc'],
-                                            min: 0,
-                                            max: maxPower,
-                                        }),
-                                    }}
-                                >
-                                    {children}
+                                <SeparatingLine />
+                            </>
+                        )}
+                        {maxRof > ROF_MIN_DIFF && (
+                            <>
+                                <div className="mt-4">
+                                    <label className="block text-5xl">Rate of Fire:</label>
+                                    <label>
+                                        Min:
+                                        <input
+                                            type="number"
+                                            className="no-arrows ml-2 inline-block w-3/4"
+                                            min={0}
+                                            value={rofValues[0]}
+                                            onChange={(e) => handleRofChange([Number(e.target.value), rofValues[1]])}
+                                        />
+                                    </label>
+                                    <br />
+                                    <label>
+                                        Max:
+                                        <input
+                                            type="number"
+                                            className="no-arrows ml-2 inline-block w-3/4"
+                                            min={rofValues[0] + ROF_MIN_DIFF}
+                                            max={maxRof}
+                                            value={rofValues[1]}
+                                            onChange={(e) => setRofValues([rofValues[0], Number(e.target.value)])}
+                                        />
+                                    </label>
                                 </div>
-                            )}
-                            renderThumb={({ props, isDragged, index }) => (
-                                <div
-                                    {...props}
-                                    className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
-                                        isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
-                                    }`}
-                                >
-                                    <div
-                                        className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
-                                    >
-                                        {powerValues[index]}
-                                    </div>
-                                </div>
-                            )}
-                        />
-                        <SeparatingLine />
 
-                        <div className="mt-4">
-                            <label className="block text-5xl">Rate of Fire:</label>
-                            <label>
-                                Min:
-                                <input
-                                    type="number"
-                                    className="no-arrows ml-2 inline-block w-3/4"
+                                <Range
+                                    values={rofValues}
+                                    step={5}
                                     min={0}
-                                    value={rofValues[0]}
-                                    onChange={(e) => handleRofChange([Number(e.target.value), rofValues[1]])}
-                                />
-                            </label>
-                            <br />
-                            <label>
-                                Max:
-                                <input
-                                    type="number"
-                                    className="no-arrows ml-2 inline-block w-3/4"
-                                    min={rofValues[0] + ROF_MIN_DIFF}
                                     max={maxRof}
-                                    value={rofValues[1]}
-                                    onChange={(e) => setRofValues([rofValues[0], Number(e.target.value)])}
+                                    onChange={handleRofChange}
+                                    renderTrack={({ props, children }) => (
+                                        <div
+                                            {...props}
+                                            className="mt-2 h-2 w-full rounded bg-gray-200"
+                                            style={{
+                                                background: getTrackBackground({
+                                                    values: rofValues,
+                                                    colors: ['#ccc', '#4F46E5', '#ccc'],
+                                                    min: 0,
+                                                    max: maxRof,
+                                                }),
+                                            }}
+                                        >
+                                            {children}
+                                        </div>
+                                    )}
+                                    renderThumb={({ props, isDragged, index }) => (
+                                        <div
+                                            {...props}
+                                            className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
+                                                isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
+                                            }`}
+                                        >
+                                            <div
+                                                className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
+                                            >
+                                                {rofValues[index]}
+                                            </div>
+                                        </div>
+                                    )}
                                 />
-                            </label>
-                        </div>
-
-                        <Range
-                            values={rofValues}
-                            step={5}
-                            min={0}
-                            max={maxRof}
-                            onChange={handleRofChange}
-                            renderTrack={({ props, children }) => (
-                                <div
-                                    {...props}
-                                    className="mt-2 h-2 w-full rounded bg-gray-200"
-                                    style={{
-                                        background: getTrackBackground({
-                                            values: rofValues,
-                                            colors: ['#ccc', '#4F46E5', '#ccc'],
-                                            min: 0,
-                                            max: maxRof,
-                                        }),
-                                    }}
-                                >
-                                    {children}
-                                </div>
-                            )}
-                            renderThumb={({ props, isDragged, index }) => (
-                                <div
-                                    {...props}
-                                    className={`h-5 w-5 rounded-full bg-white transition-shadow focus:outline-none ${
-                                        isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
-                                    }`}
-                                >
-                                    <div
-                                        className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
-                                    >
-                                        {rofValues[index]}
-                                    </div>
-                                </div>
-                            )}
-                        />
-
-                        <SeparatingLine />
+                                <SeparatingLine />
+                            </>
+                        )}
                         <div>
                             <label htmlFor="weaponTypes">Weapon Types:</label>
                             <div style={{ marginLeft: '0.5rem' }}>
