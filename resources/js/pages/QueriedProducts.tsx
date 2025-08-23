@@ -166,7 +166,11 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                         isDragged ? 'shadow-[0_0_12px_5px_rgba(79,70,229,0.8)]' : 'shadow-[0_0_8px_3px_rgba(79,70,229,0.6)]'
                                     }`}
                                 >
-                                    <div className="absolute -top-7 -left-2 text-xs">{powerValues[index]}</div>
+                                    <div
+                                        className={`absolute -top-7 -left-2 text-xs transition-transform ${isDragged ? 'scale-100' : 'translate-x-1 translate-y-2 scale-0'}`}
+                                    >
+                                        {powerValues[index]}
+                                    </div>
                                 </div>
                             )}
                         />
