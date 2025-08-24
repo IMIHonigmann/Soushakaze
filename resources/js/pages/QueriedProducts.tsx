@@ -4,7 +4,6 @@ import { FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
 import { Range, getTrackBackground } from 'react-range';
 import CategoryItem from './CategoryItem';
-import SeparatingLine from './SeparatingLine';
 
 type Weapon = {
     id: number;
@@ -136,7 +135,11 @@ export default function QueriedProducts({ weapons, message }: Props) {
             <div className="grid grid-cols-4 justify-items-center gap-20">
                 <div className="col-span-1">
                     {message && <h1 className="mb-8 text-5xl">'{message}'</h1>}
-                    <form ref={formRef} onSubmit={handleSubmit} className="mb-0.5 flex flex-col gap-8">
+                    <form
+                        ref={formRef}
+                        onSubmit={handleSubmit}
+                        className="mb-0.5 flex flex-col [&>*]:py-10 [&>*]:transition-all [&>*+*]:border-t-2 [&>*:hover]:border-dashed [&>*:hover]:border-t-blue-400 [&>*:hover]:py-12 [&>*:hover+*]:border-dashed [&>*:hover+*]:border-t-blue-400"
+                    >
                         <ul className="flex flex-col justify-between gap-2">
                             {categories.map((category) => (
                                 <CategoryItem key={category} label={category}>
@@ -146,7 +149,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 </CategoryItem>
                             ))}
                         </ul>
-                        <SeparatingLine />
+
                         <ul className="grid grid-cols-2 items-center justify-center gap-2 text-center">
                             {['Electric', 'CO₂', 'Gas Blowback', 'Schreckschuss'].map((category, index) => (
                                 <li
@@ -157,9 +160,9 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 </li>
                             ))}
                         </ul>
-                        <SeparatingLine />
+
                         {maxPower > POWER_MIN_DIFF && (
-                            <>
+                            <div>
                                 <div className="mt-4">
                                     <label className="block text-5xl">Power:</label>
                                     <label>
@@ -194,7 +197,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     renderTrack={({ props, children }) => (
                                         <div
                                             {...props}
-                                            className="mt-2 h-2 w-full rounded bg-gray-200"
+                                            className="mt-10 h-2 w-full rounded bg-gray-200"
                                             style={{
                                                 background: getTrackBackground({
                                                     values: powerValues,
@@ -222,11 +225,10 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                         </div>
                                     )}
                                 />
-                                <SeparatingLine />
-                            </>
+                            </div>
                         )}
                         {maxRof > ROF_MIN_DIFF && (
-                            <>
+                            <div>
                                 <div className="mt-4">
                                     <label className="block text-5xl">Rate of Fire:</label>
                                     <label>
@@ -262,7 +264,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     renderTrack={({ props, children }) => (
                                         <div
                                             {...props}
-                                            className="mt-2 h-2 w-full rounded bg-gray-200"
+                                            className="mt-10 h-2 w-full rounded bg-gray-200"
                                             style={{
                                                 background: getTrackBackground({
                                                     values: rofValues,
@@ -290,8 +292,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                         </div>
                                     )}
                                 />
-                                <SeparatingLine />
-                            </>
+                            </div>
                         )}
                         <div>
                             <label htmlFor="weaponTypes">Weapon Types:</label>
@@ -311,7 +312,6 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 ))}
                             </div>
                         </div>
-                        <br />
                         <div className="mt-2">
                             <button type="submit" className="btn">
                                 Apply
