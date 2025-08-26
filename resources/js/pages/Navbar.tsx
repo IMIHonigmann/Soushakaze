@@ -1,3 +1,4 @@
+import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
 import { RefObject, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
@@ -8,6 +9,7 @@ type Props = {
 };
 export default function Navbar({ formRef }: Props) {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const cart = useCartStore((state) => state.cart);
 
     function getQueriedRoute() {
         if (formRef) {
@@ -53,8 +55,18 @@ export default function Navbar({ formRef }: Props) {
                     />
                 </div>
                 <div className="flex justify-between gap-6">
-                    <FaCartShopping />
                     <FaUser />
+                    <span
+                        className="relative scale-100 cursor-pointer transition-[transform_colors] ease-out hover:scale-125 hover:text-lime-500"
+                        onClick={() => router.get(route('cart'))}
+                    >
+                        <FaCartShopping className="text-2xl" />
+                        {cart.length > 0 && (
+                            <span className="absolute -right-2.5 -bottom-2.5 flex h-5 w-5 -skew-x-12 items-center justify-center bg-red-500 text-xl text-white">
+                                {cart.length}
+                            </span>
+                        )}
+                    </span>
                 </div>
             </div>
             <div className="flex justify-center">
