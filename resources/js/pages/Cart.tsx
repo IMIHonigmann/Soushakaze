@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import Navbar from './Navbar';
 
 type CartItem = { weaponId: number; weaponName: string; selectedAttachments: Record<string, number> };
 
@@ -18,32 +19,40 @@ export default function Cart() {
 
     return (
         <>
-            {cartArray.length > 0 ? (
-                <>
-                    {cartArray.map((item, idx) => (
-                        <div key={idx}>
-                            {item.weaponName} <br />
-                            {Object.entries(item.selectedAttachments).map(([area, id]) => (
-                                <div key={area}>
-                                    {area}: {id}
-                                </div>
-                            ))}
-                            <br />
-                        </div>
-                    ))}
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem('cart');
-                            setCartArray([]);
-                        }}
-                    >
-                        {' '}
-                        Delete all elements from cart
-                    </button>
-                </>
-            ) : (
-                <div className="flex h-full min-h-screen items-center justify-center">Cart is empty</div>
-            )}
+            <div className="mx-32">
+                <Navbar />
+                <div className="grid min-h-[100svh] w-full grid-cols-2 justify-center gap-8">
+                    <div className="flex flex-col">
+                        {cartArray.length > 0 ? (
+                            <>
+                                {cartArray.map((item, idx) => (
+                                    <div key={idx}>
+                                        {item.weaponName} <br />
+                                        {Object.entries(item.selectedAttachments).map(([area, id]) => (
+                                            <div key={area}>
+                                                {area}: {id}
+                                            </div>
+                                        ))}
+                                        <br />
+                                    </div>
+                                ))}
+                                <button
+                                    onClick={() => {
+                                        localStorage.removeItem('cart');
+                                        setCartArray([]);
+                                    }}
+                                >
+                                    {' '}
+                                    Delete all elements from cart
+                                </button>
+                            </>
+                        ) : (
+                            <div className="flex h-full min-h-screen items-center justify-center">Cart is empty</div>
+                        )}
+                    </div>
+                    <div>Checkoutstuff</div>
+                </div>
+            </div>
             <br />
             <button
                 onClick={async () => {
