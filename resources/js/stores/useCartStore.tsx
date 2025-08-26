@@ -9,12 +9,20 @@ interface CartState {
 }
 
 export const useCartStore = create<CartState>((set) => ({
-    cart: [],
-    setCart: (newCart: CartItem[]) => set({ cart: newCart }),
+    cart: (() => {
+        const stored = localStorage.getItem('cart');
+        const parsedCart: CartItem[] = stored ? JSON.parse(stored) : [];
+        return parsedCart;
+    })(),
+    setCart: (newCart: CartItem[]) =>
+        set(() => {
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            return { cart: newCart };
+        }),
     addToCart: (newItem: CartItem) =>
         set((state) => {
             const newCart = [...state.cart, newItem];
-
+            localStorage.setItem('cart', JSON.stringify(newCart));
             return { cart: newCart };
         }),
 }));
