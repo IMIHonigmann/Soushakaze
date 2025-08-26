@@ -18,7 +18,7 @@ export const useCustomizerStore = create<CustomizerState>((set) => ({
         })),
     setCurrentAreaSelection: (area) => set({ currentAreaSelection: area }),
     initializeSelections: (grouped) =>
-        set((state) => {
+        set(() => {
             const initial: Record<string, number> = {};
             Object.entries(grouped).forEach(([area, attachments]) => {
                 // Default to first attachment's id in each area

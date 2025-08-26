@@ -1,3 +1,4 @@
+import { useCartStore } from '@/stores/useCartStore';
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
@@ -29,6 +30,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
     }, {});
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
+    const { addToCart } = useCartStore((state) => state);
 
     useEffect(() => {
         initializeSelections(grouped);
@@ -64,13 +66,6 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         if (currentAreaSelection === 'other') return;
         setCameraControls(target, position);
     }, [currentAreaSelection, setCameraControls]);
-
-    function addToCart(): void {
-        const localCartString = localStorage.getItem('cart');
-        const cartArray = localCartString ? JSON.parse(localCartString) : [];
-        cartArray.push({ weaponId, weaponName, selectedAttachments: { ...selected } });
-        localStorage.setItem('cart', JSON.stringify(cartArray));
-    }
 
     return (
         <>
@@ -117,7 +112,11 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                         </div>
                     ))}
                 </div>
-                <Link className="cursor-pointer" onClick={() => addToCart()} href={route('cart')}>
+                <Link
+                    className="cursor-pointer"
+                    onClick={() => addToCart({ weaponId, weaponName, selectedAttachments: { ...selected } })}
+                    href={route('cart')}
+                >
                     ADD TO CART
                 </Link>
             </div>
