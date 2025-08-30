@@ -38,6 +38,9 @@ Route::post('placeOrder', function (Request $request) {
     foreach ($customizedWeapons as $weapon) {
         $weaponId = $weapon['weapon_id'];
         $attachmentIds = $weapon['attachment_ids'];
+        $quantity = $weapon['quantity'];
+        error_log('quantity: ' . $quantity);
+
         $customWeaponId = Str::uuid()->toString();
         foreach ($attachmentIds as $attachmentId) {
             $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;

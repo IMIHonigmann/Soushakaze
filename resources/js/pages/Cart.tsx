@@ -1,5 +1,6 @@
 import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
+import { useRef } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
@@ -7,11 +8,12 @@ import Navbar from './Navbar';
 
 export default function Cart() {
     const { cart, setCart } = useCartStore((state) => state);
+    const cartRef = useRef(cart);
 
-    const weaponIdAttachments: { weapon_id: number; attachment_ids: number[] }[] = [];
+    const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
     for (let i = 0; i < cart.length; i++) {
         const attachmentIds = cart[i]?.selectedAttachments ? Object.values(cart[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: cart[i].weaponId, attachment_ids: attachmentIds });
+        weaponIdAttachments.push({ weapon_id: cart[i].weaponId, attachment_ids: attachmentIds, quantity: cart[i].quantity });
     }
 
     function placeOrder() {
@@ -53,9 +55,18 @@ export default function Cart() {
                                             </div>
                                             <div className="ml-auto flex items-center gap-4 text-xl">
                                                 <div className="relative flex self-start border-2 shadow-sm">
-                                                    <select className="cursor-pointer appearance-none bg-transparent py-4 pr-20 pl-5 outline-none hover:bg-gray-900">
+                                                    <select
+                                                        value={item.quantity || 1}
+                                                        onChange={(e) => {
+                                                            cartRef.current[idx].quantity = parseInt(e.target.value);
+                                                            setCart(cartRef.current);
+                                                        }}
+                                                        className="cursor-pointer appearance-none bg-transparent py-4 pr-20 pl-5 outline-none hover:bg-gray-900"
+                                                    >
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                            <option value={num}>{num}</option>
+                                                            <option onClick={() => (cart[idx].quantity = num)} value={num}>
+                                                                {num}
+                                                            </option>
                                                         ))}
                                                     </select>
                                                     <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-2xl">

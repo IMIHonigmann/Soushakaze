@@ -114,7 +114,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 </div>
                 <Link
                     className="cursor-pointer"
-                    onClick={() => addToCart({ weaponId, weaponName, selectedAttachments: { ...selected } })}
+                    onClick={() => addToCart({ weaponId, weaponName, selectedAttachments: { ...selected }, quantity: 1 })}
                     href={route('cart')}
                 >
                     ADD TO CART

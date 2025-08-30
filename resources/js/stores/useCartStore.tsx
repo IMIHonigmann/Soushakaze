@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type CartItem = { weaponId: number; weaponName: string; selectedAttachments: Record<string, number> };
+export type CartItem = { weaponId: number; weaponName: string; selectedAttachments: Record<string, number>; quantity: number };
 
 interface CartState {
     cart: CartItem[];
