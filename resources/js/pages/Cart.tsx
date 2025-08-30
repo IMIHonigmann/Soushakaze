@@ -1,5 +1,6 @@
 import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
+import { FaChevronDown } from 'react-icons/fa';
 import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
 import Navbar from './Navbar';
@@ -50,12 +51,17 @@ export default function Cart() {
                                                     <button className="mt-6 hover:underline">Move to wishlist</button>
                                                 </div>
                                             </div>
-                                            <div className="ml-auto flex gap-4 text-2xl">
-                                                <select className="inline-flex items-center gap-16 self-start border-2 px-5 py-3">
-                                                    {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                        <option value={num}>{num}</option>
-                                                    ))}
-                                                </select>
+                                            <div className="ml-auto flex items-center gap-4 text-xl">
+                                                <div className="relative flex self-start border-2 shadow-sm">
+                                                    <select className="cursor-pointer appearance-none bg-transparent py-4 pr-20 pl-5 outline-none hover:bg-gray-900">
+                                                        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                            <option value={num}>{num}</option>
+                                                        ))}
+                                                    </select>
+                                                    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-2xl">
+                                                        <FaChevronDown className="" />
+                                                    </div>
+                                                </div>
                                                 <span className="self-start p-2 hover:bg-zinc-900">
                                                     <RxCross1 className="text-3xl" />
                                                 </span>
