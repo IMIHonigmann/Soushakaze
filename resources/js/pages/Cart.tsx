@@ -1,6 +1,5 @@
 import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
-import { FaChevronDown } from 'react-icons/fa';
 import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
 import Navbar from './Navbar';
@@ -52,10 +51,11 @@ export default function Cart() {
                                                 </div>
                                             </div>
                                             <div className="ml-auto flex gap-4 text-2xl">
-                                                <span className="inline-flex items-center gap-16 self-start border-2 px-5 py-3">
-                                                    <span>1</span>
-                                                    <FaChevronDown className="text-xl" />
-                                                </span>
+                                                <select className="inline-flex items-center gap-16 self-start border-2 px-5 py-3">
+                                                    {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                                                        <option value={num}>{num}</option>
+                                                    ))}
+                                                </select>
                                                 <span className="self-start p-2 hover:bg-zinc-900">
                                                     <RxCross1 className="text-3xl" />
                                                 </span>
@@ -68,7 +68,7 @@ export default function Cart() {
                                 <div className="flex h-full min-h-screen items-center justify-center">Cart is empty</div>
                             )}
                         </div>
-                        <div className="self-start bg-zinc-900 p-6 text-center">
+                        <div className="sticky top-10 self-start bg-zinc-900 p-6 text-center">
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
                             aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
                             aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
