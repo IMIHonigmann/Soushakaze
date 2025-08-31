@@ -6,6 +6,7 @@ interface CartState {
     cart: CartItem[];
     addToCart: (newItem: CartItem) => void;
     setCart: (newCart: CartItem[]) => void;
+    deleteFromCart: (index: number) => void;
 }
 
 export const useCartStore = create<CartState>((set) => ({
@@ -22,6 +23,13 @@ export const useCartStore = create<CartState>((set) => ({
     addToCart: (newItem: CartItem) =>
         set((state) => {
             const newCart = [...state.cart, newItem];
+            localStorage.setItem('cart', JSON.stringify(newCart));
+            return { cart: newCart };
+        }),
+    deleteFromCart: (index: number) =>
+        set((state) => {
+            const newCart = [...state.cart];
+            newCart.splice(index, 1);
             localStorage.setItem('cart', JSON.stringify(newCart));
             return { cart: newCart };
         }),

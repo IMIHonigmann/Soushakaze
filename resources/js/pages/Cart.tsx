@@ -1,14 +1,12 @@
 import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
-import { useRef } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
 import Navbar from './Navbar';
 
 export default function Cart() {
-    const { cart, setCart } = useCartStore((state) => state);
-    const cartRef = useRef(cart);
+    const { cart, setCart, deleteFromCart } = useCartStore((state) => state);
 
     const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
     for (let i = 0; i < cart.length; i++) {
@@ -58,8 +56,9 @@ export default function Cart() {
                                                     <select
                                                         value={item.quantity || 1}
                                                         onChange={(e) => {
-                                                            cartRef.current[idx].quantity = parseInt(e.target.value);
-                                                            setCart(cartRef.current);
+                                                            const updatedCart = [...cart];
+                                                            updatedCart[idx].quantity = parseInt(e.target.value);
+                                                            setCart(updatedCart);
                                                         }}
                                                         className="cursor-pointer appearance-none bg-transparent py-4 pr-20 pl-5 outline-none hover:bg-gray-900"
                                                     >
@@ -74,7 +73,7 @@ export default function Cart() {
                                                     </div>
                                                 </div>
                                                 <span className="self-start p-2 hover:bg-zinc-900">
-                                                    <RxCross1 className="text-3xl" />
+                                                    <RxCross1 onClick={() => deleteFromCart(idx)} className="cursor-pointer text-3xl" />
                                                 </span>
                                             </div>
                                         </div>
