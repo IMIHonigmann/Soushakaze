@@ -1,6 +1,7 @@
+import { UUID } from 'crypto';
 import { create } from 'zustand';
 
-export type CartItem = { weaponId: number; weaponName: string; selectedAttachments: Record<string, number>; quantity: number };
+export type CartItem = { uuid: UUID; weaponId: number; weaponName: string; selectedAttachments: Record<string, number>; quantity: number };
 
 interface CartState {
     cart: CartItem[];

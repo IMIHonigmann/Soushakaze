@@ -1,5 +1,6 @@
 import { useCartStore } from '@/stores/useCartStore';
 import { router } from '@inertiajs/react';
+import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
@@ -7,6 +8,7 @@ import Navbar from './Navbar';
 
 export default function Cart() {
     const { cart, setCart, deleteFromCart } = useCartStore((state) => state);
+    const [deletingItems, setDeletingItems] = useState<Record<string, boolean>>({});
 
     const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
     for (let i = 0; i < cart.length; i++) {
@@ -38,7 +40,7 @@ export default function Cart() {
                             {cart.length > 0 ? (
                                 <>
                                     {cart.map((item, idx) => (
-                                        <div key={idx} className="flex gap-8 p-12">
+                                        <div key={item.uuid} className={`flex gap-8 p-12 ${deletingItems[item.uuid] ? 'animate-scale-inward' : ''}`}>
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
                                                 <div>
@@ -72,8 +74,17 @@ export default function Cart() {
                                                         <FaChevronDown className="" />
                                                     </div>
                                                 </div>
-                                                <span className="self-start p-2 hover:bg-zinc-900">
-                                                    <RxCross1 onClick={() => deleteFromCart(idx)} className="cursor-pointer text-3xl" />
+                                                <span
+                                                    onClick={() => {
+                                                        setDeletingItems((prev) => ({ ...prev, [item.uuid]: true }));
+                                                        setTimeout(() => {
+                                                            setDeletingItems((prev) => ({ ...prev, [item.uuid]: false }));
+                                                            deleteFromCart(idx);
+                                                        }, 500);
+                                                    }}
+                                                    className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
+                                                >
+                                                    <RxCross1 />
                                                 </span>
                                             </div>
                                         </div>
