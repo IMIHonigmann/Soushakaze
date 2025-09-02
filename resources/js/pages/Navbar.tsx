@@ -1,4 +1,4 @@
-import { useCartStore } from '@/stores/useCartStore';
+import { useCartStore } from '@/stores/bagStores';
 import { router } from '@inertiajs/react';
 import { RefObject, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
@@ -9,7 +9,7 @@ type Props = {
 };
 export default function Navbar({ formRef }: Props) {
     const searchInputRef = useRef<HTMLInputElement | null>(null);
-    const cart = useCartStore((state) => state.cart);
+    const cart = useCartStore((state) => state.bag);
 
     function getQueriedRoute() {
         if (formRef) {

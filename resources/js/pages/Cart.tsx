@@ -1,4 +1,4 @@
-import { useCartStore } from '@/stores/useCartStore';
+import { useCartStore } from '@/stores/bagStores';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
@@ -6,14 +6,14 @@ import { GiAmmoBox } from 'react-icons/gi';
 import { RxCross1 } from 'react-icons/rx';
 import Navbar from './Navbar';
 
-export default function Cart() {
-    const { cart, setCart, deleteFromCart } = useCartStore((state) => state);
+export default function Bag() {
+    const { bag, setBag, deleteFromBag } = useCartStore((state) => state);
     const [deletingItems, setDeletingItems] = useState<Record<string, boolean>>({});
 
     const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
-    for (let i = 0; i < cart.length; i++) {
-        const attachmentIds = cart[i]?.selectedAttachments ? Object.values(cart[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: cart[i].weaponId, attachment_ids: attachmentIds, quantity: cart[i].quantity });
+    for (let i = 0; i < bag.length; i++) {
+        const attachmentIds = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
+        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachment_ids: attachmentIds, quantity: bag[i].quantity });
     }
 
     function placeOrder() {
@@ -25,7 +25,7 @@ export default function Cart() {
             <div className="mx-32">
                 <Navbar />
                 <div className="mx-32">
-                    <div className="my-8 text-5xl font-extrabold">Your cart ({cart.length} Items)</div>
+                    <div className="my-8 text-5xl font-extrabold">Your bag ({bag.length} Items)</div>
                     <div className="flex gap-4">
                         <GiAmmoBox className="text-4xl" />
                         <div className="flex flex-col justify-start py-1 text-xl">
@@ -37,9 +37,9 @@ export default function Cart() {
                     </div>
                     <div className="grid min-h-[100svh] w-full grid-cols-[3fr_1fr] gap-20">
                         <div className="flex flex-col divide-y-2">
-                            {cart.length > 0 ? (
+                            {bag.length > 0 ? (
                                 <>
-                                    {cart.map((item, idx) => (
+                                    {bag.map((item, idx) => (
                                         <div key={item.uuid} className={`flex gap-8 p-12 ${deletingItems[item.uuid] ? 'animate-scale-inward' : ''}`}>
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
@@ -58,14 +58,14 @@ export default function Cart() {
                                                     <select
                                                         value={item.quantity || 1}
                                                         onChange={(e) => {
-                                                            const updatedCart = [...cart];
-                                                            updatedCart[idx].quantity = parseInt(e.target.value);
-                                                            setCart(updatedCart);
+                                                            const updatedBag = [...bag];
+                                                            updatedBag[idx].quantity = parseInt(e.target.value);
+                                                            setBag(updatedBag);
                                                         }}
                                                         className="cursor-pointer appearance-none bg-transparent py-4 pr-20 pl-5 outline-none hover:bg-gray-900"
                                                     >
                                                         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                                                            <option onClick={() => (cart[idx].quantity = num)} value={num}>
+                                                            <option onClick={() => (bag[idx].quantity = num)} value={num}>
                                                                 {num}
                                                             </option>
                                                         ))}
@@ -77,7 +77,7 @@ export default function Cart() {
                                                 <span
                                                     onClick={() => {
                                                         setDeletingItems((prev) => ({ ...prev, [item.uuid]: true }));
-                                                        setTimeout(() => deleteFromCart(idx), 500);
+                                                        setTimeout(() => deleteFromBag(idx), 500);
                                                     }}
                                                     className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
                                                 >
@@ -86,10 +86,10 @@ export default function Cart() {
                                             </div>
                                         </div>
                                     ))}
-                                    <button onClick={() => setCart([])}> Delete all elements from cart</button>
+                                    <button onClick={() => setBag([])}> Delete all elements from bag</button>
                                 </>
                             ) : (
-                                <div className="flex h-full min-h-screen items-center justify-center">Cart is empty</div>
+                                <div className="flex h-full min-h-screen items-center justify-center">Bag is empty</div>
                             )}
                         </div>
                         <div className="sticky top-10 self-start bg-zinc-900 p-6 text-center">
@@ -106,10 +106,10 @@ export default function Cart() {
             <br />
             <button
                 onClick={async () => {
-                    if (cart.length === 0) return;
+                    if (bag.length === 0) return;
                     placeOrder();
                 }}
-                disabled={cart.length === 0}
+                disabled={bag.length === 0}
                 className="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
             >
                 Checkout

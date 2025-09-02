@@ -1,4 +1,4 @@
-import { useCartStore } from '@/stores/useCartStore';
+import { useCartStore } from '@/stores/bagStores';
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
@@ -30,7 +30,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
     }, {});
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
-    const { addToCart } = useCartStore((state) => state);
+    const { addToBag } = useCartStore((state) => state);
 
     useEffect(() => {
         initializeSelections(grouped);
@@ -115,7 +115,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 <Link
                     className="cursor-pointer"
                     onClick={() =>
-                        addToCart({
+                        addToBag({
                             uuid: crypto.randomUUID(),
                             weaponId,
                             weaponName,
