@@ -77,10 +77,7 @@ export default function Cart() {
                                                 <span
                                                     onClick={() => {
                                                         setDeletingItems((prev) => ({ ...prev, [item.uuid]: true }));
-                                                        setTimeout(() => {
-                                                            setDeletingItems((prev) => ({ ...prev, [item.uuid]: false }));
-                                                            deleteFromCart(idx);
-                                                        }, 500);
+                                                        setTimeout(() => deleteFromCart(idx), 500);
                                                     }}
                                                     className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
                                                 >
