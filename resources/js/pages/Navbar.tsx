@@ -1,15 +1,17 @@
-import { useCartStore } from '@/stores/bagStores';
+import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { router } from '@inertiajs/react';
 import { RefObject, useRef } from 'react';
-import { FaSearch } from 'react-icons/fa';
+import { FaRegBookmark, FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
+import { VisualBag } from './VisualBag';
 
 type Props = {
     formRef?: RefObject<HTMLFormElement | null>;
 };
 export default function Navbar({ formRef }: Props) {
-    const searchInputRef = useRef<HTMLInputElement | null>(null);
     const cart = useCartStore((state) => state.bag);
+    const wishlist = useWishlistStore((state) => state.bag);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
 
     function getQueriedRoute() {
         if (formRef) {
@@ -56,17 +58,12 @@ export default function Navbar({ formRef }: Props) {
                 </div>
                 <div className="flex justify-between gap-6">
                     <FaUser />
-                    <span
-                        className="relative scale-100 cursor-pointer transition-[transform_colors] ease-out hover:scale-125 hover:text-lime-500"
-                        onClick={() => router.get(route('cart'))}
-                    >
+                    <VisualBag bag={cart} routeName={'cart'}>
                         <FaCartShopping className="text-2xl" />
-                        {cart.length > 0 && (
-                            <span className="absolute -right-2.5 -bottom-2.5 flex h-5 w-5 -skew-x-12 items-center justify-center bg-red-500 text-xl text-white">
-                                {cart.length}
-                            </span>
-                        )}
-                    </span>
+                    </VisualBag>
+                    <VisualBag bag={wishlist} routeName={'wishlist'}>
+                        <FaRegBookmark className="text-2xl" />
+                    </VisualBag>
                 </div>
             </div>
             <div className="flex justify-center">
