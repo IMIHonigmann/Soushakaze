@@ -32,6 +32,17 @@ export default function Bag() {
                             <div className="items-center">
                                 <p> Bag shipped by Soushakaze</p>
                                 <p className="font-extrabold">Tue, 02/09 - Wed, 03/09</p>
+                                <div className="mt-4"></div>
+                                <div className="gap-2 [&>*>*]:mr-5">
+                                    <div>
+                                        <input type="radio" name="shipping" value="standard" defaultChecked />
+                                        Standard Shipping
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipping" value="premium" />
+                                        Premium Shipping
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
