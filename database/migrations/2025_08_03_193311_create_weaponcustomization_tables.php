@@ -10,6 +10,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        Schema::create('custom_weapon_ids', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+        });
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -45,6 +48,10 @@ return new class extends Migration {
         Schema::create('usercreated_weapons_attachments', function (Blueprint $table) {
             $table->id();
             $table->uuid(column: 'custom_weapon_id');
+            $table->foreign('custom_weapon_id')
+                  ->references('id')
+                  ->on('custom_weapon_ids')
+                  ->onDelete('cascade');
             $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
             $table->foreignId('attachment_id')->nullable()->constrained('attachments')->onDelete('cascade');
             $table->timestamps();

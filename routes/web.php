@@ -42,6 +42,7 @@ Route::post('placeOrder', function (Request $request) {
         error_log('quantity: ' . $quantity);
 
         $customWeaponId = Str::uuid()->toString();
+        DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId]);
         foreach ($attachmentIds as $attachmentId) {
             $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
             $ordersToInsert[] = [
