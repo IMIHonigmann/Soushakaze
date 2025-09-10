@@ -34,6 +34,15 @@ Route::get('/products/search', [ProductsController::class, 'getByQuery'])->name(
 Route::post('placeOrder', function (Request $request) {
     $customizedWeapons = $request->weaponid_attachments;
     $ordersToInsert = [];
+    $userId = $request->user()->id;
+    $orderId = Str::uuid()->toString();
+    $orderWeapons = [];
+        DB::table('orders')->insert([
+            'id' => $orderId,
+            'user_id' => $userId,
+            'expected_arrival_date' => now()->addDays(3),
+        ]);
+
 
     foreach ($customizedWeapons as $weapon) {
         $weaponId = $weapon['weapon_id'];
@@ -42,8 +51,12 @@ Route::post('placeOrder', function (Request $request) {
         error_log('quantity: ' . $quantity);
 
         $customWeaponId = Str::uuid()->toString();
+            $orderWeapons[] = [
+                'order_id' => $orderId,
+                'custom_weapon_id' => $customWeaponId
+            ];
         DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId]);
-        foreach ($attachmentIds as $attachmentId) {
+       foreach ($attachmentIds as $attachmentId) {
             $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
             $ordersToInsert[] = [
                 'custom_weapon_id' => $customWeaponId,
@@ -52,10 +65,12 @@ Route::post('placeOrder', function (Request $request) {
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
+
         }
     }
     if (!empty($ordersToInsert)) {
         DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
+        DB::table('orders_weapons')->insert($orderWeapons);
     }
 
     return Inertia::render('OrderPlaced', ['message' => 'Order has been processed successfully']);

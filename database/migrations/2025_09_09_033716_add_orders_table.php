@@ -12,14 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->uuid('custom_weapon_id')->nullable();
-            $table->foreign('custom_weapon_id')
-                  ->references('custom_weapon_id')
-                  ->on('usercreated_weapons_attachments')
-                  ->onDelete('set null');
             $table->string('status')->default('pending');
-            $table->decimal('total_price', 10, 2)->nullable();
+            $table->timestamp('expected_arrival_date')->nullable();
             $table->timestamps();
         });
     }
