@@ -18,6 +18,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('profile', function (Request $request) {
+        // Pass the authenticated user to the client
+        return Inertia::render('Profile', [
+            'user' => $request->user(),
+        ]);
+    })->name('profile');
+});
+
 
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
