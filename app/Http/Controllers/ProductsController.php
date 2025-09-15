@@ -32,7 +32,12 @@ class ProductsController extends Controller
         }
         $qCheckedWeaponTypes = array_values(array_filter($qWeaponTypes, fn($v) => trim((string) $v) !== ''));
 
+        $avgReviews = DB::table('reviews')
+            ->select('weapon_id', DB::raw('AVG(rating) as avg_rating'))
+            ->groupBy('weapon_id');
+
         $weapons = DB::table('weapons')
+            ->leftJoinSub($avgReviews, 'r', 'weapons.id', '=', 'r.weapon_id')
             ->when($qWeaponName !== '', fn($query) => $query->where('name', 'like', "%{$qWeaponName}%"))
             ->when($qRofLower !== '' && $qRofUpper === '', fn($query) => $query->where('rate_of_fire', '>=', $qRofLower))
             ->when($qRofUpper !== '' && $qRofLower === '', fn($query) => $query->where('rate_of_fire', '<=', $qRofUpper))

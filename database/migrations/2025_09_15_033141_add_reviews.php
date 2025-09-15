@@ -15,8 +15,7 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->index();
-            $table->uuid('weapon_id');
-            $table->foreign('weapon_id')->references('id')->on('custom_weapon_ids')->onDelete('cascade');
+            $table->foreignId('weapon_id')->onDelete('cascade');
             $table->text('review');
             $table->unsignedTinyInteger('rating');
             $table->timestamps();

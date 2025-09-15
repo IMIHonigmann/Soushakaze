@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 
 type Weapon = {
     id: number;
+    rating: number;
     name: string;
     rate_of_fire: number;
     type: string;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export default function QueriedProducts({ weapons, message }: Props) {
+    console.log(weapons);
     const categories = ['Up Close And Personal', 'Wick and Run', 'For COD Enjoyers', 'Yard Counters', 'Flex Throws'];
 
     const formRef = useRef<HTMLFormElement | null>(null);
@@ -292,7 +294,9 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             <div className="mt-4 ml-6 flex flex-col gap-2">
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{weapon.name}</div>
 
-                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">⭐⭐⭐⭐⭐ 4.5/5</div>
+                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">
+                                    ⭐⭐⭐⭐⭐ {weapon.rating}/5
+                                </div>
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
                             </div>
                         </Link>
