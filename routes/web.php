@@ -30,8 +30,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $orders = DB::table('orders')->where('user_id', $user->id)->get();
         return Inertia::render('OrderHistory', ['orders' => $orders, 'user' => $user]);
     })->name('order-history');
+
+    Route::post('sendReview', function (Request $request) {
+        $validated = $request->validate([
+            'product_id' => 'required|integer',
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'required|string|max:1000',
+        ]);
+
+        DB::table('reviews')->insert([
+            'user_id' => $request->user()->id,
+            'weapon_id' => $validated['product_id'],
+            'rating' => $validated['rating'],
+            'review' => $validated['review'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('order-history')->with('success', 'Review submitted successfully.');
+    })->name('send-review');
 });
 
+Route::get('composeReview', function (Request $request) {
+    return Inertia::render('ComposeReview');
+})->name('compose-review');
 
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
