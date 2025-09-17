@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->index();
             $table->foreignId('weapon_id')->onDelete('cascade');
+            $table->string('title')->nullable();
             $table->text('review');
             $table->unsignedTinyInteger('rating');
             $table->timestamps();
