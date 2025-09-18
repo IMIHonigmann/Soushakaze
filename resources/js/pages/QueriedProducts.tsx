@@ -6,7 +6,7 @@ import Navbar from './Navbar';
 
 type Weapon = {
     id: number;
-    rating: number;
+    avg_rating: number;
     name: string;
     rate_of_fire: number;
     type: string;
@@ -295,7 +295,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{weapon.name}</div>
 
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">
-                                    ⭐⭐⭐⭐⭐ {weapon.rating}/5
+                                    ⭐⭐⭐⭐⭐ {weapon.avg_rating}/5
                                 </div>
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
                             </div>
