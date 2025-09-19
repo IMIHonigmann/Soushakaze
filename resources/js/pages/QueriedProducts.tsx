@@ -95,6 +95,18 @@ export default function QueriedProducts({ weapons, message }: Props) {
         setRofValues([newMinValue, newMaxValue]);
     };
 
+    function displayStars(unparsedRating: string) {
+        let composedStars = '';
+        if (parseInt(unparsedRating) === 5) return '★★★★★';
+        if (parseInt(unparsedRating) === 4) composedStars = '★★★★';
+        if (parseInt(unparsedRating) === 3) composedStars = '★★★';
+        if (parseInt(unparsedRating) === 2) composedStars = '★★';
+        if (parseInt(unparsedRating) === 1) composedStars = '★';
+
+        if (parseFloat(unparsedRating) - parseInt(unparsedRating) > 0) return composedStars + '½';
+        return composedStars;
+    }
+
     return (
         <div className="mx-32">
             <Navbar formRef={formRef} />
@@ -296,7 +308,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
 
                                 {!isNaN(parseFloat(weapon.avg_rating)) && (
                                     <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">
-                                        ★★★★½ {parseFloat(weapon.avg_rating).toFixed(1)}/5
+                                        {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
                                     </div>
                                 )}
                                 <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>

@@ -36,8 +36,6 @@ class ProductsController extends Controller
             ->select('weapon_id', DB::raw('AVG(rating) as avg_rating'))
             ->groupBy('weapon_id');
 
-        dump($avgReviews->get());
-
         $weapons = DB::table('weapons')
             ->leftJoinSub($avgReviews, 'r', 'weapons.id', '=', 'r.weapon_id')
             ->select('weapons.*', 'r.avg_rating')
