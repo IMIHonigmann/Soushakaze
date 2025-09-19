@@ -96,15 +96,14 @@ export default function QueriedProducts({ weapons, message }: Props) {
     };
 
     function displayStars(unparsedRating: string) {
-        let composedStars = '';
-        if (parseInt(unparsedRating) === 5) return '★★★★★';
-        if (parseInt(unparsedRating) === 4) composedStars = '★★★★';
-        if (parseInt(unparsedRating) === 3) composedStars = '★★★';
-        if (parseInt(unparsedRating) === 2) composedStars = '★★';
-        if (parseInt(unparsedRating) === 1) composedStars = '★';
+        const num = parseFloat(unparsedRating);
+        if (isNaN(num) || num <= 0) return '';
 
-        if (parseFloat(unparsedRating) - parseInt(unparsedRating) > 0) return composedStars + '½';
-        return composedStars;
+        const rounded = Math.round(Math.max(0, Math.min(5, num)) * 2) / 2;
+        const full = Math.floor(rounded);
+        const hasHalf = rounded - full === 0.5;
+
+        return '★'.repeat(full) + (hasHalf ? '½' : '');
     }
 
     return (
