@@ -103,7 +103,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
         const full = Math.floor(rounded);
         const hasHalf = rounded - full === 0.5;
 
-        return '★'.repeat(full) + (hasHalf ? '½' : '');
+        return '★'.repeat(full) + (hasHalf ? '½' : '') + '☆'.repeat(5 - full - Number(hasHalf));
     }
 
     return (
