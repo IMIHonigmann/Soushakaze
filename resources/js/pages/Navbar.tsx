@@ -5,13 +5,21 @@ import { FaRegBookmark, FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
 import { VisualBag } from './VisualBag';
 
-type Props = {
-    formRef?: RefObject<HTMLFormElement | null>;
-};
-export default function Navbar({ formRef }: Props) {
+type Props =
+    | {
+          formRef: RefObject<HTMLFormElement | null>;
+          upperSearchInputRef: RefObject<HTMLInputElement | null>;
+      }
+    | {
+          formRef?: undefined;
+          upperSearchInputRef?: undefined;
+      };
+
+export default function Navbar({ formRef, upperSearchInputRef }: Props) {
     const cart = useCartStore((state) => state.bag);
     const wishlist = useWishlistStore((state) => state.bag);
-    const searchInputRef = useRef<HTMLInputElement | null>(null);
+    const internalSearchRef = useRef<HTMLInputElement | null>(null);
+    const searchInputRef = upperSearchInputRef ?? internalSearchRef;
 
     function getQueriedRoute() {
         if (formRef) {
