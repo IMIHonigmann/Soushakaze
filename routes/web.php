@@ -68,6 +68,7 @@ Route::get('cart', function () {
 Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
 Route::get('/products/search', [ProductsController::class, 'getByQuery'])->name('queried-products');
+Route::get('/products/{weaponId}', [ProductsController::class, 'getById'])->name('product.show');
 
 
 require __DIR__ . '/settings.php';

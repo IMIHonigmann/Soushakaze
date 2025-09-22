@@ -19,6 +19,16 @@ class ProductsController extends Controller
             'message' => "Found {$count} products"
         ]);
     }
+    public function getById(int $weaponId)
+    {
+        $weapon = DB::table('weapons')->where('id', $weaponId)->first();
+
+        return Inertia::render('ProductPreview', [
+            'weapon' => $weapon,
+        ]);
+    }
+
+
     public function getByQuery(Request $request)
     {
         $qWeaponName = trim((string) $request->query('name', ''));

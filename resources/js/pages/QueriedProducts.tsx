@@ -1,17 +1,9 @@
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Range, getTrackBackground } from 'react-range';
+import { Weapon } from '../types/types';
 import CategoryItem from './CategoryItem';
 import Navbar from './Navbar';
-
-type Weapon = {
-    id: number;
-    avg_rating: string;
-    name: string;
-    rate_of_fire: number;
-    type: string;
-    power: number;
-};
 
 type Props = {
     searchQuery: string;
