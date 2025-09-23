@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\CustomizerController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -55,6 +55,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return redirect()->route('order-history')->with('success', 'Review submitted successfully.');
     })->name('send-review');
+
+    Route::post('placeOrder', [OrdersController::class, 'placeOrder'])->name('place-order');
 });
 
 
@@ -69,6 +71,10 @@ Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 
 Route::get('/products/search', [ProductsController::class, 'getByQuery'])->name('queried-products');
 Route::get('/products/{weaponId}', [ProductsController::class, 'getById'])->name('product.show');
+
+
+
+
 
 
 require __DIR__ . '/settings.php';
