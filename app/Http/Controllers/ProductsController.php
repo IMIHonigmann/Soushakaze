@@ -21,10 +21,19 @@ class ProductsController extends Controller
     }
     public function getById(int $weaponId)
     {
+
         $weapon = DB::table('weapons')->where('id', $weaponId)->first();
+
+        $reviews = DB::table('reviews')
+            ->where('weapon_id', $weaponId)
+            ->get();
+
+        $avgRating = $reviews->avg('rating');
 
         return Inertia::render('ProductPreview', [
             'weapon' => $weapon,
+            'avgRating' => $avgRating,
+            'reviews' => $reviews,
         ]);
     }
 
