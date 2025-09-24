@@ -15,17 +15,28 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
                 console.log('animating...');
                 const tl = gsap.timeline({
                     onComplete: () => {
-                        setIsAnimating(false);
                         console.log('not animating anymore');
                     },
                 });
 
                 tl.to(`#${id}-g`, {
                     duration: 0.25,
-                    attr: { transform: 'translate(12,0)' },
+                    x: 12,
                     ease: 'power2.out',
                 });
-
+                tl.to(
+                    `#${id}-g`,
+                    {
+                        duration: 0.25,
+                        rotation: -10,
+                        transformOrigin: '50% 50%',
+                        ease: 'power2.inOut',
+                        yoyo: true,
+                        yoyoEase: true,
+                        repeat: 1,
+                    },
+                    0,
+                );
                 tl.to(
                     `#${id}`,
                     {
