@@ -178,13 +178,13 @@
 
     .morph-root svg {
         margin-right: -2.25rem;
+        transform: skewX(-10deg);
         transition-duration: 0.2s;
         transition-property: color, transform;
     }
 
     .morph-root svg:hover {
-        color: greenyellow;
-        transform: scale(1.1);
+        transform: skewX(-10deg) scale(1.1);
         transform-origin: center;
         cursor: pointer;
     }

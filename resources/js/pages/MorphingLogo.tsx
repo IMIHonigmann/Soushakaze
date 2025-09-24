@@ -15,6 +15,7 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
                 console.log('animating...');
                 const tl = gsap.timeline({
                     onComplete: () => {
+                        setIsAnimating(false);
                         console.log('not animating anymore');
                     },
                 });
@@ -23,6 +24,10 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
                     duration: 0.25,
                     x: 12,
                     ease: 'power2.out',
+                    yoyo: true,
+                    yoyoEase: true,
+                    repeat: 1,
+                    repeatDelay: 2,
                 });
                 tl.to(
                     `#${id}-g`,
@@ -42,8 +47,24 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
                     {
                         duration: 0.5,
                         morphSVG: `#${id}-kanji`,
+                        yoyo: true,
+                        yoyoEase: true,
+                        repeat: 1,
+                        repeatDelay: 1.75,
                     },
                     0,
+                );
+                tl.to(
+                    `#${id}`,
+                    {
+                        duration: 0.5,
+                        translateX: -10,
+                        transformOrigin: '50% 50%',
+                        ease: 'back.in',
+                        yoyo: true,
+                        repeat: 1,
+                    },
+                    2.25,
                 );
             }}
         >
@@ -71,6 +92,7 @@ export default function MorphingLogo() {
                             width="108.65234375px"
                             height="83.75px"
                             viewBox="-18.974609375 -63.359375 108.65234375 83.75"
+                            className="hover:text-red-500"
                         >
                             <g id="sou-g">
                                 <path
@@ -87,6 +109,7 @@ export default function MorphingLogo() {
                             width="110.5322265625px"
                             height="83.75px"
                             viewBox="-18.974609375 -63.359375 110.5322265625 83.75"
+                            className="hover:text-orange-400"
                         >
                             <g id="sha-g">
                                 <path
@@ -104,6 +127,7 @@ export default function MorphingLogo() {
                         width="126.1328125px"
                         height="82.96875px"
                         viewBox="-18.095703125 -62.96875 126.1328125 82.96875"
+                        className="hover:text-yellow-300"
                     >
                         <g id="kaze-g">
                             <path
