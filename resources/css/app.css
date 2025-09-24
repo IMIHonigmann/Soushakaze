@@ -175,6 +175,10 @@
     button {
         cursor: pointer;
     }
+
+    svg {
+        margin-right: -2.25rem;
+    }
 }
 
 @layer components {
