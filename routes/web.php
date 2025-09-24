@@ -73,8 +73,9 @@ Route::get('/products/search', [ProductsController::class, 'getByQuery'])->name(
 Route::get('/products/{weaponId}', [ProductsController::class, 'getById'])->name('product.show');
 
 
-
-
+Route::get('morphTest', function (Request $request) {
+    return Inertia::render('MorphTest');
+})->name('morph-test');
 
 
 require __DIR__ . '/settings.php';
