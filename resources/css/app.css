@@ -176,7 +176,7 @@
         cursor: pointer;
     }
 
-    svg {
+    .morph-root svg {
         margin-right: -2.25rem;
     }
 }
