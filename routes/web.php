@@ -74,7 +74,7 @@ Route::get('/products/{weaponId}', [ProductsController::class, 'getById'])->name
 
 
 Route::get('morphTest', function (Request $request) {
-    return Inertia::render('MorphTest');
+    return Inertia::render('MorphingLogo');
 })->name('morph-test');
 
 

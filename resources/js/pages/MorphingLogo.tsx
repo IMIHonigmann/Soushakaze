@@ -52,10 +52,18 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
     );
 }
 
-export default function MorphTest() {
+export default function MorphingLogo() {
     return (
-        <div className="morph-root">
-            <span className="inline-flex">
+        <div className="group/logo morph-root mt-2.5">
+            <span className="relative inline-flex">
+                <span
+                    className="absolute top-0 right-0 h-[2px] w-0 bg-current transition-all duration-300 group-hover/logo:w-3/4"
+                    id="morph-underline"
+                />
+                <span
+                    className="absolute bottom-0 left-0 h-[2px] w-0 bg-current transition-all duration-300 group-hover/logo:w-3/4"
+                    id="morph-underline"
+                />
                 <span className="inline-flex">
                     <MorphingSvg id="sou">
                         <svg

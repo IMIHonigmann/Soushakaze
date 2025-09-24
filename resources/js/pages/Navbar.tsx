@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react';
 import { RefObject, useRef } from 'react';
 import { FaRegBookmark, FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
+import MorphingLogo from './MorphingLogo';
 import { VisualBag } from './VisualBag';
 
 type Props =
@@ -40,7 +41,7 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
         <div className="group">
             <div className="grid grid-cols-[1fr_2fr_3fr_auto] items-center gap-16 py-8 text-xl">
                 <span onClick={() => router.get(route('queried-products'))} className="cursor-pointer text-4xl font-extrabold">
-                    SOUSHA.KAZE
+                    <MorphingLogo />
                 </span>
                 <div className="flex justify-between">
                     <span>Shop</span>
