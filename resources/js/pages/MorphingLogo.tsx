@@ -33,9 +33,9 @@ export function MorphingSvg({ children, id }: { children: React.ReactNode; id: s
                     `#${id}-g`,
                     {
                         duration: 0.25,
-                        rotation: -10,
+                        rotation: -6,
                         transformOrigin: '50% 50%',
-                        ease: 'power2.inOut',
+                        ease: 'power2.out',
                         yoyo: true,
                         yoyoEase: true,
                         repeat: 1,
