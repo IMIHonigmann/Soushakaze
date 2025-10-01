@@ -1,3 +1,5 @@
+import { useCartStore } from '@/stores/bagStores';
+import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
@@ -13,6 +15,10 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     console.log(weapon);
     console.log(reviews);
     console.log(avgRating);
+
+    const { selected } = useCustomizerStore();
+    const { addToBag } = useCartStore((state) => state);
+
     return (
         <div className="mx-32">
             <Navbar />
@@ -52,7 +58,21 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <Link className="col-span-12 transition-colors hover:bg-zinc-900" href={route('customizer', { weaponId: weapon.id })}>
                             Customize
                         </Link>
-                        <div className="col-span-11 row-start-2">Add to bag</div>
+                        <Link
+                            className="col-span-11 row-start-2 hover:bg-zinc-900"
+                            onClick={() =>
+                                addToBag({
+                                    uuid: crypto.randomUUID(),
+                                    weaponId: weapon.id,
+                                    weaponName: weapon.name,
+                                    selectedAttachments: { ...selected },
+                                    quantity: 1,
+                                })
+                            }
+                            href={route('cart')}
+                        >
+                            ADD TO CART
+                        </Link>
                         <FaRegBookmark className="col-span-1 row-start-2" />
                     </div>
                     <ul className="mt-36 [&>*]:border-2 [&>*]:p-4">
