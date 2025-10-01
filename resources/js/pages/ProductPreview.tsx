@@ -17,7 +17,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
         <div className="mx-32">
             <Navbar />
             <div className="grid grid-cols-2 justify-items-center text-xl">
-                <div className="sticky top-20 flex w-3/4 items-stretch justify-between">
+                <div className="sticky top-10 flex w-3/4 items-stretch justify-between self-start">
                     <ul className="flex flex-col gap-2 [&>*]:border-2 [&>*]:p-8">
                         <li>1</li>
                         <li>2</li>
@@ -67,6 +67,17 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                     </span>
                 </div>
             </div>
+            <p className="mt-96 text-9xl">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nisl aliquam enim, nec
+                dictum urna quam nec urna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum
+                ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Etiam at risus et justo dignissim congue. Donec congue
+                lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus eget in
+                metus. In pellentesque faucibus vestibulum. Nulla at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in
+                blandit. Curabitur vulputate, ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class
+                aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed molestie augue sit amet leo consequat
+                posuere. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Proin vel ante a orci tempus eleifend
+                ut et magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            </p>
         </div>
     );
 }
