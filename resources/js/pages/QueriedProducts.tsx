@@ -107,7 +107,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                     <form
                         ref={formRef}
                         onSubmit={handleSubmit}
-                        className="mb-0.5 flex flex-col [&>*]:py-10 [&>*]:transition-all [&>*+*]:border-t-2 [&>*:hover]:border-dashed [&>*:hover]:border-t-blue-400 [&>*:hover]:py-12 [&>*:hover+*]:border-dashed [&>*:hover+*]:border-t-blue-400"
+                        className="mb-0.5 flex flex-col [&>*]:py-10 [&>*]:transition-all [&>*+*]:border-t-2 [&>*:hover]:border-t-purple-400 [&>*:hover]:py-12 [&>*:hover+*]:border-t-purple-400"
                     >
                         <ul className="flex flex-col justify-between gap-2">
                             {categories.map((category) => (
