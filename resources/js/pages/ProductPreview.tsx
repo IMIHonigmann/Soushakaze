@@ -1,5 +1,6 @@
 import { Weapon } from '@/types/types';
-import { FaRegBookmark } from 'react-icons/fa';
+import { Link } from '@inertiajs/react';
+import { FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
 import Navbar from './Navbar';
 
 type Props = {
@@ -15,7 +16,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     return (
         <div className="mx-32">
             <Navbar />
-            <div className="grid grid-cols-2 justify-items-center">
+            <div className="grid grid-cols-2 justify-items-center text-xl">
                 <div className="sticky top-20 flex w-3/4 items-stretch justify-between">
                     <ul className="flex flex-col gap-2 [&>*]:border-2 [&>*]:p-8">
                         <li>1</li>
@@ -28,26 +29,42 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                     </ul>
                     <div className="flex h-[900px] items-center border-2 border-white px-52">Image</div>
                 </div>
-                <div className="flex flex-col gap-4 text-4xl">
-                    <h1>On</h1>
-                    <div className="font-extrabold">CLOUDPULSE - Training shoe - ivory horizon</div>
-                    <div>
-                        €160.00 <span className="text-gray-300 opacity-75">VAT included</span>
+                <div>
+                    <div className="flex flex-col gap-4 text-4xl">
+                        <h1 className="">On</h1>
+                        <div className="font-extrabold">CLOUDPULSE - Training shoe - ivory horizon</div>
+                        <div className="text-3xl">
+                            €160.00 <span className="text-gray-300 opacity-75">VAT included</span>
+                        </div>
+
+                        <div className="mt-8 text-xl">
+                            <h1>Delivery</h1>
+                            <div className="mt-3 grid grid-cols-2 grid-rows-2 gap-2">
+                                <span className="font-extrabold">June 15, 2024 - June 18, 2024</span>
+                                <span className="place-self-end">Free</span>
+                                <span className="col-start-1 row-start-2 font-extrabold">June 13, 2024 - June 14, 2024</span>
+                                <span className="place-self-end">4,90EUR</span>
+                            </div>
+                        </div>
                     </div>
                     <div className="mt-36">Color: {'green'}</div>
                     <div className="mt-36 grid grid-cols-8 grid-rows-2 place-items-center gap-4 [&>*]:h-full [&>*]:w-full [&>*]:border-2 [&>*]:p-4">
-                        <div className="col-span-12">Customize</div>
+                        <Link className="col-span-12 transition-colors hover:bg-zinc-900" href={route('customizer', { weaponId: weapon.id })}>
+                            Customize
+                        </Link>
                         <div className="col-span-11 row-start-2">Add to bag</div>
                         <FaRegBookmark className="col-span-1 row-start-2" />
                     </div>
-                    <div className="mt-36 [&>*]:border-2 [&>*]:p-4">
-                        <div>Sold by H&K, shipped by Soushakaze.</div>
-                        <div>Standard delivery</div>
-                        <div>Free delivery and returns</div>
-                        <div>30 day return policy</div>
-                        <div>Sell it back</div>
-                    </div>
-                    <div>Report a legal concern</div>
+                    <ul className="mt-36 [&>*]:border-2 [&>*]:p-4">
+                        <li>Sold by H&K, shipped by Soushakaze.</li>
+                        <li>Free delivery and returns</li>
+                        <li>30 day return policy</li>
+                        <li>Sell it back</li>
+                    </ul>
+                    <span className="mt-5 flex gap-4 text-blue-600">
+                        <FaFontAwesomeFlag />
+                        <span>Report a legal concern</span>
+                    </span>
                 </div>
             </div>
         </div>

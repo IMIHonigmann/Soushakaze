@@ -290,7 +290,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                 </div>
                 <div className="col-span-3 col-start-2 grid h-fit grid-cols-3 content-start gap-8 text-xl">
                     {weapons.map((weapon, id) => (
-                        <Link className="group inline-block h-fit py-2 text-center" href={route('customizer', { weaponId: weapon.id })} key={id}>
+                        <Link className="group inline-block h-fit py-2 text-center" href={route('product.show', { weaponId: weapon.id })} key={id}>
                             <div className="flex scale-100 justify-center rounded-2xl border-2 px-44 py-40 transition-transform ease-out group-hover:scale-105">
                                 <div className="flex items-center justify-center">🖼️</div>
                             </div>
