@@ -1,4 +1,4 @@
-import { useCartStore } from '@/stores/bagStores';
+import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
@@ -9,6 +9,8 @@ import Navbar from './Navbar';
 export default function Bag() {
     const { bag, setBag, deleteFromBag } = useCartStore((state) => state);
     const [deletingItems, setDeletingItems] = useState<Record<string, boolean>>({});
+
+    const { addToBag: addToWishlistBag } = useWishlistStore((state) => state);
 
     const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
     for (let i = 0; i < bag.length; i++) {
@@ -61,7 +63,20 @@ export default function Bag() {
                                                             {area}: {id}
                                                         </div>
                                                     ))}
-                                                    <button className="mt-6 hover:underline">Move to wishlist</button>
+                                                    <button
+                                                        className="mt-6 cursor-pointer hover:underline"
+                                                        onClick={() => {
+                                                            addToWishlistBag({
+                                                                uuid: crypto.randomUUID(),
+                                                                weaponId: item.weaponId,
+                                                                weaponName: item.weaponName,
+                                                                selectedAttachments: item.selectedAttachments,
+                                                                quantity: 1,
+                                                            });
+                                                        }}
+                                                    >
+                                                        Move to wishlist
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div className="ml-auto flex items-center gap-4 text-xl">
