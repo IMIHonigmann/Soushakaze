@@ -66,6 +66,9 @@ Route::post('/customizer', [CustomizerController::class, 'store'])->name('custom
 Route::get('cart', function () {
     return Inertia::render('Cart');
 })->name('cart');
+Route::get('wishlist', function () {
+    return Inertia::render('Wishlist');
+})->name('wishlist');
 
 Route::get('products', [ProductsController::class, 'getAll'])->name('products');
 

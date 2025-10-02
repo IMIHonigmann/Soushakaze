@@ -70,7 +70,7 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                     <VisualBag bag={cart} routeName={'cart'}>
                         <FaCartShopping className="text-2xl" />
                     </VisualBag>
-                    <VisualBag bag={wishlist} routeName={'wishlist'}>
+                    <VisualBag className="bg-orange-500" bag={wishlist} routeName={'wishlist'}>
                         <FaRegBookmark className="text-2xl" />
                     </VisualBag>
                 </div>
