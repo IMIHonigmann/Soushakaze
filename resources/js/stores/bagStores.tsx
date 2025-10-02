@@ -1,7 +1,12 @@
-import { UUID } from 'crypto';
 import { create } from 'zustand';
 
-export type BagItem = { uuid: UUID; weaponId: number; weaponName: string; selectedAttachments: Record<string, number>; quantity: number };
+export type BagItem = {
+    customizedWeaponId: string;
+    weaponId: number;
+    weaponName: string;
+    selectedAttachments: Record<string, number>;
+    quantity: number;
+};
 
 interface BagState {
     bag: BagItem[];

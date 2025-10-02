@@ -1,3 +1,4 @@
+import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore } from '@/stores/bagStores';
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Link } from '@inertiajs/react';
@@ -30,7 +31,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
     }, {});
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
-    const { addToBag } = useCartStore((state) => state);
+    const { addToBag, bag } = useCartStore((state) => state);
 
     useEffect(() => {
         initializeSelections(grouped);
@@ -114,15 +115,19 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 </div>
                 <Link
                     className="cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                        const customizedWeaponId = makeSelectionKey(weaponId, { ...selected });
+                        const exists = bag.some((item) => customizedWeaponId === item.customizedWeaponId);
+                        if (exists) return;
+
                         addToBag({
-                            uuid: crypto.randomUUID(),
+                            customizedWeaponId: customizedWeaponId,
                             weaponId,
                             weaponName,
                             selectedAttachments: { ...selected },
                             quantity: 1,
-                        })
-                    }
+                        });
+                    }}
                     href={route('cart')}
                 >
                     ADD TO CART

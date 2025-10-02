@@ -1,3 +1,4 @@
+import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
@@ -32,7 +33,10 @@ export default function Bag() {
                             {bag.length > 0 ? (
                                 <>
                                     {bag.map((item, idx) => (
-                                        <div key={item.uuid} className={`flex gap-8 p-12 ${deletingItems[item.uuid] ? 'animate-scale-inward' : ''}`}>
+                                        <div
+                                            key={item.customizedWeaponId}
+                                            className={`flex gap-8 p-12 ${deletingItems[item.customizedWeaponId] ? 'animate-scale-inward' : ''}`}
+                                        >
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
                                                 <div>
@@ -45,8 +49,11 @@ export default function Bag() {
                                                     <Link
                                                         className="mt-6 cursor-pointer hover:underline"
                                                         onClick={() => {
+                                                            const customizedWeaponId = makeSelectionKey(item.weaponId, {});
+                                                            const exists = bag.some((item) => customizedWeaponId === item.customizedWeaponId);
+                                                            if (exists) return;
                                                             addToCartBag({
-                                                                uuid: crypto.randomUUID(),
+                                                                customizedWeaponId: makeSelectionKey(item.weaponId, item.selectedAttachments),
                                                                 weaponId: item.weaponId,
                                                                 weaponName: item.weaponName,
                                                                 selectedAttachments: item.selectedAttachments,
@@ -62,7 +69,7 @@ export default function Bag() {
                                             <div className="ml-auto flex items-center gap-4 text-xl">
                                                 <span
                                                     onClick={() => {
-                                                        setDeletingItems((prev) => ({ ...prev, [item.uuid]: true }));
+                                                        setDeletingItems((prev) => ({ ...prev, [item.customizedWeaponId]: true }));
                                                         setTimeout(() => deleteFromBag(idx), 500);
                                                     }}
                                                     className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"

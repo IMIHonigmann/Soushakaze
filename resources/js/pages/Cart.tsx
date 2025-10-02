@@ -1,3 +1,4 @@
+import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -10,7 +11,7 @@ export default function Bag() {
     const { bag, setBag, deleteFromBag } = useCartStore((state) => state);
     const [deletingItems, setDeletingItems] = useState<Record<string, boolean>>({});
 
-    const { addToBag: addToWishlistBag } = useWishlistStore((state) => state);
+    const { addToBag: addToWishlistBag, bag: wishlistBag } = useWishlistStore((state) => state);
 
     const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
     for (let i = 0; i < bag.length; i++) {
@@ -53,7 +54,10 @@ export default function Bag() {
                             {bag.length > 0 ? (
                                 <>
                                     {bag.map((item, idx) => (
-                                        <div key={item.uuid} className={`flex gap-8 p-12 ${deletingItems[item.uuid] ? 'animate-scale-inward' : ''}`}>
+                                        <div
+                                            key={item.customizedWeaponId}
+                                            className={`flex gap-8 p-12 ${deletingItems[item.customizedWeaponId] ? 'animate-scale-inward' : ''}`}
+                                        >
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
                                                 <div>
@@ -66,17 +70,24 @@ export default function Bag() {
                                                     <button
                                                         className="mt-6 cursor-pointer hover:underline"
                                                         onClick={() => {
-                                                            addToWishlistBag({
-                                                                uuid: crypto.randomUUID(),
-                                                                weaponId: item.weaponId,
-                                                                weaponName: item.weaponName,
-                                                                selectedAttachments: item.selectedAttachments,
-                                                                quantity: 1,
-                                                            });
+                                                            const customizedWeaponId = makeSelectionKey(item.weaponId, {});
+                                                            const existingWeaponIdx = wishlistBag.findIndex(
+                                                                (item) => customizedWeaponId === item.customizedWeaponId,
+                                                            );
+                                                            if (existingWeaponIdx === -1) {
+                                                                addToWishlistBag({
+                                                                    customizedWeaponId: customizedWeaponId,
+                                                                    weaponId: item.weaponId,
+                                                                    weaponName: item.weaponName,
+                                                                    selectedAttachments: item.selectedAttachments,
+                                                                    quantity: 1,
+                                                                });
+                                                            }
                                                         }}
                                                     >
                                                         Move to wishlist
                                                     </button>
+                                                    <div>{item.customizedWeaponId}</div>
                                                 </div>
                                             </div>
                                             <div className="ml-auto flex items-center gap-4 text-xl">
@@ -102,7 +113,7 @@ export default function Bag() {
                                                 </div>
                                                 <span
                                                     onClick={() => {
-                                                        setDeletingItems((prev) => ({ ...prev, [item.uuid]: true }));
+                                                        setDeletingItems((prev) => ({ ...prev, [item.customizedWeaponId]: true }));
                                                         setTimeout(() => deleteFromBag(idx), 500);
                                                     }}
                                                     className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
