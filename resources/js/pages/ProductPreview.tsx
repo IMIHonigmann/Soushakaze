@@ -17,7 +17,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     console.log(reviews);
     console.log(avgRating);
 
-    const { addToBag, bag } = useCartStore((state) => state);
+    const { addToBag } = useCartStore((state) => state);
     const { addToBag: addToWishlist, bag: wishlistBag, deleteFromBag: deleteFromWishlistBag } = useWishlistStore((state) => state);
 
     const [bookmarked, setBookmarked] = useState(wishlistBag.some((item) => item.customizedWeaponId === makeSelectionKey(weapon.id, {})));
@@ -63,19 +63,15 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         </Link>
                         <Link
                             className="col-span-11 row-start-2 hover:bg-zinc-900"
-                            onClick={() => {
-                                const customizedWeaponId = makeSelectionKey(weapon.id, {});
-                                const exists = bag.some((item) => customizedWeaponId === item.customizedWeaponId);
-                                if (exists) return;
-
+                            onClick={() =>
                                 addToBag({
                                     customizedWeaponId: makeSelectionKey(weapon.id, {}),
                                     weaponId: weapon.id,
                                     weaponName: weapon.name,
                                     selectedAttachments: {},
                                     quantity: 1,
-                                });
-                            }}
+                                })
+                            }
                             href={route('cart')}
                         >
                             ADD TO CART
@@ -97,7 +93,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                                     return;
                                 }
 
-                                console.log(customizedWeaponId[existingWeaponIdx]);
+                                console.log(customizedWeaponId);
                                 deleteFromWishlistBag(existingWeaponIdx);
                                 return;
                             }}

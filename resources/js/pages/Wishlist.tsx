@@ -48,18 +48,15 @@ export default function Bag() {
                                                     ))}
                                                     <Link
                                                         className="mt-6 cursor-pointer hover:underline"
-                                                        onClick={() => {
-                                                            const customizedWeaponId = makeSelectionKey(item.weaponId, {});
-                                                            const exists = bag.some((item) => customizedWeaponId === item.customizedWeaponId);
-                                                            if (exists) return;
+                                                        onClick={() =>
                                                             addToCartBag({
                                                                 customizedWeaponId: makeSelectionKey(item.weaponId, item.selectedAttachments),
                                                                 weaponId: item.weaponId,
                                                                 weaponName: item.weaponName,
                                                                 selectedAttachments: item.selectedAttachments,
                                                                 quantity: 1,
-                                                            });
-                                                        }}
+                                                            })
+                                                        }
                                                         href={route('cart')}
                                                     >
                                                         Add to cart

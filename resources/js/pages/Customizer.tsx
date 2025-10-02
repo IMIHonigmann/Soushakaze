@@ -31,7 +31,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
     }, {});
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
-    const { addToBag, bag } = useCartStore((state) => state);
+    const { addToBag } = useCartStore((state) => state);
 
     useEffect(() => {
         initializeSelections(grouped);
@@ -115,19 +115,15 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 </div>
                 <Link
                     className="cursor-pointer"
-                    onClick={() => {
-                        const customizedWeaponId = makeSelectionKey(weaponId, { ...selected });
-                        const exists = bag.some((item) => customizedWeaponId === item.customizedWeaponId);
-                        if (exists) return;
-
+                    onClick={() =>
                         addToBag({
-                            customizedWeaponId: customizedWeaponId,
+                            customizedWeaponId: makeSelectionKey(weaponId, { ...selected }),
                             weaponId,
                             weaponName,
                             selectedAttachments: { ...selected },
                             quantity: 1,
-                        });
-                    }}
+                        })
+                    }
                     href={route('cart')}
                 >
                     ADD TO CART

@@ -30,7 +30,23 @@ export const createBagStore = (bagName: string) =>
             }),
         addToBag: (newItem: BagItem) =>
             set((state) => {
-                const newBag = [...state.bag, newItem];
+                const idx = state.bag.findIndex((i) => i.customizedWeaponId === newItem.customizedWeaponId);
+                let newBag: BagItem[];
+                if (idx === -1) {
+                    newBag = [...state.bag, newItem];
+                } else {
+                    const existing = state.bag[idx];
+                    const merged: BagItem = {
+                        ...existing,
+                        quantity: (existing.quantity ?? 0) + (newItem.quantity ?? 1),
+                        selectedAttachments: { ...newItem.selectedAttachments },
+                        weaponId: newItem.weaponId,
+                        weaponName: newItem.weaponName,
+                    };
+                    newBag = [...state.bag];
+                    newBag[idx] = merged;
+                }
+
                 localStorage.setItem(bagName, JSON.stringify(newBag));
                 return { bag: newBag };
             }),
