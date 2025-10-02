@@ -1,8 +1,8 @@
-import { useCartStore } from '@/stores/bagStores';
-import { useCustomizerStore } from '@/stores/useCustomizerStore';
+import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
-import { FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaBookmark, FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
 import Navbar from './Navbar';
 
 type Props = {
@@ -16,8 +16,10 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     console.log(reviews);
     console.log(avgRating);
 
-    const { selected } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
+    const { addToBag: addToWishlist } = useWishlistStore((state) => state);
+
+    const [bookmarked, setBookmarked] = useState(false);
 
     return (
         <div className="mx-32">
@@ -65,7 +67,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                                     uuid: crypto.randomUUID(),
                                     weaponId: weapon.id,
                                     weaponName: weapon.name,
-                                    selectedAttachments: { ...selected },
+                                    selectedAttachments: {},
                                     quantity: 1,
                                 })
                             }
@@ -73,7 +75,21 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         >
                             ADD TO CART
                         </Link>
-                        <FaRegBookmark className="col-span-1 row-start-2" />
+                        <button
+                            className="hover:bg-zinc-900"
+                            onClick={() => {
+                                setBookmarked((prev) => !prev);
+                                addToWishlist({
+                                    uuid: crypto.randomUUID(),
+                                    weaponId: weapon.id,
+                                    weaponName: weapon.name,
+                                    selectedAttachments: {},
+                                    quantity: 1,
+                                });
+                            }}
+                        >
+                            {bookmarked ? <FaBookmark className="col-span-1 row-start-2" /> : <FaRegBookmark className="col-span-1 row-start-2" />}
+                        </button>
                     </div>
                     <ul className="mt-36 [&>*]:border-2 [&>*]:p-4">
                         <li>Sold by H&K, shipped by Soushakaze.</li>
