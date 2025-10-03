@@ -1,42 +1,68 @@
+import { Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 
-type Props = {};
+export default function FrontPage() {
+    const [word, setWord] = useState('Flag');
 
-export default function FrontPage({}: Props) {
+    useEffect(() => {
+        const words = ['Gun', 'Attachment', 'Match', 'Flag'];
+        let index = 0;
+        const interval = setInterval(() => {
+            index = (index + 1) % words.length;
+            setWord(words[index]);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <>
+            <h1 className="bg-zinc-900 p-1 text-center">
+                Sign up and fully top up your weapon with no extra cost{' '}
+                <Link href={route('register')} className="text-blue-300 underline transition-colors hover:text-blue-500">
+                    Sign Up Now
+                </Link>
+            </h1>
             <main className="mx-32">
-                <div className="grid grid-cols-2">
+                <header>
+                    <Navbar />
+                </header>
+                <div className="mt-16 grid grid-cols-2">
                     <div>
-                        <header>
-                            <h1>
-                                Sign up and fully top up your weapon with no extra cost{' '}
-                                <a href="#" className="text-blue-300 underline">
-                                    Sign Up Now
-                                </a>
-                            </h1>
-                            <Navbar />
-                        </header>
-                        <section>
-                            <h2>Winning the CTF One Flag At A Time, One Attachment At A Time</h2>
-                            <p>
+                        <section className="flex flex-col place-items-start gap-8">
+                            <h2 className="text-7xl font-extrabold">Winning the CTF One {word} At A Time</h2>
+                            <p className="text-lg opacity-75">
                                 Browse through our diverse range of meticulously crafted guns, designed to bring out your personality and cater to
                                 your playstyle.
                             </p>
-                            <button>Shop Now</button>
+                            <Link
+                                href={route('queried-products')}
+                                className="ml-4 rounded-full bg-zinc-800 px-12 py-3 transition-colors hover:bg-zinc-900"
+                            >
+                                Shop Now
+                            </Link>
                         </section>
-                        <ul className="mt-8 flex gap-4">
-                            <li>200+ International Brands</li>
-                            <li>2,000+ Quality Guns</li>
-                            <li>30,000+ Happy Customers</li>
+                        <ul className="mt-8 mb-24 flex items-center justify-center justify-items-center divide-x divide-zinc-700 text-4xl [&>*]:px-16">
+                            <li>
+                                <div>200+</div>
+                                <div className="text-sm">International Brands</div>
+                            </li>
+                            <li>
+                                <div>2,000+</div>
+                                <div className="text-sm">Quality Guns</div>
+                            </li>
+                            <li>
+                                <div>30,000+</div>
+                                <div className="text-sm">Happy Customers</div>
+                            </li>
                         </ul>
                     </div>
-                    <div>Image</div>
+                    <div className="place-self-center">Image</div>
                 </div>
             </main>
             <div className="flex justify-between bg-zinc-800 p-8">
                 {Array.from({ length: 10 }, (_, i) => (
-                    <div key={i}>Element 2{i + 1}</div>
+                    <div key={i}>Element {i + 1}</div>
                 ))}
             </div>
         </>

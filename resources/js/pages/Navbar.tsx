@@ -1,5 +1,5 @@
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { RefObject, useRef } from 'react';
 import { FaRegBookmark, FaSearch } from 'react-icons/fa';
 import { FaCartShopping, FaUser } from 'react-icons/fa6';
@@ -40,15 +40,15 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
     return (
         <div className="group">
             <div className="grid grid-cols-[1fr_2fr_3fr_auto] items-center gap-16 py-8 text-xl">
-                <span onClick={() => router.get(route('queried-products'))} className="cursor-pointer text-4xl font-extrabold">
+                <Link href={route('front-page')} className="cursor-pointer text-4xl font-extrabold">
                     <MorphingLogo />
-                </span>
-                <div className="flex justify-between">
-                    <span>Shop</span>
+                </Link>
+                <nav className="flex justify-between">
+                    <Link href={route('queried-products')}>Shop</Link>
                     <span>On Sale</span>
                     <span>New Arrivals</span>
                     <span>Brands</span>
-                </div>
+                </nav>
                 <div className="flex items-center justify-between gap-6">
                     <input
                         onKeyDown={(e) => {
