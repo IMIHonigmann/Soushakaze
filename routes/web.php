@@ -80,6 +80,10 @@ Route::get('morphTest', function (Request $request) {
     return Inertia::render('MorphingLogo');
 })->name('morph-test');
 
+Route::get('frontpage', function (Request $request) {
+    return Inertia::render('FrontPage');
+})->name('front-page');
+
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
