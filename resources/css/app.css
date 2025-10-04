@@ -137,6 +137,14 @@
         margin: 0;
     }
 
+    .changing-word {
+        display: inline-block;
+        position: relative;
+        min-width: 120px;
+        text-align: center;
+        will-change: transform;
+    }
+
     .animate-scale-inward {
         animation: scale-inward-y 0.49s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         overflow: hidden;

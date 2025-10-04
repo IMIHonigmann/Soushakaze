@@ -1,17 +1,39 @@
 import { Link } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { gsap } from 'gsap';
+import { useEffect, useRef, useState } from 'react';
 import Navbar from './Navbar';
 
 export default function FrontPage() {
+    const textRef = useRef(null);
     const [word, setWord] = useState('Flag');
 
     useEffect(() => {
         const words = ['Gun', 'Attachment', 'Match', 'Flag'];
         let index = 0;
+
         const interval = setInterval(() => {
-            index = (index + 1) % words.length;
-            setWord(words[index]);
-        }, 5000);
+            gsap.to(textRef.current, {
+                opacity: 0,
+                y: -20,
+                scaleY: 0.9,
+                duration: 0.4,
+                ease: 'power2.out',
+                onComplete: () => {
+                    index = (index + 1) % words.length;
+                    setWord(words[index]);
+
+                    gsap.set(textRef.current, { y: 20 });
+                    gsap.to(textRef.current, {
+                        opacity: 1,
+                        y: 0,
+                        scaleY: 1,
+                        duration: 0.5,
+                        ease: 'power2.out',
+                    });
+                },
+            });
+        }, 3000);
+
         return () => clearInterval(interval);
     }, []);
 
@@ -30,7 +52,13 @@ export default function FrontPage() {
                 <div className="mt-16 grid grid-cols-2">
                     <div>
                         <section className="flex flex-col place-items-start gap-8">
-                            <h2 className="text-7xl font-extrabold">Winning the CTF One {word} At A Time</h2>
+                            <h2 className="text-7xl font-extrabold">
+                                Winning the CTF One{' '}
+                                <strong ref={textRef} className="changing-word">
+                                    {word}
+                                </strong>{' '}
+                                At A Time
+                            </h2>
                             <p className="text-lg opacity-75">
                                 Browse through our diverse range of meticulously crafted guns, designed to bring out your personality and cater to
                                 your playstyle.
