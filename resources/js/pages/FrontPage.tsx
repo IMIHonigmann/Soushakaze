@@ -10,9 +10,15 @@ export default function FrontPage() {
     const wordRef = useRef<HTMLElement | null>(null);
     const textRef = useRef<HTMLHeadingElement | null>(null);
     const [word, setWord] = useState('Match');
+    const [wordColor, setWordColor] = useState('#50d71e');
 
     useEffect(() => {
-        const words = ['Gun', 'Attachment', 'Flag', 'Match'];
+        const wordsColors = {
+            Gun: '#ff3b30',
+            Attachment: '#af52de',
+            Flag: '#ffcc00',
+            Match: '#50d71e',
+        };
         let index = 0;
         const split = SplitText.create(textRef.current, { type: 'words,lines', mask: 'lines' });
 
@@ -36,8 +42,11 @@ export default function FrontPage() {
                 duration: 0.4,
                 ease: 'power2.out',
                 onComplete: () => {
-                    index = (index + 1) % words.length;
-                    setWord(words[index]);
+                    const values = Object.values(wordsColors);
+                    const keys = Object.keys(wordsColors);
+                    index = (index + 1) % keys.length;
+                    setWord(keys[index]);
+                    setWordColor(values[index]);
 
                     gsap.set(wordRef.current, { y: 20 });
                     gsap.to(wordRef.current, {
@@ -74,7 +83,7 @@ export default function FrontPage() {
                         <section className="flex flex-col place-items-start gap-8">
                             <h2 ref={textRef} className="overflow-hidden text-8xl leading-28 font-extrabold">
                                 Winning the CTF One{' '}
-                                <strong ref={wordRef} className="changing-word">
+                                <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordColor }}>
                                     {word}
                                 </strong>{' '}
                                 At A Time
