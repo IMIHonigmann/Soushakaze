@@ -1,18 +1,35 @@
 import { Link } from '@inertiajs/react';
 import { gsap } from 'gsap';
+import { SplitText } from 'gsap/SplitText';
 import { useEffect, useRef, useState } from 'react';
 import Navbar from './Navbar';
 
+gsap.registerPlugin(SplitText);
+
 export default function FrontPage() {
-    const textRef = useRef(null);
-    const [word, setWord] = useState('Flag');
+    const wordRef = useRef<HTMLElement | null>(null);
+    const textRef = useRef<HTMLHeadingElement | null>(null);
+    const [word, setWord] = useState('Match');
 
     useEffect(() => {
-        const words = ['Gun', 'Attachment', 'Match', 'Flag'];
+        const words = ['Gun', 'Attachment', 'Flag', 'Match'];
         let index = 0;
+        const split = SplitText.create(textRef.current, { type: 'words,lines', mask: 'lines' });
+
+        gsap.from(split.lines, {
+            rotationX: -100,
+            transformOrigin: '50% 50% -160px',
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power3',
+            stagger: 0.25,
+            onComplete: () => {
+                textRef.current!.classList.remove('overflow-hidden');
+            },
+        });
 
         const interval = setInterval(() => {
-            gsap.to(textRef.current, {
+            gsap.to(wordRef.current, {
                 opacity: 0,
                 y: -20,
                 scaleY: 0.9,
@@ -22,8 +39,8 @@ export default function FrontPage() {
                     index = (index + 1) % words.length;
                     setWord(words[index]);
 
-                    gsap.set(textRef.current, { y: 20 });
-                    gsap.to(textRef.current, {
+                    gsap.set(wordRef.current, { y: 20 });
+                    gsap.to(wordRef.current, {
                         opacity: 1,
                         y: 0,
                         scaleY: 1,
@@ -34,7 +51,10 @@ export default function FrontPage() {
             });
         }, 3000);
 
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+            split.revert();
+        };
     }, []);
 
     return (
@@ -49,12 +69,12 @@ export default function FrontPage() {
                 <header>
                     <Navbar />
                 </header>
-                <div className="mt-16 grid grid-cols-2">
+                <div className="mt-16 grid grid-cols-[60%_40%]">
                     <div>
                         <section className="flex flex-col place-items-start gap-8">
-                            <h2 className="text-7xl font-extrabold">
+                            <h2 ref={textRef} className="overflow-hidden text-8xl leading-28 font-extrabold">
                                 Winning the CTF One{' '}
-                                <strong ref={textRef} className="changing-word">
+                                <strong ref={wordRef} className="changing-word">
                                     {word}
                                 </strong>{' '}
                                 At A Time
