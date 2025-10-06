@@ -8,16 +8,18 @@ gsap.registerPlugin(SplitText);
 
 export default function FrontPage() {
     const wordRef = useRef<HTMLElement | null>(null);
+    const kanjiRef = useRef<HTMLElement | null>(null);
     const textRef = useRef<HTMLHeadingElement | null>(null);
     const [word, setWord] = useState('Match');
     const [wordColor, setWordColor] = useState('#50d71e');
+    const [kanji, setKanji] = useState('勝負');
 
     useEffect(() => {
-        const wordsColors = {
-            Gun: '#ff3b30',
-            Attachment: '#af52de',
-            Flag: '#ffcc00',
-            Match: '#50d71e',
+        const wordsColors: Record<string, { color: string; kanji: string }> = {
+            Gun: { color: '#ff3b30', kanji: '銃' },
+            Attachment: { color: '#af52de', kanji: '装 備' },
+            Flag: { color: '#ffcc00', kanji: '旗' },
+            Match: { color: '#50d71e', kanji: '勝負' },
         };
         let index = 0;
         const split = SplitText.create(textRef.current, { type: 'words,lines', mask: 'lines' });
@@ -35,7 +37,7 @@ export default function FrontPage() {
         });
 
         const interval = setInterval(() => {
-            gsap.to(wordRef.current, {
+            gsap.to([wordRef.current, kanjiRef.current], {
                 opacity: 0,
                 y: -20,
                 scaleY: 0.9,
@@ -46,10 +48,11 @@ export default function FrontPage() {
                     const keys = Object.keys(wordsColors);
                     index = (index + 1) % keys.length;
                     setWord(keys[index]);
-                    setWordColor(values[index]);
+                    setWordColor(values[index].color);
+                    setKanji(values[index].kanji);
 
-                    gsap.set(wordRef.current, { y: 20 });
-                    gsap.to(wordRef.current, {
+                    gsap.set([wordRef.current, kanjiRef.current], { y: 20 });
+                    gsap.to([wordRef.current, kanjiRef.current], {
                         opacity: 1,
                         y: 0,
                         scaleY: 1,
@@ -81,13 +84,24 @@ export default function FrontPage() {
                 <div className="mt-16 grid grid-cols-[60%_40%]">
                     <div>
                         <section className="flex flex-col place-items-start gap-8">
-                            <h2 ref={textRef} className="overflow-hidden text-8xl leading-28 font-extrabold">
+                            <h3 ref={textRef} className="overflow-hidden text-8xl leading-32 font-extrabold">
                                 Winning the CTF One{' '}
-                                <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordColor }}>
-                                    {word}
-                                </strong>{' '}
+                                <span className="relative inline-block">
+                                    <span
+                                        style={{
+                                            color: wordColor + '1a',
+                                        }}
+                                        className="absolute top-1/2 left-1/2 -z-10 w-auto -translate-1/2 text-center text-9xl whitespace-nowrap"
+                                        ref={kanjiRef}
+                                    >
+                                        {kanji}
+                                    </span>
+                                    <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordColor }}>
+                                        {word}
+                                    </strong>
+                                </span>{' '}
                                 At A Time
-                            </h2>
+                            </h3>
                             <p className="text-lg opacity-75">
                                 Browse through our diverse range of meticulously crafted guns, designed to bring out your personality and cater to
                                 your playstyle.
