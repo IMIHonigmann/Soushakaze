@@ -10,18 +10,15 @@ export default function FrontPage() {
     const wordRef = useRef<HTMLElement | null>(null);
     const kanjiRef = useRef<HTMLElement | null>(null);
     const textRef = useRef<HTMLHeadingElement | null>(null);
-    const [word, setWord] = useState('Match');
-    const [wordColor, setWordColor] = useState('#50d71e');
-    const [kanji, setKanji] = useState('勝負');
+    const [index, setIndex] = useState(0);
+    const wordValues = [
+        { word: 'Gun', color: '#ff3b30', kanji: '銃' },
+        { word: 'Attachment', color: '#af52de', kanji: '装 備' },
+        { word: 'Flag', color: '#ffcc00', kanji: '旗' },
+        { word: 'Match', color: '#50d71e', kanji: '勝負' },
+    ];
 
     useEffect(() => {
-        const wordsColors: Record<string, { color: string; kanji: string }> = {
-            Gun: { color: '#ff3b30', kanji: '銃' },
-            Attachment: { color: '#af52de', kanji: '装 備' },
-            Flag: { color: '#ffcc00', kanji: '旗' },
-            Match: { color: '#50d71e', kanji: '勝負' },
-        };
-        let index = 0;
         const split = SplitText.create(textRef.current, { type: 'words,lines', mask: 'lines' });
 
         gsap.from(split.lines, {
@@ -44,12 +41,7 @@ export default function FrontPage() {
                 duration: 0.4,
                 ease: 'power2.out',
                 onComplete: () => {
-                    const values = Object.values(wordsColors);
-                    const keys = Object.keys(wordsColors);
-                    index = (index + 1) % keys.length;
-                    setWord(keys[index]);
-                    setWordColor(values[index].color);
-                    setKanji(values[index].kanji);
+                    setIndex((prev) => (prev + 1) % wordValues.length);
 
                     gsap.set([wordRef.current, kanjiRef.current], { y: 20 });
                     gsap.to([wordRef.current, kanjiRef.current], {
@@ -67,7 +59,7 @@ export default function FrontPage() {
             clearInterval(interval);
             split.revert();
         };
-    }, []);
+    }, [wordValues.length]);
 
     return (
         <>
@@ -89,15 +81,15 @@ export default function FrontPage() {
                                 <span className="relative inline-block">
                                     <span
                                         style={{
-                                            color: wordColor + '1a',
+                                            color: wordValues[index].color + '1a',
                                         }}
                                         className="absolute top-1/2 left-1/2 -z-10 w-auto -translate-1/2 text-center text-9xl whitespace-nowrap"
                                         ref={kanjiRef}
                                     >
-                                        {kanji}
+                                        {wordValues[index].kanji}
                                     </span>
-                                    <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordColor }}>
-                                        {word}
+                                    <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordValues[index].color }}>
+                                        {wordValues[index].word}
                                     </strong>
                                 </span>{' '}
                                 At A Time
