@@ -13,7 +13,7 @@ export default function FrontPage() {
     const [index, setIndex] = useState(0);
     const wordValues = [
         { word: 'Gun', color: '#ff3b30', kanji: '銃' },
-        { word: 'Attachment', color: '#af52de', kanji: '装 備' },
+        { word: 'Attachment', color: '#af52de', kanji: '装備' },
         { word: 'Flag', color: '#ffcc00', kanji: '旗' },
         { word: 'Match', color: '#50d71e', kanji: '勝負' },
     ];
@@ -83,7 +83,7 @@ export default function FrontPage() {
                                         style={{
                                             color: wordValues[index].color + '1a',
                                         }}
-                                        className="absolute top-1/2 left-1/2 -z-10 w-auto -translate-1/2 text-center text-9xl whitespace-nowrap"
+                                        className="absolute inset-0 -z-10 flex w-auto items-center justify-center text-center text-9xl tracking-widest whitespace-nowrap"
                                         ref={kanjiRef}
                                     >
                                         {wordValues[index].kanji}
@@ -120,7 +120,11 @@ export default function FrontPage() {
                             </li>
                         </ul>
                     </div>
-                    <div className="place-self-center">Image</div>
+                    <img
+                        src="/goofy-ahh-apple.gif"
+                        alt="Hero Image"
+                        className="fade-in-image w-full place-self-center transition-all duration-2000 ease-in-out hover:translate-y-96 hover:scale-[600%]"
+                    />
                 </div>
             </main>
             <div className="flex justify-between bg-zinc-800 p-8">
