@@ -43,7 +43,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <h1 className="">On</h1>
                         <div className="font-extrabold">CLOUDPULSE - Training shoe - ivory horizon</div>
                         <div className="text-3xl">
-                            €160.00 <span className="text-gray-300 opacity-75">VAT included</span>
+                            €{weapon.price} <span className="text-gray-300 opacity-75">VAT included</span>
                         </div>
 
                         <div className="mt-8 text-xl">

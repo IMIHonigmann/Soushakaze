@@ -5,4 +5,5 @@ export type Weapon = {
     rate_of_fire: number;
     type: string;
     power: number;
+    price: number;
 };

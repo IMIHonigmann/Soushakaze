@@ -19,11 +19,13 @@ return new class extends Migration {
             $table->integer(column: 'rate_of_fire');
             $table->enum('type', ['handgun', 'smg', 'shotgun', 'blade']);
             $table->integer('power');
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->decimal('price', 10, 2);
             $table->enum('area', [
                 'muzzle', // suppressor, compensator, etc.
                 'scope', // red dot, acog, etc.
@@ -49,9 +51,9 @@ return new class extends Migration {
             $table->id();
             $table->uuid(column: 'custom_weapon_id');
             $table->foreign('custom_weapon_id')
-                  ->references('id')
-                  ->on('custom_weapon_ids')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('custom_weapon_ids')
+                ->onDelete('cascade');
             $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
             $table->foreignId('attachment_id')->nullable()->constrained('attachments')->onDelete('cascade');
             $table->timestamps();

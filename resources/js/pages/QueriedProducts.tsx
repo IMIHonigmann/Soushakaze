@@ -302,7 +302,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                         {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
                                     </div>
                                 )}
-                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">{'$999'}</div>
+                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">€{weapon.price}</div>
                             </div>
                         </Link>
                     ))}
