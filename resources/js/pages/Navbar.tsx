@@ -57,8 +57,8 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                             }
                         }}
                         ref={searchInputRef}
-                        className="w-full rounded-4xl border-2 p-4"
-                        placeholder="🔎 Search for weapons..."
+                        className="w-full border-2 p-4"
+                        placeholder="Search for weapons..."
                     />
                     <FaSearch
                         className="cursor-pointer text-4xl transition-[colors_transform] hover:scale-110 hover:text-lime-400"

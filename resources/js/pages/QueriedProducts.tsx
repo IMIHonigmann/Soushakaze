@@ -288,33 +288,33 @@ export default function QueriedProducts({ weapons, message }: Props) {
                         </div>
                     </form>
                 </div>
-                <div className="col-span-3 col-start-2 flex h-fit w-full flex-col content-start gap-8 place-self-start text-xl">
+                <div className="col-span-3 col-start-2 flex h-fit w-full flex-col content-start gap-8 place-self-start text-xl [&>*]:p-8">
                     {weapons.map((weapon, id) => (
                         <Link
-                            className="grid h-full w-full grid-cols-2 grid-rows-1 place-items-stretch py-2 text-center"
+                            className="group grid max-h-96 w-full grid-cols-2 grid-rows-1 place-items-stretch border-2 text-center"
                             href={route('product.show', { weaponId: weapon.id })}
                             key={id}
                         >
-                            <div className="flex h-full w-full scale-100 items-center justify-center rounded-md border-2 transition-transform ease-out group-hover:scale-105">
+                            <div className="flex h-full w-full scale-100 items-center justify-center rounded-md transition-transform ease-out">
                                 <img
                                     src={`data:image/png;base64,${weapon.image_base64}`}
                                     alt={weapon.name}
-                                    className="h-full w-full transform object-cover transition-transform duration-300 group-hover:scale-110"
+                                    className="h-full w-full scale-125 transform object-cover transition-transform duration-300 group-hover:scale-[135%]"
                                 />
                             </div>
                             <div className="mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8">
                                 <div className="text-2xl">
-                                    <div className="translate-y-0 text-left font-extrabold transition-transform group-hover:translate-y-1">
+                                    <div className="translate-y-0 text-left font-extrabold transition-transform group-hover:translate-x-1">
                                         {weapon.name}
                                     </div>
 
                                     {!isNaN(parseFloat(weapon.avg_rating)) && (
-                                        <div className="block translate-y-0 text-left transition-transform group-hover:translate-y-1">
+                                        <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
                                             {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
                                         </div>
                                     )}
                                 </div>
-                                <div className="block translate-y-0 -skew-x-12 text-end text-6xl font-black transition-transform group-hover:translate-y-1">
+                                <div className="block translate-y-0 -skew-x-12 text-end text-6xl font-black transition-transform">
                                     €{weapon.price}
                                 </div>
                             </div>
