@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -20,8 +21,11 @@ return new class extends Migration {
             $table->enum('type', ['handgun', 'smg', 'shotgun', 'blade']);
             $table->integer('power');
             $table->decimal('price', 10, 2);
+            $table->binary('image_blob')->nullable();
             $table->timestamps();
         });
+        DB::statement("ALTER TABLE weapons MODIFY image_blob MEDIUMBLOB");
+
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -39,14 +43,19 @@ return new class extends Migration {
                 'underbarrel',
                 'other', // fallback
             ]);
+            $table->binary('image_blob')->nullable();
             $table->timestamps();
         });
+        DB::statement("ALTER TABLE weapons MODIFY image_blob MEDIUMBLOB");
+
         Schema::create('weapons_attachments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
             $table->foreignId('attachment_id')->constrained('attachments')->onDelete('cascade');
             $table->timestamps();
         });
+
+
         Schema::create('usercreated_weapons_attachments', function (Blueprint $table) {
             $table->id();
             $table->uuid(column: 'custom_weapon_id');

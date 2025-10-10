@@ -57,6 +57,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('send-review');
 
     Route::post('placeOrder', [OrdersController::class, 'placeOrder'])->name('place-order');
+
+
+    Route::post('addImage', function (Request $request) {
+        $validated = $request->validate([
+            'image' => 'required|string',
+            'weapon_id' => 'required|integer'
+        ]);
+
+        $imageData = $validated['image'];
+        $weaponId = $validated['weapon_id'];
+
+        if (preg_match('/^data:(.*);base64,(.*)$/', $imageData, $matches)) {
+            $binary = base64_decode($matches[2]);
+        } else {
+            $binary = base64_decode($imageData);
+        }
+
+
+        DB::table('weapons')->where('id', $weaponId)->update([
+            'image_blob' => $binary,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Image uploaded.');
+    })->name('add-image');
 });
 
 
@@ -83,6 +108,7 @@ Route::get('morphTest', function (Request $request) {
 Route::get('frontpage', function (Request $request) {
     return Inertia::render('FrontPage');
 })->name('front-page');
+
 
 
 require __DIR__ . '/settings.php';

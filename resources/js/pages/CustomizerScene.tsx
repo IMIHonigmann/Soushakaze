@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
@@ -37,6 +38,10 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
     const handleScreenshot = useCallback(
         (dataURL: string) => {
             setScreenshotDataURL(dataURL);
+            router.post('/addImage', {
+                image: dataURL,
+                weapon_id: weaponId,
+            });
 
             // Download logic
             const link = document.createElement('a');
