@@ -1,13 +1,54 @@
 import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import React, { lazy, memo, Suspense, useMemo } from 'react';
+import React, { lazy, memo, Suspense, useCallback, useMemo, useRef } from 'react';
 import { Area } from './Customizer';
 
-type Props = { cameraControlsRef: React.RefObject<CameraControls | null>; weaponId: number; setCurrentAreaSelection: React.Dispatch<Area> };
 const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
 
+interface Props {
+    cameraControlsRef: React.RefObject<any>;
+    weaponId: number | null;
+    setCurrentAreaSelection: (area: Area) => void;
+}
+
+function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {
+    const { gl, scene, camera } = useThree();
+
+    React.useEffect(() => {
+        window.takeScreenshot = () => {
+            gl.render(scene, camera);
+            const dataURL = gl.domElement.toDataURL('image/png');
+            onScreenshotReady(dataURL);
+        };
+
+        return () => {
+            window.takeScreenshot = undefined;
+        };
+    }, [gl, scene, camera, onScreenshotReady]);
+
+    return null;
+}
+
 function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection }: Props) {
+    const canvasRef = useRef(null);
+    const [screenshotDataURL, setScreenshotDataURL] = React.useState<string | null>(null);
+
+    const handleScreenshot = useCallback(
+        (dataURL: string) => {
+            setScreenshotDataURL(dataURL);
+
+            // Download logic
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = `weapon-${weaponId}-screenshot.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        [weaponId],
+    );
+
     const WeaponModel = useMemo(() => {
         if (!weaponId) return null;
 
@@ -24,6 +65,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
             }));
         });
     }, [weaponId]);
+
     return (
         <>
             <div style={{ width: '1920px', height: '960px', margin: 'auto', backgroundColor: '#151517' }}>
@@ -34,7 +76,23 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                         </div>
                     }
                 >
-                    <Canvas shadows gl={{ alpha: true, antialias: true }}>
+                    <button
+                        onClick={() => {
+                            if (window.takeScreenshot) {
+                                cameraControlsRef.current.setLookAt(0, 0, 5, 0, 0, 0, false);
+                                const take = window.takeScreenshot;
+                                setTimeout(() => {
+                                    take?.();
+                                }, 100);
+                            }
+                        }}
+                    >
+                        Take screenshot
+                    </button>
+                    <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
+                        {/* Add the ScreenshotHelper component inside the Canvas */}
+                        <ScreenshotHelper onScreenshotReady={handleScreenshot} />
+
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
                             {WeaponModel ? <WeaponModel /> : null}
                         </Stage>
@@ -59,6 +117,12 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
             </div>
         </>
     );
+}
+
+declare global {
+    interface Window {
+        takeScreenshot?: () => void;
+    }
 }
 
 export default memo(CustomizerScene);
