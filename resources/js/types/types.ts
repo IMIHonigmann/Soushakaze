@@ -6,4 +6,5 @@ export type Weapon = {
     type: string;
     power: number;
     price: number;
+    image_base64: string;
 };

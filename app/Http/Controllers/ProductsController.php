@@ -64,7 +64,14 @@ class ProductsController extends Controller
             ->when($qPowerLower !== '', fn($query) => $query->where('power', '>=', $qPowerLower))
             ->when($qPowerUpper !== '', fn($query) => $query->where('power', '<=', $qPowerUpper))
             ->when(count($qCheckedWeaponTypes) > 0, fn($query) => $query->whereIn('type', $qCheckedWeaponTypes))
-            ->get();
+            ->get()
+            ->map(function ($weapon) {
+                if (isset($weapon->image_blob)) {
+                    $weapon->image_base64 = base64_encode($weapon->image_blob);
+                    unset($weapon->image_blob);
+                }
+                return $weapon;
+            });
         $count = $weapons->count();
 
         return Inertia::render('QueriedProducts', [
