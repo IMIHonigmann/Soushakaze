@@ -26,8 +26,8 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
         <div className="mx-32">
             <Navbar />
             <div className="grid grid-cols-2 justify-items-center text-xl">
-                <div className="sticky top-10 flex w-3/4 items-stretch justify-between self-start">
-                    <ul className="flex flex-col gap-2 [&>*]:border-2 [&>*]:p-8">
+                <div className="sticky top-10 flex w-3/4 items-stretch justify-between gap-4 self-start">
+                    <ul className="flex flex-col gap-4 [&>*]:border-2 [&>*]:p-8">
                         <li>1</li>
                         <li>2</li>
                         <li>3</li>
@@ -36,12 +36,14 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <li>6</li>
                         <li>7</li>
                     </ul>
-                    <div className="flex h-[900px] items-center border-2 border-white px-52">Image</div>
+                    <div className="flex h-[900px] items-center border-2 border-white">
+                        <img alt={weapon.name} src={`data:image/png;base64,${weapon.image_base64}`} />
+                    </div>
                 </div>
                 <div>
                     <div className="flex flex-col gap-4 text-4xl">
-                        <h1 className="">On</h1>
-                        <div className="font-extrabold">CLOUDPULSE - Training shoe - ivory horizon</div>
+                        <h1 className="">On--</h1>
+                        <div className="font-extrabold">{weapon.name}</div>
                         <div className="text-3xl">
                             €{weapon.price} <span className="text-gray-300 opacity-75">VAT included</span>
                         </div>
@@ -52,11 +54,11 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                                 <span className="font-extrabold">June 15, 2024 - June 18, 2024</span>
                                 <span className="place-self-end">Free</span>
                                 <span className="col-start-1 row-start-2 font-extrabold">June 13, 2024 - June 14, 2024</span>
-                                <span className="place-self-end">4,90EUR</span>
+                                <span className="place-self-end">4,90EUR--</span>
                             </div>
                         </div>
                     </div>
-                    <div className="mt-36">Color: {'green'}</div>
+                    <div className="mt-36">Color: {'green--'}</div>
                     <div className="mt-36 grid grid-cols-8 grid-rows-2 place-items-center gap-4 [&>*]:h-full [&>*]:w-full [&>*]:border-2 [&>*]:p-4">
                         <Link className="col-span-12 transition-colors hover:bg-zinc-900" href={route('customizer', { weaponId: weapon.id })}>
                             Customize
@@ -102,7 +104,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         </button>
                     </div>
                     <ul className="mt-36 [&>*]:border-2 [&>*]:p-4">
-                        <li>Sold by H&K, shipped by Soushakaze.</li>
+                        <li>Sold by H&K, shipped by Soushakaze.--</li>
                         <li>Free delivery and returns</li>
                         <li>30 day return policy</li>
                         <li>Sell it back</li>
