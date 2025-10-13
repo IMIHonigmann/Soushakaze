@@ -4,6 +4,7 @@ import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { AiOutlinePlus } from 'react-icons/ai';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import CustomizerScene from './CustomizerScene';
@@ -80,7 +81,30 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
             <div className="flex justify-center">
-                <div className="absolute bottom-10 flex justify-center gap-8">
+                <div className="absolute bottom-10 w-full px-4">
+                    <div className="mx-auto flex max-w-3xl justify-center gap-4">
+                        {Object.entries(grouped).map(([area, attachments]) => {
+                            return (
+                                <div key={area} className="flex aspect-square w-48 flex-col items-stretch">
+                                    <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                                    <div className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_10px_rgba(249,115,22,0.7)] [&>*]:w-full">
+                                        <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
+                                            <AiOutlinePlus className="text-6xl" />
+                                        </div>
+                                        <div className="flex h-1/4 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                            <div
+                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} text-sm uppercase`}
+                                            >
+                                                {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+                <div className="absolute top-10 flex justify-center gap-8">
                     {Object.entries(grouped).map(([area, attachments]) => (
                         <div key={area}>
                             <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
