@@ -89,7 +89,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                     <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <div className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_10px_rgba(249,115,22,0.7)] [&>*]:w-full">
                                         <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
-                                            <AiOutlinePlus className="text-6xl" />
+                                            {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt="img" />}
                                         </div>
                                         <div className="flex h-1/4 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
                                             <div
