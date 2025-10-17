@@ -89,7 +89,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                     <div className="mx-auto flex max-w-3xl justify-center gap-4">
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
-                                <div key={area} className="flex aspect-square w-48 flex-col items-stretch">
+                                <div key={area} className="z-30 flex aspect-square w-48 flex-col items-stretch">
                                     <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
@@ -127,20 +127,23 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                     ADD TO CART
                 </Link>
             </div>
-            <div className="pointer-events-none absolute top-0 right-0 flex h-full w-screen justify-end gap-8">
+            <div
+                style={{ backgroundColor: currentAreaSelection === 'other' || currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)' }}
+                className="pointer-events-none absolute top-0 right-0 flex h-full w-screen justify-end gap-8 transition-all duration-400"
+            >
                 {Object.entries(grouped).map(
                     ([area, attachments]) =>
                         currentAreaSelection === area && (
                             <div key={area} className="animate-fade-from-left pointer-events-auto bg-black">
                                 <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                <ul>
+                                <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-10 [&>*]:py-5">
                                     <li
                                         key={`standard-${area}`}
                                         style={{
                                             fontWeight: selected[area] === 0 ? 'bold' : 'normal',
                                             background: selected[area] === 0 ? '#FF0000' : 'transparent',
                                         }}
-                                        onClick={() => handleSelect(area as Area, 0)}
+                                        onMouseEnter={() => handleSelect(area as Area, 0)}
                                         className="cursor-pointer select-none"
                                     >
                                         Factory issue
@@ -152,7 +155,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                                 fontWeight: selected[area] === a.id ? 'bold' : 'normal',
                                                 background: selected[area] === a.id ? '#FF0000' : 'transparent',
                                             }}
-                                            onClick={() => handleSelect(area as Area, a.id)}
+                                            onMouseEnter={() => handleSelect(area as Area, a.id)}
                                             className="cursor-pointer select-none"
                                         >
                                             {a.name}
