@@ -169,6 +169,21 @@
         }
     }
 
+    .animate-fade-from-left {
+        animation: fade-from-left 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fade-from-left {
+        0% {
+            opacity: 1;
+            transform: translateX(20vw);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
     .no-arrows {
         -moz-appearance: textfield; /* Firefox */
     }

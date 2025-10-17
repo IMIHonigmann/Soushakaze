@@ -69,6 +69,10 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
         setCameraControls(target, position);
     }, [currentAreaSelection, setCameraControls]);
 
+    function handleClickAttachmentArea(area: Area) {
+        setCurrentAreaSelection(area);
+    }
+
     return (
         <>
             <MdOutlineCameraswitch
@@ -87,7 +91,10 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             return (
                                 <div key={area} className="flex aspect-square w-48 flex-col items-stretch">
                                     <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                    <div className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_10px_rgba(249,115,22,0.7)] [&>*]:w-full">
+                                    <button
+                                        onClick={() => handleClickAttachmentArea(area as Area)}
+                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_10px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                    >
                                         <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
                                             {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt="img" />}
                                         </div>
@@ -98,44 +105,11 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                                 {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
                                             </div>
                                         </div>
-                                    </div>
+                                    </button>
                                 </div>
                             );
                         })}
                     </div>
-                </div>
-                <div className="absolute top-10 flex justify-center gap-8">
-                    {Object.entries(grouped).map(([area, attachments]) => (
-                        <div key={area}>
-                            <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                            <ul>
-                                <li
-                                    key={`standard-${area}`}
-                                    style={{
-                                        fontWeight: selected[area] === 0 ? 'bold' : 'normal',
-                                        background: selected[area] === 0 ? '#FF0000' : 'transparent',
-                                    }}
-                                    onClick={() => handleSelect(area as Area, 0)}
-                                    className="cursor-pointer select-none"
-                                >
-                                    Factory issue
-                                </li>
-                                {(attachments as Attachment[]).map((a) => (
-                                    <li
-                                        key={a.id}
-                                        style={{
-                                            fontWeight: selected[area] === a.id ? 'bold' : 'normal',
-                                            background: selected[area] === a.id ? '#FF0000' : 'transparent',
-                                        }}
-                                        onClick={() => handleSelect(area as Area, a.id)}
-                                        className="cursor-pointer select-none"
-                                    >
-                                        {a.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
                 </div>
                 <Link
                     className="cursor-pointer"
@@ -152,6 +126,42 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 >
                     ADD TO CART
                 </Link>
+            </div>
+            <div className="pointer-events-none absolute top-0 right-0 flex h-full w-screen justify-end gap-8">
+                {Object.entries(grouped).map(
+                    ([area, attachments]) =>
+                        currentAreaSelection === area && (
+                            <div key={area} className="animate-fade-from-left pointer-events-auto bg-black">
+                                <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                                <ul>
+                                    <li
+                                        key={`standard-${area}`}
+                                        style={{
+                                            fontWeight: selected[area] === 0 ? 'bold' : 'normal',
+                                            background: selected[area] === 0 ? '#FF0000' : 'transparent',
+                                        }}
+                                        onClick={() => handleSelect(area as Area, 0)}
+                                        className="cursor-pointer select-none"
+                                    >
+                                        Factory issue
+                                    </li>
+                                    {(attachments as Attachment[]).map((a) => (
+                                        <li
+                                            key={a.id}
+                                            style={{
+                                                fontWeight: selected[area] === a.id ? 'bold' : 'normal',
+                                                background: selected[area] === a.id ? '#FF0000' : 'transparent',
+                                            }}
+                                            onClick={() => handleSelect(area as Area, a.id)}
+                                            className="cursor-pointer select-none"
+                                        >
+                                            {a.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ),
+                )}
             </div>
         </>
     );
