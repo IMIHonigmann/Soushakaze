@@ -89,11 +89,16 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                     <div className="mx-auto flex max-w-3xl justify-center gap-4">
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
-                                <div key={area} className="z-30 flex aspect-square w-48 flex-col items-stretch">
+                                <div
+                                    key={area}
+                                    style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
+                                    className="z-30 flex aspect-square w-48 flex-col items-stretch transition-all"
+                                >
                                     <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
-                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_10px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                        style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
+                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
                                     >
                                         <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
                                             {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt="img" />}
@@ -129,42 +134,48 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
             </div>
             <div
                 style={{ backgroundColor: currentAreaSelection === 'other' || currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)' }}
-                className="pointer-events-none absolute top-0 right-0 flex h-full w-screen justify-end gap-8 transition-all duration-400"
+                className="pointer-events-none absolute top-0 right-0 h-full w-screen transition-all duration-400"
             >
-                {Object.entries(grouped).map(
-                    ([area, attachments]) =>
-                        currentAreaSelection === area && (
-                            <div key={area} className="animate-fade-from-left pointer-events-auto bg-black">
-                                <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-10 [&>*]:py-5">
+                <div>
+                    {Object.entries(grouped).map(([area, attachments]) => (
+                        <div
+                            key={area}
+                            style={{
+                                transform: `translateX(${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
+                                opacity: currentAreaSelection === area ? 1 : 0,
+                                pointerEvents: currentAreaSelection === area ? 'auto' : 'none',
+                                right: currentAreaSelection === area ? '0' : '-30%',
+                            }}
+                            className="absolute top-0 right-0 h-full bg-black transition-all duration-300"
+                        >
+                            <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-20 [&>*]:py-5">
+                                <li
+                                    key={`standard-${area}`}
+                                    style={{
+                                        background: selected[area] === 0 ? '#FF0000' : 'transparent',
+                                    }}
+                                    onMouseEnter={() => handleSelect(area as Area, 0)}
+                                    className="cursor-pointer transition-[background] select-none"
+                                >
+                                    Factory issue
+                                </li>
+                                {(attachments as Attachment[]).map((a) => (
                                     <li
-                                        key={`standard-${area}`}
+                                        key={a.id}
                                         style={{
-                                            fontWeight: selected[area] === 0 ? 'bold' : 'normal',
-                                            background: selected[area] === 0 ? '#FF0000' : 'transparent',
+                                            background: selected[area] === a.id ? '#FF0000' : 'transparent',
                                         }}
-                                        onMouseEnter={() => handleSelect(area as Area, 0)}
-                                        className="cursor-pointer select-none"
+                                        onMouseEnter={() => handleSelect(area as Area, a.id)}
+                                        className="cursor-pointer transition-[background] duration-300 select-none"
                                     >
-                                        Factory issue
+                                        {a.name}
                                     </li>
-                                    {(attachments as Attachment[]).map((a) => (
-                                        <li
-                                            key={a.id}
-                                            style={{
-                                                fontWeight: selected[area] === a.id ? 'bold' : 'normal',
-                                                background: selected[area] === a.id ? '#FF0000' : 'transparent',
-                                            }}
-                                            onMouseEnter={() => handleSelect(area as Area, a.id)}
-                                            className="cursor-pointer select-none"
-                                        >
-                                            {a.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ),
-                )}
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </div>
             </div>
         </>
     );
