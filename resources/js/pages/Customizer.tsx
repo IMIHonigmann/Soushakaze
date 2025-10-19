@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { IoIosReturnLeft } from 'react-icons/io';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import CustomizerScene from './CustomizerScene';
@@ -136,6 +137,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 style={{ backgroundColor: currentAreaSelection === 'other' || currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)' }}
                 className="pointer-events-none absolute top-0 right-0 h-full w-screen transition-all duration-400"
             >
+                {/* Attachment Selection List */}
                 <div>
                     {Object.entries(grouped).map(([area, attachments]) => (
                         <div
@@ -148,7 +150,13 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             }}
                             className="absolute top-0 right-0 h-full bg-black transition-all duration-300"
                         >
-                            <strong className="select-none">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                            <div className="m-4 flex items-center justify-between">
+                                <strong className="text-xl tracking-widest uppercase select-none">{area}</strong>
+                                <IoIosReturnLeft
+                                    onClick={() => setCurrentAreaSelection('other')}
+                                    className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
+                                />
+                            </div>
                             <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-20 [&>*]:py-5">
                                 <li
                                     key={`standard-${area}`}
