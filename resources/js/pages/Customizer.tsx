@@ -118,9 +118,10 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             );
                         })}
                     </div>
-                    <div className="mt-auto mb-[0.875rem] flex flex-col gap-2 uppercase">
+                    <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%]">
+                        <div className="flex flex-col gap-2 uppercase">
                         {['Firepower', 'Accuracy', 'Mobility', 'Handling'].map((stat) => (
-                            <div key={stat} className="grid grid-cols-[15%_5%_80%] items-center gap-4">
+                                <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
                                 <span>{stat}</span> <FaAngleUp className="text-2xl" />
                                 <div className="relative flex h-3/4 w-3/4 border">
                                     <div className="h-full w-[43%] border-r bg-white" />
@@ -128,6 +129,17 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                 </div>
                             </div>
                         ))}
+                        </div>
+                        <div className="grid grid-cols-1 font-extrabold [&>*]:-skew-x-6">
+                            <div>
+                                <div>Mags</div>
+                                <div className="-mt-1 text-4xl">5</div>
+                            </div>
+                            <div>
+                                <div>Mag Size</div>
+                                <div className="-mt-1 text-4xl">30</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <Link
