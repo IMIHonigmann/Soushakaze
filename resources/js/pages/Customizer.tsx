@@ -6,7 +6,7 @@ import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
-import { GiSupersonicBullet } from 'react-icons/gi';
+import { FaAngleDoubleUp, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
@@ -88,7 +88,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
             <div className="flex justify-center">
-                <div className="absolute bottom-10 w-full px-4">
+                <div className="absolute bottom-10 grid w-full grid-cols-[70%_30%] px-4">
                     <div className="mx-auto flex max-w-3xl justify-center gap-4">
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
@@ -117,6 +117,17 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                 </div>
                             );
                         })}
+                    </div>
+                    <div className="mt-auto mb-[0.875rem] flex flex-col gap-2 uppercase">
+                        {['Firepower', 'Accuracy', 'Mobility', 'Handling'].map((stat) => (
+                            <div key={stat} className="grid grid-cols-[15%_5%_80%] items-center gap-4">
+                                <span>{stat}</span> <FaAngleUp className="text-2xl" />
+                                <div className="relative flex h-3/4 w-3/4 border">
+                                    <div className="h-full w-[43%] border-r bg-white" />
+                                    <div className="h-full w-[18%] border-r bg-lime-400" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
                 <Link
@@ -182,8 +193,9 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                         onClick={() => handleSelect(area as Area, a.id)}
                                         className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
                                     >
-                                        <div className="border-2 bg-black">
-                                            <GiSupersonicBullet className="p-2 text-6xl" />
+                                        <div className="relative border-2 bg-black">
+                                            <FaCrosshairs className="p-2 text-6xl" />
+                                            <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
                                         </div>
                                         <div className="text-xl">{a.name}</div>
                                     </li>
