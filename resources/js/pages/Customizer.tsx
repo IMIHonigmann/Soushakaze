@@ -5,6 +5,8 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { CiIceCream } from 'react-icons/ci';
+import { GiSupersonicBullet } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
@@ -163,21 +165,27 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                 />
                             </div>
-                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-20 [&>*]:py-5">
+                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:min-w-80 [&>*]:p-4">
                                 <li
                                     key={`standard-${area}`}
                                     onClick={() => handleSelect(area as Area, 0)}
-                                    className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} cursor-pointer transition-[background] duration-300 select-none hover:bg-red-600`}
+                                    className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
                                 >
-                                    Factory issue
+                                    <div className="border-2">
+                                        <CiIceCream className="p-2 text-6xl" />
+                                    </div>
+                                    <div className="text-xl">Factory Issue</div>
                                 </li>
                                 {attachments.map((a) => (
                                     <li
                                         key={a.id}
                                         onClick={() => handleSelect(area as Area, a.id)}
-                                        className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} cursor-pointer transition-all select-none hover:bg-red-600`}
+                                        className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
                                     >
-                                        {a.name}
+                                        <div className="border-2">
+                                            <GiSupersonicBullet className="p-2 text-6xl" />
+                                        </div>
+                                        <div className="text-xl">{a.name}</div>
                                     </li>
                                 ))}
                             </ul>
