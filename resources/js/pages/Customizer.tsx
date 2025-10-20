@@ -151,7 +151,13 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             className="absolute top-0 right-0 h-full bg-black transition-all duration-300"
                         >
                             <div className="m-4 flex items-center justify-between">
-                                <strong className="text-xl tracking-widest uppercase select-none">{area}</strong>
+                                <div className="relative">
+                                    <strong className="text-xl tracking-widest uppercase select-none">{area}</strong>
+                                    <span
+                                        className={`absolute -bottom-1 left-0 h-0.5 origin-left ${currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
                                 <IoIosReturnLeft
                                     onClick={() => setCurrentAreaSelection('other')}
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
@@ -160,22 +166,16 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             <ul className="mx-2 flex flex-col divide-y-2 [&>*]:px-20 [&>*]:py-5">
                                 <li
                                     key={`standard-${area}`}
-                                    style={{
-                                        background: selected[area] === 0 ? '#FF0000' : 'transparent',
-                                    }}
-                                    onMouseEnter={() => handleSelect(area as Area, 0)}
-                                    className="cursor-pointer transition-[background] select-none"
+                                    onClick={() => handleSelect(area as Area, 0)}
+                                    className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} cursor-pointer transition-[background] duration-300 select-none hover:bg-red-600`}
                                 >
                                     Factory issue
                                 </li>
-                                {(attachments as Attachment[]).map((a) => (
+                                {attachments.map((a) => (
                                     <li
                                         key={a.id}
-                                        style={{
-                                            background: selected[area] === a.id ? '#FF0000' : 'transparent',
-                                        }}
-                                        onMouseEnter={() => handleSelect(area as Area, a.id)}
-                                        className="cursor-pointer transition-[background] duration-300 select-none"
+                                        onClick={() => handleSelect(area as Area, a.id)}
+                                        className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} cursor-pointer transition-all select-none hover:bg-red-600`}
                                     >
                                         {a.name}
                                     </li>
