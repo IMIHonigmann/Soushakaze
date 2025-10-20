@@ -150,7 +150,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                 pointerEvents: currentAreaSelection === area ? 'auto' : 'none',
                                 right: currentAreaSelection === area ? '0' : '-30%',
                             }}
-                            className="absolute top-0 right-0 h-full bg-black transition-all duration-300"
+                            className="absolute top-0 right-0 h-full border-l bg-black transition-all duration-300"
                         >
                             <div className="m-4 flex items-center justify-between">
                                 <div className="relative">
@@ -171,7 +171,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                     onClick={() => handleSelect(area as Area, 0)}
                                     className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
                                 >
-                                    <div className="border-2">
+                                    <div className="border-2 bg-black">
                                         <CiIceCream className="p-2 text-6xl" />
                                     </div>
                                     <div className="text-xl">Factory Issue</div>
@@ -182,7 +182,7 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                                         onClick={() => handleSelect(area as Area, a.id)}
                                         className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
                                     >
-                                        <div className="border-2">
+                                        <div className="border-2 bg-black">
                                             <GiSupersonicBullet className="p-2 text-6xl" />
                                         </div>
                                         <div className="text-xl">{a.name}</div>
