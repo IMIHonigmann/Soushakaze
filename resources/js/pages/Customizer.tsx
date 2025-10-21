@@ -29,10 +29,14 @@ export type Attachment = {
     updated_at?: string;
 };
 
+const statTypes = ['power', 'accuracy', 'mobility', 'handling'] as const;
+export type Stats = (typeof statTypes)[number];
+
 export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
 
 interface Props {
     weapon: Weapon;
+    maxPower: number;
     attachments: Attachment[];
 }
 
@@ -86,6 +90,20 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         setCurrentAreaSelection(area);
     }
 
+    const statModifiers: Record<Stats, number> = useMemo(() => {
+        return Object.fromEntries(
+            statTypes.map((stat) => {
+                const sum = Object.entries(grouped).reduce((total, [area, attachments]) => {
+                    const id = selected[area];
+                    if (!id) return total;
+                    const att = attachments.find((a) => a.id === id);
+                    return total + (att ? att[`${stat}_modifier`] : 0);
+                }, 0);
+                return [stat, sum];
+            }),
+        ) as Record<Stats, number>;
+    }, [selected, grouped]);
+
     return (
         <>
             <MdOutlineCameraswitch
@@ -120,7 +138,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                         </div>
                                         <div className="flex h-1/4 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
                                             <div
-                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} text-sm uppercase`}
+                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} text-xs uppercase`}
                                             >
                                                 {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
                                             </div>
@@ -134,20 +152,26 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : '-translate-x-[35vw]'} z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all`}
                     >
                         <div className="flex flex-col gap-2 uppercase">
-                            {['firepower', 'accuracy', 'mobility', 'handling'].map((stat) => (
-                                <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
-                                    <span>{stat}</span> <FaAngleUp className="text-2xl" />
-                                    <div className="relative flex h-3/4 w-3/4 border">
-                                        <div
-                                            style={{
-                                                width: stat === 'firepower' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
-                                            }}
-                                            className="h-full border-r bg-white"
-                                        />
-                                        <div className="h-full w-[18%] border-r bg-lime-400" />
+                            {statTypes.map((stat) => {
+                                console.log('Stat Mods:', statModifiers);
+                                return (
+                                    <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
+                                        <span>{stat}</span> <FaAngleUp className="text-2xl" />
+                                        <div className="relative flex h-3/4 w-3/4 border">
+                                            <div
+                                                style={{
+                                                    width: stat === 'power' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
+                                                }}
+                                                className="h-full border-r bg-white"
+                                            />
+                                            <div
+                                                style={{ width: `${statModifiers[stat]}%` }}
+                                                className="h-full border-r bg-lime-400 transition-all"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                         <div className="grid grid-cols-1 font-extrabold [&>*]:-skew-x-6">
                             <div>

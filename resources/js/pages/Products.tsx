@@ -1,16 +1,6 @@
+import { Weapon } from '@/types/types';
 import { Link, router } from '@inertiajs/react';
 import { Fragment } from 'react/jsx-runtime';
-
-type Weapon = {
-    id: number;
-    name: string;
-    rate_of_fire: number;
-    type: string;
-    power: number;
-    accuracy: number;
-    mobility: number;
-    handling: number;
-};
 
 type Props = {
     weapons: Weapon[];
