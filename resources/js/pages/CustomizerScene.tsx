@@ -33,7 +33,7 @@ function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: 
 
 function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection }: Props) {
     const canvasRef = useRef(null);
-    const [screenshotDataURL, setScreenshotDataURL] = React.useState<string | null>(null);
+    const [, setScreenshotDataURL] = React.useState<string | null>(null);
 
     const handleScreenshot = useCallback(
         (dataURL: string) => {

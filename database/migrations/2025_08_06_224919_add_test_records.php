@@ -11,70 +11,241 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        DB::table('weapons')->insert([
+        DB::table('weapons')->insert(
             [
-                'name' => 'Katana',
-                'type' => 'blade',
-                'power' => 100,
-                'rate_of_fire' => 0,
-                'price' => 149.99,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'H&K MP5',
-                'type' => 'smg',
-                'rate_of_fire' => 100,
-                'power' => 560,
-                'price' => 1199,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Desert Eagle',
-                'type' => 'handgun',
-                'rate_of_fire' => 30,
-                'power' => 400,
-                'price' => 899.99,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Remington 870',
-                'type' => 'shotgun',
-                'rate_of_fire' => 20,
-                'power' => 700,
-                'price' => 799.99,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Combat Knife',
-                'type' => 'blade',
-                'rate_of_fire' => 0,
-                'power' => 80,
-                'price' => 59.99,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'PPSH41',
-                'type' => 'smg',
-                'rate_of_fire' => 90,
-                'power' => 1200,
-                'price' => 1099,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+                [
+                    'name' => 'Katana',
+                    'type' => 'blade',
+                    'power' => 5,
+                    'accuracy' => 57,
+                    'mobility' => 9,
+                    'handling' => 54,
+                    'rate_of_fire' => 0,
+                    'price' => 149.99,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'name' => 'H&K MP5',
+                    'type' => 'smg',
+                    'rate_of_fire' => 60,
+                    'power' => 1.1,
+                    'accuracy' => 44,
+                    'mobility' => 54,
+                    'handling' => 50,
+                    'price' => 1199,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'name' => 'Desert Eagle',
+                    'type' => 'handgun',
+                    'rate_of_fire' => 18,
+                    'power' => 3,
+                    'accuracy' => 41,
+                    'mobility' => 25,
+                    'handling' => 40,
+                    'price' => 899.99,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'name' => 'Remington 870',
+                    'type' => 'shotgun',
+                    'rate_of_fire' => 12,
+                    'power' => 3.5,
+                    'accuracy' => 32,
+                    'mobility' => 19,
+                    'handling' => 37,
+                    'price' => 799.99,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'name' => 'Combat Knife',
+                    'type' => 'blade',
+                    'rate_of_fire' => 0,
+                    'power' => 5,
+                    'accuracy' => 60,
+                    'mobility' => 60,
+                    'handling' => 60,
+                    'price' => 59.99,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'name' => 'PPSH41',
+                    'type' => 'smg',
+                    'rate_of_fire' => 54,
+                    'power' => 1.4,
+                    'accuracy' => 38,
+                    'mobility' => 50,
+                    'handling' => 47,
+                    'price' => 1099,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            ]
+
+        );
+
         $attachments = [
-            ['name' => 'Red Dot Sight', 'area' => 'scope', 'price' => 199.99],
-            ['name' => 'Suppressor', 'area' => 'barrel', 'price' => 299.99],
-            ['name' => 'Extended Magazine', 'area' => 'magazine', 'price' => 99.99],
-            ['name' => 'Laser Sight', 'area' => 'underbarrel', 'price' => 119.99],
-            ['name' => 'Foregrip', 'area' => 'underbarrel', 'price' => 79.99],
-            ['name' => 'Collapsible Stock', 'area' => 'stock', 'price' => 149.99],
-            ['name' => 'Fixed Stock', 'area' => 'stock', 'price' => 129.99],
+            // existing attachments with modifiers
+            [
+                'name' => 'Red Dot Sight',
+                'area' => 'scope',
+                'price' => 199.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 10,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 5,
+            ],
+            [
+                'name' => 'Suppressor',
+                'area' => 'barrel',
+                'price' => 299.99,
+                'power_modifier' => -5,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => -2,
+                'handling_modifier' => -1,
+            ],
+            [
+                'name' => 'Extended Magazine',
+                'area' => 'magazine',
+                'price' => 99.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => -3,
+                'handling_modifier' => 10,
+            ],
+            [
+                'name' => 'Laser Sight',
+                'area' => 'underbarrel',
+                'price' => 119.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 8,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 3,
+            ],
+            [
+                'name' => 'Foregrip',
+                'area' => 'underbarrel',
+                'price' => 79.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 6,
+                'mobility_modifier' => -1,
+                'handling_modifier' => 7,
+            ],
+            [
+                'name' => 'Collapsible Stock',
+                'area' => 'stock',
+                'price' => 149.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 4,
+                'mobility_modifier' => 5,
+                'handling_modifier' => 6,
+            ],
+            [
+                'name' => 'Fixed Stock',
+                'area' => 'stock',
+                'price' => 129.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 6,
+                'mobility_modifier' => -2,
+                'handling_modifier' => 4,
+            ],
+
+            // new attachments
+            [
+                'name' => '4x Scope',
+                'area' => 'scope',
+                'price' => 349.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 20,
+                'mobility_modifier' => -10,
+                'handling_modifier' => -5,
+            ],
+            [
+                'name' => 'Holographic Sight',
+                'area' => 'scope',
+                'price' => 249.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 12,
+                'mobility_modifier' => -2,
+                'handling_modifier' => 4,
+            ],
+            [
+                'name' => 'Bipod',
+                'area' => 'underbarrel',
+                'price' => 89.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 15,
+                'mobility_modifier' => -20,
+                'handling_modifier' => -10,
+            ],
+            [
+                'name' => 'Muzzle Brake',
+                'area' => 'barrel',
+                'price' => 159.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 6,
+                'mobility_modifier' => 0,
+                'handling_modifier' => -2,
+            ],
+            [
+                'name' => 'Flash Hider',
+                'area' => 'barrel',
+                'price' => 129.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 2,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 0,
+            ],
+            [
+                'name' => 'Drum Magazine',
+                'area' => 'magazine',
+                'price' => 199.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => -2,
+                'mobility_modifier' => -15,
+                'handling_modifier' => -5,
+            ],
+            [
+                'name' => 'Tactical Light',
+                'area' => 'underbarrel',
+                'price' => 49.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 1,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 0,
+            ],
+            [
+                'name' => 'Grip Tape',
+                'area' => 'underbarrel',
+                'price' => 19.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 3,
+            ],
+            [
+                'name' => 'Compensator',
+                'area' => 'barrel',
+                'price' => 139.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 7,
+                'mobility_modifier' => 0,
+                'handling_modifier' => -1,
+            ],
+            [
+                'name' => 'Angled Foregrip',
+                'area' => 'underbarrel',
+                'price' => 89.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 5,
+                'mobility_modifier' => -1,
+                'handling_modifier' => 6,
+            ],
         ];
 
         foreach ($attachments as $attachment) {
@@ -82,10 +253,15 @@ return new class extends Migration {
                 'name' => $attachment['name'],
                 'area' => $attachment['area'],
                 'price' => $attachment['price'],
+                'power_modifier' => $attachment['power_modifier'],
+                'accuracy_modifier' => $attachment['accuracy_modifier'],
+                'mobility_modifier' => $attachment['mobility_modifier'],
+                'handling_modifier' => $attachment['handling_modifier'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
+
 
         DB::table('weapons_attachments')->insert([
             [
@@ -108,7 +284,13 @@ return new class extends Migration {
             ],
             [
                 'weapon_id' => 2, // H&K MP5
-                'attachment_id' => 4,
+                'attachment_id' => 4, // Laser Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 5, // Foregrip
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -119,32 +301,215 @@ return new class extends Migration {
                 'updated_at' => now(),
             ],
             [
-                'weapon_id' => 6,
-                'attachment_id' => 1,
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 7, // Fixed Stock
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'weapon_id' => 6,
-                'attachment_id' => 3,
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 8, // 4x Scope
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'weapon_id' => 6,
-                'attachment_id' => 4,
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 9, // Holographic Sight
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'weapon_id' => 6,
-                'attachment_id' => 5,
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 10, // Bipod
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 14, // Tactical Light
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 15, // Grip Tape
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 16, // Compensator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 17, // Angled Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Attachments for PPSH41 (weapon_id 6)
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 1, // Red Dot Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 3, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 4, // Laser Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 5, // Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 6, // Collapsible Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 7, // Fixed Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 8, // 4x Scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 9, // Holographic Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 10, // Bipod
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 14, // Tactical Light
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 15, // Grip Tape
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 16, // Compensator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 17, // Angled Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Existing and other weapons
+            [
+                'weapon_id' => 3, // Desert Eagle
+                'attachment_id' => 7, // Fixed Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 3, // Desert Eagle
+                'attachment_id' => 8, // 4x Scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 4, // Remington 870
+                'attachment_id' => 9, // Holographic Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 4, // Remington 870
+                'attachment_id' => 10, // Bipod
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 5, // Combat Knife
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 5, // Combat Knife
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 1, // Katana
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
-
     /**
      * Reverse the migrations.
      */

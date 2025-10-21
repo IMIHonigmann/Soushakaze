@@ -1,6 +1,7 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore } from '@/stores/bagStores';
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
+import { Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -14,19 +15,28 @@ import CustomizerScene from './CustomizerScene';
 
 export type Attachment = {
     id: number;
+    seller_id?: number | null;
+    manufacturer_id?: number | null;
     name: string;
-    area: string;
+    price: number;
+    area: Area;
+    image_blob?: string | null; // base64 or URL depending on API
+    power_modifier: number;
+    accuracy_modifier: number;
+    mobility_modifier: number;
+    handling_modifier: number;
+    created_at?: string;
+    updated_at?: string;
 };
 
 export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
 
 interface Props {
-    weaponName: string;
-    weaponId: number;
+    weapon: Weapon;
     attachments: Attachment[];
 }
 
-export default function Customizer({ weaponName, weaponId, attachments }: Props) {
+export default function Customizer({ weapon, maxPower, attachments }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
     const grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
         acc[att.area] = acc[att.area] || [];
@@ -83,13 +93,15 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                 onClick={() => setCurrentAreaSelection('all')}
             />
             <CustomizerScene
-                weaponId={weaponId}
+                weaponId={weapon.id}
                 setCurrentAreaSelection={setCurrentAreaSelection}
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
             <div className="flex justify-center">
-                <div className="absolute bottom-10 grid w-full grid-cols-[70%_30%] px-4">
-                    <div className="mx-auto flex max-w-3xl justify-center gap-4">
+                <div className="absolute bottom-10 grid w-full grid-cols-[70%_30%] px-4 transition-transform">
+                    <div
+                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : 'translate-y-[30vh]'} mx-auto flex max-w-3xl justify-center gap-4 transition-transform`}
+                    >
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
                                 <div
@@ -118,17 +130,24 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                             );
                         })}
                     </div>
-                    <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%]">
+                    <div
+                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : '-translate-x-[35vw]'} z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all`}
+                    >
                         <div className="flex flex-col gap-2 uppercase">
-                        {['Firepower', 'Accuracy', 'Mobility', 'Handling'].map((stat) => (
+                            {['firepower', 'accuracy', 'mobility', 'handling'].map((stat) => (
                                 <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
-                                <span>{stat}</span> <FaAngleUp className="text-2xl" />
-                                <div className="relative flex h-3/4 w-3/4 border">
-                                    <div className="h-full w-[43%] border-r bg-white" />
-                                    <div className="h-full w-[18%] border-r bg-lime-400" />
+                                    <span>{stat}</span> <FaAngleUp className="text-2xl" />
+                                    <div className="relative flex h-3/4 w-3/4 border">
+                                        <div
+                                            style={{
+                                                width: stat === 'firepower' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
+                                            }}
+                                            className="h-full border-r bg-white"
+                                        />
+                                        <div className="h-full w-[18%] border-r bg-lime-400" />
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                         </div>
                         <div className="grid grid-cols-1 font-extrabold [&>*]:-skew-x-6">
                             <div>
@@ -146,9 +165,9 @@ export default function Customizer({ weaponName, weaponId, attachments }: Props)
                     className="cursor-pointer"
                     onClick={() =>
                         addToBag({
-                            customizedWeaponId: makeSelectionKey(weaponId, { ...selected }),
-                            weaponId,
-                            weaponName,
+                            customizedWeaponId: makeSelectionKey(weapon.id, { ...selected }),
+                            weaponId: weapon.id,
+                            weaponName: weapon.name,
                             selectedAttachments: { ...selected },
                             quantity: 1,
                         })

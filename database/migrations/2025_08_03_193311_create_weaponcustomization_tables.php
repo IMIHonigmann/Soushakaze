@@ -16,10 +16,15 @@ return new class extends Migration {
         });
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('seller_id')->nullable();
+            $table->foreignId('manufacturer_id')->nullable();
             $table->string('name');
             $table->integer(column: 'rate_of_fire');
             $table->enum('type', ['handgun', 'smg', 'shotgun', 'blade']);
             $table->integer('power');
+            $table->integer('accuracy')->default(0);
+            $table->integer('mobility')->default(0);
+            $table->integer('handling')->default(0);
             $table->decimal('price', 10, 2);
             $table->binary('image_blob')->nullable();
             $table->timestamps();
@@ -28,6 +33,8 @@ return new class extends Migration {
 
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('seller_id')->nullable();
+            $table->foreignId('manufacturer_id')->nullable();
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->enum('area', [
@@ -44,6 +51,10 @@ return new class extends Migration {
                 'other', // fallback
             ]);
             $table->binary('image_blob')->nullable();
+            $table->integer('power_modifier')->default(0);
+            $table->integer('accuracy_modifier')->default(0);
+            $table->integer('mobility_modifier')->default(0);
+            $table->integer('handling_modifier')->default(0);
             $table->timestamps();
         });
         DB::statement("ALTER TABLE weapons MODIFY image_blob MEDIUMBLOB");
