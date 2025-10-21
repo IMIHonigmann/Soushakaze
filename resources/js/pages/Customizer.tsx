@@ -153,10 +153,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     >
                         <div className="flex flex-col gap-2 uppercase">
                             {statTypes.map((stat) => {
-                                console.log('Stat Mods:', statModifiers);
+                                console.log('Stat Mods:', statModifiers[stat]);
                                 return (
                                     <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
-                                        <span>{stat}</span> <FaAngleUp className="text-2xl" />
+                                        <span className={`${statModifiers[stat] > 0 ? 'text-lime-400' : ''} transition-all`}>{stat}</span>{' '}
+                                        <FaAngleUp className={`${statModifiers[stat] > 0 ? 'text-lime-400' : 'scale-0'} text-2xl`} />
                                         <div className="relative flex h-3/4 w-3/4 border">
                                             <div
                                                 style={{
@@ -165,7 +166,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 className="h-full border-r bg-white"
                                             />
                                             <div
-                                                style={{ width: `${statModifiers[stat]}%` }}
+                                                style={{ width: statModifiers[stat] >= 0 ? `${statModifiers[stat]}%` : '0%' }}
                                                 className="h-full border-r bg-lime-400 transition-all"
                                             />
                                         </div>
