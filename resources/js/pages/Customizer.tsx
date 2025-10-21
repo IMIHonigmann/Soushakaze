@@ -157,7 +157,9 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 return (
                                     <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
                                         <span className={`${statModifiers[stat] > 0 ? 'text-lime-400' : ''} transition-all`}>{stat}</span>{' '}
-                                        <FaAngleUp className={`${statModifiers[stat] > 0 ? 'text-lime-400' : 'scale-0'} text-2xl`} />
+                                        <FaAngleUp
+                                            className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400' : 'translate-y-1 opacity-0'} text-2xl transition-all`}
+                                        />
                                         <div className="relative flex h-3/4 w-3/4 border">
                                             <div
                                                 style={{
