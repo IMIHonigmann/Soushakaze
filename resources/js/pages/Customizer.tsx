@@ -7,7 +7,7 @@ import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
-import { FaAngleDoubleUp, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
+import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
@@ -155,21 +155,44 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             {statTypes.map((stat) => {
                                 console.log('Stat Mods:', statModifiers[stat]);
                                 return (
-                                    <div key={stat} className="grid grid-cols-[20%_5%_75%] items-center gap-4">
-                                        <span className={`${statModifiers[stat] > 0 ? 'text-lime-400' : ''} transition-all`}>{stat}</span>{' '}
-                                        <FaAngleUp
-                                            className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400' : 'translate-y-1 opacity-0'} text-2xl transition-all`}
-                                        />
+                                    <div key={stat} className="grid grid-cols-[20%_15%_70%] items-center gap-4">
+                                        <span
+                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} transition-all duration-250`}
+                                        >
+                                            {stat}
+                                        </span>
+                                        <div className="grid grid-cols-2 items-center gap-2">
+                                            <div className="relative h-6 w-6">
+                                                <FaAngleUp
+                                                    className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
+                                                />
+                                                <FaAngleDown
+                                                    className={`${statModifiers[stat] < 0 ? 'translate-y-0 text-red-500 opacity-100' : '-translate-y-2 opacity-0'} absolute inset-0 text-2xl transition-all duration-250`}
+                                                />
+                                            </div>
+                                            <div
+                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} text-sm font-bold transition-all`}
+                                            >
+                                                {statModifiers[stat] >= 0
+                                                    ? `+${Math.round(statModifiers[stat])}%`
+                                                    : `${Math.round(statModifiers[stat])}%`}
+                                            </div>
+                                        </div>
                                         <div className="relative flex h-3/4 w-3/4 border">
                                             <div
                                                 style={{
                                                     width: stat === 'power' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
                                                 }}
-                                                className="h-full border-r bg-white"
-                                            />
+                                                className="relative z-30 h-full bg-white"
+                                            >
+                                                <div
+                                                    style={{ width: `${Math.abs(Math.min(statModifiers[stat], 0))}%` }}
+                                                    className="absolute right-0 h-full border-l bg-red-500 transition-all"
+                                                />
+                                            </div>
                                             <div
-                                                style={{ width: statModifiers[stat] >= 0 ? `${statModifiers[stat]}%` : '0%' }}
-                                                className="h-full border-r bg-lime-400 transition-all"
+                                                style={{ width: `${Math.max(0, statModifiers[stat])}%` }}
+                                                className="h-full bg-lime-400 transition-all"
                                             />
                                         </div>
                                     </div>
