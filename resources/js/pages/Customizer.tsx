@@ -171,7 +171,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 />
                                             </div>
                                             <div
-                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} text-sm font-bold transition-all`}
+                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} ${statModifiers[stat] < 0 ? 'text-red-500' : statModifiers[stat] > 0 ? 'text-lime-400' : 'text-white'} text-sm font-bold transition-all`}
                                             >
                                                 {statModifiers[stat] >= 0
                                                     ? `+${Math.round(statModifiers[stat])}%`
