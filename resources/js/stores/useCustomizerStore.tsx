@@ -20,9 +20,9 @@ export const useCustomizerStore = create<CustomizerState>((set) => ({
     initializeSelections: (grouped) =>
         set(() => {
             const initial: Record<string, number> = {};
-            Object.entries(grouped).forEach(([area, attachments]) => {
+            Object.entries(grouped).forEach(([area]) => {
                 // Default to first attachment's id in each area
-                initial[area] = attachments[0]?.id ?? 0;
+                initial[area] = 0;
             });
             return { selected: initial };
         }),

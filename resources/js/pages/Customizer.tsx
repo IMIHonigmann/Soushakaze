@@ -116,16 +116,18 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
             <div className="flex justify-center">
-                <div className="absolute bottom-10 grid w-full grid-cols-[70%_30%] px-4 transition-transform">
+                <div
+                    className={`absolute bottom-10 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[65%_35%_0%]' : 'grid-cols-[50%_35%_15%]'} px-4 transition-all duration-200`}
+                >
                     <div
-                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : 'translate-y-[30vh]'} mx-auto flex max-w-3xl justify-center gap-4 transition-transform`}
+                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-3xl justify-center gap-4 transition-transform`}
                     >
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
                                 <div
                                     key={area}
                                     style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                    className="z-30 flex aspect-square w-48 flex-col items-stretch transition-all"
+                                    className="z-30 flex aspect-square max-w-48 flex-col items-stretch transition-all"
                                 >
                                     <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
@@ -148,16 +150,14 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             );
                         })}
                     </div>
-                    <div
-                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : '-translate-x-[35vw]'} z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all`}
-                    >
-                        <div className="flex flex-col gap-2 uppercase">
+                    <div className="z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
+                        <div className="flex flex-col gap-y-2 uppercase">
                             {statTypes.map((stat) => {
                                 console.log('Stat Mods:', statModifiers[stat]);
                                 return (
-                                    <div key={stat} className="grid grid-cols-[20%_15%_70%] items-center gap-4">
+                                    <div key={stat} className="grid grid-cols-[15%_10%_60%] items-center gap-6">
                                         <span
-                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} transition-all duration-250`}
+                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} font-extrabold transition-all duration-250`}
                                         >
                                             {stat}
                                         </span>
@@ -178,7 +178,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                     : `${Math.round(statModifiers[stat])}%`}
                                             </div>
                                         </div>
-                                        <div className="relative flex h-3/4 w-3/4 -skew-x-12 border">
+                                        <div className="relative flex h-3/4 w-full -skew-x-12 border">
                                             <div
                                                 style={{
                                                     width: stat === 'power' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
@@ -210,6 +210,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             </div>
                         </div>
                     </div>
+                    {/* empty element for grid */}
+                    <div />
                 </div>
                 <Link
                     className="cursor-pointer"
