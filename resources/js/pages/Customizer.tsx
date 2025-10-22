@@ -171,14 +171,14 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 />
                                             </div>
                                             <div
-                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} ${statModifiers[stat] < 0 ? 'text-red-500' : statModifiers[stat] > 0 ? 'text-lime-400' : 'text-white'} text-sm font-bold transition-all`}
+                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} ${statModifiers[stat] < 0 ? 'text-red-500' : statModifiers[stat] > 0 ? 'text-lime-400' : 'text-white'} -skew-x-12 text-sm font-bold transition-all`}
                                             >
                                                 {statModifiers[stat] >= 0
                                                     ? `+${Math.round(statModifiers[stat])}%`
                                                     : `${Math.round(statModifiers[stat])}%`}
                                             </div>
                                         </div>
-                                        <div className="relative flex h-3/4 w-3/4 border">
+                                        <div className="relative flex h-3/4 w-3/4 -skew-x-12 border">
                                             <div
                                                 style={{
                                                     width: stat === 'power' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
@@ -186,7 +186,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 className="relative z-30 h-full bg-white"
                                             >
                                                 <div
-                                                    style={{ width: `${Math.abs(Math.min(statModifiers[stat], 0))}%` }}
+                                                    style={{ width: `${Math.abs(Math.min(statModifiers[stat] / (weapon[stat] * 0.01), 0))}%` }}
                                                     className="absolute right-0 h-full border-l bg-red-500 transition-all"
                                                 />
                                             </div>
@@ -199,7 +199,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 );
                             })}
                         </div>
-                        <div className="grid grid-cols-1 font-extrabold [&>*]:-skew-x-6">
+                        <div className="grid grid-cols-1 font-extrabold">
                             <div>
                                 <div>Mags</div>
                                 <div className="-mt-1 text-4xl">5</div>
