@@ -117,30 +117,30 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             ></CustomizerScene>
             <div className="flex justify-center">
                 <div
-                    className={`absolute bottom-10 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[65%_35%_0%]' : 'grid-cols-[50%_35%_15%]'} px-4 transition-all duration-200`}
+                    className={`absolute bottom-10 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
                 >
                     <div
-                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-3xl justify-center gap-4 transition-transform`}
+                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-3xl shrink basis-48 justify-center gap-4 transition-transform`}
                     >
                         {Object.entries(grouped).map(([area, attachments]) => {
                             return (
                                 <div
                                     key={area}
                                     style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                    className="z-30 flex aspect-square max-w-48 flex-col items-stretch transition-all"
+                                    className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24'} flex-col transition-all`}
                                 >
-                                    <strong className="ml-1 w-full truncate uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                                    <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
                                         style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
                                         className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
                                     >
                                         <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
-                                            {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt="img" />}
+                                            {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt={`Att-${selected[area]}`} />}
                                         </div>
-                                        <div className="flex h-1/4 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                        <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
                                             <div
-                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} text-xs uppercase`}
+                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
                                             >
                                                 {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
                                             </div>
@@ -155,13 +155,13 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             {statTypes.map((stat) => {
                                 console.log('Stat Mods:', statModifiers[stat]);
                                 return (
-                                    <div key={stat} className="grid grid-cols-[15%_10%_60%] items-center gap-6">
+                                    <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
                                         <span
                                             className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} font-extrabold transition-all duration-250`}
                                         >
                                             {stat}
                                         </span>
-                                        <div className="grid grid-cols-2 items-center gap-2">
+                                        <div className="grid grid-cols-2 place-items-center items-center gap-2 pl-4">
                                             <div className="relative h-6 w-6">
                                                 <FaAngleUp
                                                     className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
@@ -259,7 +259,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                 />
                             </div>
-                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:min-w-80 [&>*]:p-4">
+                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:p-4">
                                 <li
                                     key={`standard-${area}`}
                                     onClick={() => handleSelect(area as Area, 0)}
