@@ -120,35 +120,33 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     className={`absolute bottom-10 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
                 >
                     <div
-                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-3xl shrink basis-48 justify-center gap-4 transition-transform`}
+                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
                     >
-                        {Object.entries(grouped).map(([area, attachments]) => {
-                            return (
-                                <div
-                                    key={area}
-                                    style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                    className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24'} flex-col transition-all`}
+                        {Object.entries(grouped).map(([area, attachments]) => (
+                            <div
+                                key={area}
+                                style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
+                                className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
+                            >
+                                <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                                <button
+                                    onClick={() => handleClickAttachmentArea(area as Area)}
+                                    style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
+                                    className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
                                 >
-                                    <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                    <button
-                                        onClick={() => handleClickAttachmentArea(area as Area)}
-                                        style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
-                                    >
-                                        <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
-                                            {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt={`Att-${selected[area]}`} />}
+                                    <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
+                                        {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt={`Att-${selected[area]}`} />}
+                                    </div>
+                                    <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                        <div
+                                            className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
+                                        >
+                                            {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
                                         </div>
-                                        <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
-                                            <div
-                                                className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
-                                            >
-                                                {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
-                                            </div>
-                                        </div>
-                                    </button>
-                                </div>
-                            );
-                        })}
+                                    </div>
+                                </button>
+                            </div>
+                        ))}
                     </div>
                     <div className="z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
