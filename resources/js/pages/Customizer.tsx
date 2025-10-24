@@ -155,11 +155,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 return (
                                     <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
                                         <span
-                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} font-extrabold transition-all duration-250`}
+                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} place-self-end font-extrabold transition-all duration-250`}
                                         >
-                                            {stat}
+                                            {weapon.type !== 'blade' ? (stat === 'power' ? 'firepower' : stat) : stat}
                                         </span>
-                                        <div className="grid grid-cols-2 place-items-center items-center gap-2 pl-4">
+                                        <div className="grid grid-cols-2 place-items-center items-center gap-2">
                                             <div className="relative h-6 w-6">
                                                 <FaAngleUp
                                                     className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
@@ -184,12 +184,14 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 className="relative z-30 h-full bg-white"
                                             >
                                                 <div
-                                                    style={{ width: `${Math.abs(Math.min(statModifiers[stat] / (weapon[stat] * 0.01), 0))}%` }}
+                                                    style={{
+                                                        width: `${Math.abs(Math.max(Math.min(statModifiers[stat] / (weapon[stat] * 0.01), 0), -100))}%`,
+                                                    }}
                                                     className="absolute right-0 h-full border-l bg-red-500 transition-all"
                                                 />
                                             </div>
                                             <div
-                                                style={{ width: `${Math.max(0, statModifiers[stat])}%` }}
+                                                style={{ width: `${Math.min(Math.max(statModifiers[stat], 0), 100)}%` }}
                                                 className="h-full bg-lime-400 transition-all"
                                             />
                                         </div>
