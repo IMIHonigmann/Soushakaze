@@ -1,5 +1,6 @@
+import { Attachment } from '@/types/types';
 import { create } from 'zustand';
-import { Area, Attachment } from '../pages/Customizer';
+import { Area } from '../pages/Customizer';
 
 interface CustomizerState {
     selected: Record<string, number>;

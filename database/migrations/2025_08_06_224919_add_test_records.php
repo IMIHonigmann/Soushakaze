@@ -21,6 +21,8 @@ return new class extends Migration {
                     'mobility' => 9,
                     'handling' => 54,
                     'rate_of_fire' => 0,
+                    'extra_mags' => 0, // blades have no magazines
+                    'magsize' => 0,
                     'price' => 149.99,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -33,6 +35,8 @@ return new class extends Migration {
                     'accuracy' => 44,
                     'mobility' => 54,
                     'handling' => 50,
+                    'extra_mags' => 3,
+                    'magsize' => 30,
                     'price' => 1199,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -45,6 +49,8 @@ return new class extends Migration {
                     'accuracy' => 41,
                     'mobility' => 25,
                     'handling' => 40,
+                    'extra_mags' => 2,
+                    'magsize' => 7,
                     'price' => 899.99,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -57,6 +63,8 @@ return new class extends Migration {
                     'accuracy' => 32,
                     'mobility' => 19,
                     'handling' => 37,
+                    'extra_mags' => 1,
+                    'magsize' => 6,
                     'price' => 799.99,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -69,6 +77,8 @@ return new class extends Migration {
                     'accuracy' => 60,
                     'mobility' => 60,
                     'handling' => 60,
+                    'extra_mags' => 0,
+                    'magsize' => 0,
                     'price' => 59.99,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -81,16 +91,16 @@ return new class extends Migration {
                     'accuracy' => 38,
                     'mobility' => 50,
                     'handling' => 47,
+                    'extra_mags' => 4,
+                    'magsize' => 35,
                     'price' => 1099,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],
             ]
-
         );
 
         $attachments = [
-            // existing attachments with modifiers
             [
                 'name' => 'Red Dot Sight',
                 'area' => 'scope',
@@ -99,6 +109,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 10,
                 'mobility_modifier' => 0,
                 'handling_modifier' => 5,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Suppressor',
@@ -108,6 +119,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => -2,
                 'handling_modifier' => -1,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Extended Magazine',
@@ -117,6 +129,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => -3,
                 'handling_modifier' => 10,
+                'magsize_modifier' => 10, // logical increase
             ],
             [
                 'name' => 'Laser Sight',
@@ -126,6 +139,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 8,
                 'mobility_modifier' => 0,
                 'handling_modifier' => 3,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Foregrip',
@@ -135,6 +149,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => -1,
                 'handling_modifier' => 7,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Collapsible Stock',
@@ -144,6 +159,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 4,
                 'mobility_modifier' => 5,
                 'handling_modifier' => 6,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Fixed Stock',
@@ -153,9 +169,8 @@ return new class extends Migration {
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => -2,
                 'handling_modifier' => 4,
+                'magsize_modifier' => 0,
             ],
-
-            // new attachments
             [
                 'name' => '4x Scope',
                 'area' => 'scope',
@@ -164,6 +179,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 20,
                 'mobility_modifier' => -10,
                 'handling_modifier' => -5,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Holographic Sight',
@@ -173,6 +189,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 12,
                 'mobility_modifier' => -2,
                 'handling_modifier' => 4,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Bipod',
@@ -182,6 +199,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 15,
                 'mobility_modifier' => -20,
                 'handling_modifier' => -10,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Muzzle Brake',
@@ -191,6 +209,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => 0,
                 'handling_modifier' => -2,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Flash Hider',
@@ -200,6 +219,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 2,
                 'mobility_modifier' => 0,
                 'handling_modifier' => 0,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Drum Magazine',
@@ -209,6 +229,7 @@ return new class extends Migration {
                 'accuracy_modifier' => -2,
                 'mobility_modifier' => -15,
                 'handling_modifier' => -5,
+                'magsize_modifier' => 25, // logical increase
             ],
             [
                 'name' => 'Tactical Light',
@@ -218,6 +239,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 1,
                 'mobility_modifier' => 0,
                 'handling_modifier' => 0,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Grip Tape',
@@ -227,6 +249,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => 0,
                 'handling_modifier' => 3,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Compensator',
@@ -236,6 +259,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 7,
                 'mobility_modifier' => 0,
                 'handling_modifier' => -1,
+                'magsize_modifier' => 0,
             ],
             [
                 'name' => 'Angled Foregrip',
@@ -245,6 +269,7 @@ return new class extends Migration {
                 'accuracy_modifier' => 5,
                 'mobility_modifier' => -1,
                 'handling_modifier' => 6,
+                'magsize_modifier' => 0,
             ],
         ];
 
@@ -257,6 +282,7 @@ return new class extends Migration {
                 'accuracy_modifier' => $attachment['accuracy_modifier'],
                 'mobility_modifier' => $attachment['mobility_modifier'],
                 'handling_modifier' => $attachment['handling_modifier'],
+                'magsize_modifier' => $attachment['magsize_modifier'] ?? 0, // <-- added
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

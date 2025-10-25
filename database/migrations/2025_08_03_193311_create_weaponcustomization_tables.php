@@ -25,6 +25,8 @@ return new class extends Migration {
             $table->integer('accuracy')->default(0);
             $table->integer('mobility')->default(0);
             $table->integer('handling')->default(0);
+            $table->integer('extra_mags')->default(2);
+            $table->integer('magsize')->default(8);
             $table->decimal('price', 10, 2);
             $table->binary('image_blob')->nullable();
             $table->timestamps();
@@ -55,6 +57,7 @@ return new class extends Migration {
             $table->integer('accuracy_modifier')->default(0);
             $table->integer('mobility_modifier')->default(0);
             $table->integer('handling_modifier')->default(0);
+            $table->integer('magsize_modifier')->default(0);
             $table->timestamps();
         });
         DB::statement("ALTER TABLE weapons MODIFY image_blob MEDIUMBLOB");

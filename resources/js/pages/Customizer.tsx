@@ -1,7 +1,7 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore } from '@/stores/bagStores';
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
-import { Weapon } from '@/types/types';
+import { Attachment, Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -13,23 +13,7 @@ import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import CustomizerScene from './CustomizerScene';
 
-export type Attachment = {
-    id: number;
-    seller_id?: number | null;
-    manufacturer_id?: number | null;
-    name: string;
-    price: number;
-    area: Area;
-    image_blob?: string | null; // base64 or URL depending on API
-    power_modifier: number;
-    accuracy_modifier: number;
-    mobility_modifier: number;
-    handling_modifier: number;
-    created_at?: string;
-    updated_at?: string;
-};
-
-const statTypes = ['power', 'accuracy', 'mobility', 'handling'] as const;
+const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize'] as const;
 export type Stats = (typeof statTypes)[number];
 
 export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
@@ -151,7 +135,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     <div className="z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
                             {statTypes.map((stat) => {
-                                console.log('Stat Mods:', statModifiers[stat]);
+                                if (stat === 'magsize') return;
                                 return (
                                     <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
                                         <span
@@ -199,16 +183,18 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 );
                             })}
                         </div>
-                        <div className="grid grid-cols-1 font-extrabold">
-                            <div>
-                                <div>Mags</div>
-                                <div className="-mt-1 text-4xl">5</div>
+                        {weapon.type !== 'blade' && (
+                            <div className="grid grid-cols-1 font-extrabold">
+                                <div>
+                                    <div>Mags</div>
+                                    <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
+                                </div>
+                                <div>
+                                    <div>Mag Size</div>
+                                    <div className="-mt-1 text-4xl">{weapon.magsize + statModifiers['magsize']}</div>
+                                </div>
                             </div>
-                            <div>
-                                <div>Mag Size</div>
-                                <div className="-mt-1 text-4xl">30</div>
-                            </div>
-                        </div>
+                        )}
                     </div>
                     {/* empty element for grid */}
                     <div />
