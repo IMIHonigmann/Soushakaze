@@ -184,14 +184,23 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             })}
                         </div>
                         {weapon.type !== 'blade' && (
-                            <div className="grid grid-cols-1 font-extrabold">
+                            <div className="grid w-3/4 grid-cols-1 font-extrabold">
                                 <div>
                                     <div>Mags</div>
                                     <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
                                 </div>
-                                <div>
+                                <div
+                                    className={`${weapon.magsize + statModifiers['magsize'] > weapon.magsize ? 'text-lime-400' : weapon.magsize + statModifiers['magsize'] < weapon.magsize ? 'text-red-500' : ''} transition-all`}
+                                >
                                     <div>Mag Size</div>
-                                    <div className="-mt-1 text-4xl">{weapon.magsize + statModifiers['magsize']}</div>
+                                    <div className="flex">
+                                        <div className="-mt-1 text-4xl">{weapon.magsize}</div>
+                                        <div
+                                            className={`${statModifiers['magsize'] !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
+                                        >
+                                            {statModifiers['magsize'] >= 0 ? `+${statModifiers['magsize']}` : statModifiers['magsize']}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
