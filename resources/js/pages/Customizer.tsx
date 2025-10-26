@@ -4,6 +4,8 @@ import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Attachment, Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
+import { gsap } from 'gsap';
+import { ScrambleTextPlugin } from 'gsap/all';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
@@ -13,6 +15,8 @@ import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import Count from './Counter';
 import CustomizerScene from './CustomizerScene';
+
+gsap.registerPlugin(ScrambleTextPlugin);
 
 const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize', 'price'] as const;
 export type Stats = (typeof statTypes)[number];
@@ -35,6 +39,31 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
+
+    const weaponNameRef = useRef(null);
+
+    useEffect(() => {
+        const tl = gsap.timeline();
+        tl.to(
+            weaponNameRef.current,
+            {
+                duration: 1.5,
+                ease: 'none',
+                scrambleText: {
+                    text: weapon.name,
+                    speed: 2,
+                },
+            },
+            4,
+        ).to(weaponNameRef.current, {
+            duration: 1,
+            ease: 'sine.out',
+        });
+
+        return () => {
+            tl.kill();
+        };
+    }, [weapon.name]);
 
     useEffect(() => {
         initializeSelections(grouped);
@@ -290,11 +319,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     ))}
                 </div>
                 <div className="absolute top-4 left-4 font-extrabold">
-                    <h1 className="text-8xl">{weapon.name}</h1>
-                    <div className="text-xl">Total Price (inkl. Tax): </div>
-                    <div className="-skew-x-12 text-3xl">
-                        <Count from={Number(weapon.price)} to={Number(weapon.price) + statModifiers['price']} />€
-                    </div>
+                    <h1 ref={weaponNameRef} className="text-8xl text-shadow-white">
+                        S0USHAK4Z3
+                    </h1>
+                    <div className="mt-1 text-xl">Total Price (inkl. Tax): </div>
+                    <Count from={Number(weapon.price)} to={Number(weapon.price) + statModifiers['price']} />
                 </div>
             </div>
         </>
