@@ -21,7 +21,7 @@ export type Attachment = {
     seller_id?: number | null;
     manufacturer_id?: number | null;
     name: string;
-    price: number;
+    price_modifier: number;
     area: Area;
     image_blob?: string | null; // base64 or URL depending on API
     power_modifier: number;

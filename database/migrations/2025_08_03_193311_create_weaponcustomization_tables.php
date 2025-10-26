@@ -38,7 +38,7 @@ return new class extends Migration {
             $table->foreignId('seller_id')->nullable();
             $table->foreignId('manufacturer_id')->nullable();
             $table->string('name');
-            $table->decimal('price', 10, 2);
+            $table->decimal('price_modifier', 10, 2);
             $table->enum('area', [
                 'muzzle', // suppressor, compensator, etc.
                 'scope', // red dot, acog, etc.

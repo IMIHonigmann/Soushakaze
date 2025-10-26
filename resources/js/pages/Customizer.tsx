@@ -11,9 +11,10 @@ import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaCrosshairs } from 'react-ico
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
+import Count from './Counter';
 import CustomizerScene from './CustomizerScene';
 
-const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize'] as const;
+const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize', 'price'] as const;
 export type Stats = (typeof statTypes)[number];
 
 export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
@@ -81,7 +82,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     const id = selected[area];
                     if (!id) return total;
                     const att = attachments.find((a) => a.id === id);
-                    return total + (att ? att[`${stat}_modifier`] : 0);
+                    return total + (att ? Number(att[`${stat}_modifier`]) || 0 : 0);
                 }, 0);
                 return [stat, sum];
             }),
@@ -91,7 +92,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     return (
         <>
             <MdOutlineCameraswitch
-                className={`scale absolute top-4 left-4 z-10 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? '-translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
+                className={`scale absolute top-4 right-4 z-5 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => setCurrentAreaSelection('all')}
             />
             <CustomizerScene
@@ -101,7 +102,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             ></CustomizerScene>
             <div className="flex justify-center">
                 <div
-                    className={`absolute bottom-10 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
+                    className={`absolute bottom-10 z-101 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
                 >
                     <div
                         className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
@@ -132,10 +133,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             </div>
                         ))}
                     </div>
-                    <div className="z-30 mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
+                    <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
                             {statTypes.map((stat) => {
-                                if (stat === 'magsize') return;
+                                const skipItems = new Set(['magsize', 'price']);
+                                if (skipItems.has(stat)) return;
                                 return (
                                     <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
                                         <span
@@ -226,7 +228,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             </div>
             <div
                 style={{ backgroundColor: currentAreaSelection === 'other' || currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)' }}
-                className="pointer-events-none absolute top-0 right-0 h-full w-screen transition-all duration-400"
+                className="pointer-events-none absolute top-0 right-0 z-100 h-full w-screen transition-all duration-400"
             >
                 {/* Attachment Selection List */}
                 <div>
@@ -265,22 +267,34 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     </div>
                                     <div className="text-xl">Factory Issue</div>
                                 </li>
-                                {attachments.map((a) => (
-                                    <li
-                                        key={a.id}
-                                        onClick={() => handleSelect(area as Area, a.id)}
-                                        className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
-                                    >
-                                        <div className="relative border-2 bg-black">
-                                            <FaCrosshairs className="p-2 text-6xl" />
-                                            <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
-                                        </div>
-                                        <div className="text-xl">{a.name}</div>
-                                    </li>
-                                ))}
+                                {attachments
+                                    .sort((a1, a2) => a1.price_modifier - a2.price_modifier)
+                                    .map((a) => (
+                                        <li
+                                            key={a.id}
+                                            onClick={() => handleSelect(area as Area, a.id)}
+                                            className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
+                                        >
+                                            <div className="relative border-2 bg-black">
+                                                <FaCrosshairs className="p-2 text-6xl" />
+                                                <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
+                                            </div>
+                                            <div className="text-xl">
+                                                <div>{a.name}</div>
+                                                <div className="-skew-x-12 font-extrabold">{a.price_modifier}€</div>
+                                            </div>
+                                        </li>
+                                    ))}
                             </ul>
                         </div>
                     ))}
+                </div>
+                <div className="absolute top-4 left-4 font-extrabold">
+                    <h1 className="text-8xl">{weapon.name}</h1>
+                    <div className="text-xl">Total Price (inkl. Tax): </div>
+                    <div className="-skew-x-12 text-3xl">
+                        <Count from={Number(weapon.price)} to={Number(weapon.price) + statModifiers['price']} />€
+                    </div>
                 </div>
             </div>
         </>

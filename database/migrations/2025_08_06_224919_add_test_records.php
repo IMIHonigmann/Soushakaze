@@ -104,7 +104,7 @@ return new class extends Migration {
             [
                 'name' => 'Red Dot Sight',
                 'area' => 'scope',
-                'price' => 199.99,
+                'price_modifier' => 199.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 10,
                 'mobility_modifier' => 0,
@@ -114,7 +114,7 @@ return new class extends Migration {
             [
                 'name' => 'Suppressor',
                 'area' => 'barrel',
-                'price' => 299.99,
+                'price_modifier' => 299.99,
                 'power_modifier' => -5,
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => -2,
@@ -124,7 +124,7 @@ return new class extends Migration {
             [
                 'name' => 'Extended Magazine',
                 'area' => 'magazine',
-                'price' => 99.99,
+                'price_modifier' => 99.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => -3,
@@ -134,7 +134,7 @@ return new class extends Migration {
             [
                 'name' => 'Laser Sight',
                 'area' => 'underbarrel',
-                'price' => 119.99,
+                'price_modifier' => 119.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 8,
                 'mobility_modifier' => 0,
@@ -144,7 +144,7 @@ return new class extends Migration {
             [
                 'name' => 'Foregrip',
                 'area' => 'underbarrel',
-                'price' => 79.99,
+                'price_modifier' => 79.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => -1,
@@ -154,7 +154,7 @@ return new class extends Migration {
             [
                 'name' => 'Collapsible Stock',
                 'area' => 'stock',
-                'price' => 149.99,
+                'price_modifier' => 149.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 4,
                 'mobility_modifier' => 5,
@@ -164,7 +164,7 @@ return new class extends Migration {
             [
                 'name' => 'Fixed Stock',
                 'area' => 'stock',
-                'price' => 129.99,
+                'price_modifier' => 129.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => -2,
@@ -174,7 +174,7 @@ return new class extends Migration {
             [
                 'name' => '4x Scope',
                 'area' => 'scope',
-                'price' => 349.99,
+                'price_modifier' => 349.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 20,
                 'mobility_modifier' => -10,
@@ -184,7 +184,7 @@ return new class extends Migration {
             [
                 'name' => 'Holographic Sight',
                 'area' => 'scope',
-                'price' => 249.99,
+                'price_modifier' => 249.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 12,
                 'mobility_modifier' => -2,
@@ -194,7 +194,7 @@ return new class extends Migration {
             [
                 'name' => 'Bipod',
                 'area' => 'underbarrel',
-                'price' => 89.99,
+                'price_modifier' => 89.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 15,
                 'mobility_modifier' => -20,
@@ -204,7 +204,7 @@ return new class extends Migration {
             [
                 'name' => 'Muzzle Brake',
                 'area' => 'barrel',
-                'price' => 159.99,
+                'price_modifier' => 159.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 6,
                 'mobility_modifier' => 0,
@@ -214,7 +214,7 @@ return new class extends Migration {
             [
                 'name' => 'Flash Hider',
                 'area' => 'barrel',
-                'price' => 129.99,
+                'price_modifier' => 129.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 2,
                 'mobility_modifier' => 0,
@@ -224,7 +224,7 @@ return new class extends Migration {
             [
                 'name' => 'Drum Magazine',
                 'area' => 'magazine',
-                'price' => 199.99,
+                'price_modifier' => 199.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => -2,
                 'mobility_modifier' => -15,
@@ -234,7 +234,7 @@ return new class extends Migration {
             [
                 'name' => 'Tactical Light',
                 'area' => 'underbarrel',
-                'price' => 49.99,
+                'price_modifier' => 49.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 1,
                 'mobility_modifier' => 0,
@@ -244,7 +244,7 @@ return new class extends Migration {
             [
                 'name' => 'Grip Tape',
                 'area' => 'underbarrel',
-                'price' => 19.99,
+                'price_modifier' => 19.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 0,
                 'mobility_modifier' => 0,
@@ -254,7 +254,7 @@ return new class extends Migration {
             [
                 'name' => 'Compensator',
                 'area' => 'barrel',
-                'price' => 139.99,
+                'price_modifier' => 139.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 7,
                 'mobility_modifier' => 0,
@@ -264,7 +264,7 @@ return new class extends Migration {
             [
                 'name' => 'Angled Foregrip',
                 'area' => 'underbarrel',
-                'price' => 89.99,
+                'price_modifier' => 89.99,
                 'power_modifier' => 0,
                 'accuracy_modifier' => 5,
                 'mobility_modifier' => -1,
@@ -277,7 +277,7 @@ return new class extends Migration {
             DB::table('attachments')->insert([
                 'name' => $attachment['name'],
                 'area' => $attachment['area'],
-                'price' => $attachment['price'],
+                'price_modifier' => $attachment['price_modifier'],
                 'power_modifier' => $attachment['power_modifier'],
                 'accuracy_modifier' => $attachment['accuracy_modifier'],
                 'mobility_modifier' => $attachment['mobility_modifier'],
