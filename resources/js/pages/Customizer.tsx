@@ -323,7 +323,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     ))}
                 </div>
                 <div className="absolute top-4 left-4 font-extrabold">
-                    <h1 ref={weaponNameRef} className="text-8xl font-extrabold text-shadow-white">
+                    <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
                     </h1>
                     <div className="mt-1 text-xl">Total Price (inkl. Tax): </div>

@@ -304,7 +304,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                             </div>
                             <div className="mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8">
                                 <div className="text-2xl">
-                                    <div className="translate-y-0 text-left font-extrabold transition-transform group-hover:translate-x-1">
+                                    <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
                                         {weapon.name}
                                     </div>
 

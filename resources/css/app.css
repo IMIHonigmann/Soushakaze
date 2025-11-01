@@ -11,6 +11,8 @@
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+    --font-hitmarker-condensed: 'HitmarkerFontDisplay', ui-sans-serif, system-ui, sans-serif;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -131,6 +133,33 @@
 }
 
 @layer base {
+    @font-face {
+        font-family: 'HitmarkerFont';
+        src:
+            local('HitmarkerText-Regular'),
+            url('../fonts/18082023_Hitmarker/Text/WOFF/HitmarkerText-Regular.woff2') format('woff2'),
+            url('../fonts/18082023_Hitmarker/Text/WOFF/HitmarkerText-Regular.woff') format('woff'),
+            url('../fonts/18082023_Hitmarker/Text/TTF/HitmarkerText-Regular.ttf') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'HitmarkerFontDisplay';
+        src:
+            local('HitmarkerCondensed-Bold'),
+            url('../fonts/18082023_Hitmarker/Display/Condensed/WOFF/HitmarkerCondensed-Bold.woff2') format('woff2'),
+            url('../fonts/18082023_Hitmarker/Display/Condensed/WOFF/HitmarkerCondensed-Bold.woff') format('woff'),
+            url('../fonts/18082023_Hitmarker/Display/Condensed/TTF/HitmarkerCondensed-Bold.ttf') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    html {
+        font-family: 'HitmarkerFont', ui-sans-serif, system-ui, sans-serif;
+    }
+
     .no-arrows::-webkit-inner-spin-button,
     .no-arrows::-webkit-outer-spin-button {
         -webkit-appearance: none;
