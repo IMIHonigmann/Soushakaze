@@ -82,7 +82,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                     }
                 >
                     <button
-                        className="absolute bottom-0"
+                        className="absolute bottom-0 z-105"
                         onClick={() => {
                             if (window.takeScreenshot) {
                                 cameraControlsRef.current.setLookAt(0, 0, 5, 0, 0, 0, false);

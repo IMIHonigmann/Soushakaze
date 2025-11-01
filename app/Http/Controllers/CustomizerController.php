@@ -13,6 +13,10 @@ class CustomizerController extends Controller
         $weapon = DB::table('weapons')
             ->where('id', $weaponId)
             ->first();
+        if (isset($weapon->image_blob)) {
+            $weapon->image_base64 = base64_encode($weapon->image_blob);
+            unset($weapon->image_blob);
+        }
         $attachments = DB::table('weapons_attachments')
             ->where('weapon_id', $weaponId)
             ->join('attachments', 'weapons_attachments.attachment_id', '=', 'attachments.id')

@@ -11,7 +11,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
 import { IoIosReturnLeft } from 'react-icons/io';
-import { MdOutlineCameraswitch } from 'react-icons/md';
+import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import Count from './Counter';
 import CustomizerScene from './CustomizerScene';
@@ -52,6 +52,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 scrambleText: {
                     text: weapon.name,
                     speed: 2,
+                    chars: 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:\'",.<>/?`~',
                 },
             },
             4,
@@ -146,7 +147,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 <button
                                     onClick={() => handleClickAttachmentArea(area as Area)}
                                     style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                    className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                    className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
                                 >
                                     <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
                                         {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt={`Att-${selected[area]}`} />}
@@ -240,7 +241,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     <div />
                 </div>
                 <Link
-                    className="cursor-pointer"
+                    className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:px-2"
                     onClick={() =>
                         addToBag({
                             customizedWeaponId: makeSelectionKey(weapon.id, { ...selected }),
@@ -252,7 +253,10 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     }
                     href={route('cart')}
                 >
-                    ADD TO CART
+                    <MdAddShoppingCart className="-skew-x-12 text-6xl" />
+                    <span className="ml-2 translate-x-[60vw] -skew-x-12 text-xl font-extrabold transition-transform duration-300 group-hover:translate-x-0">
+                        ADD TO CART
+                    </span>
                 </Link>
             </div>
             <div
@@ -319,7 +323,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     ))}
                 </div>
                 <div className="absolute top-4 left-4 font-extrabold">
-                    <h1 ref={weaponNameRef} className="text-8xl text-shadow-white">
+                    <h1 ref={weaponNameRef} className="text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
                     </h1>
                     <div className="mt-1 text-xl">Total Price (inkl. Tax): </div>
