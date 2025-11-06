@@ -119,6 +119,20 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         ) as Record<Stats, number>;
     }, [selected, grouped]);
 
+    function contextDependentStatModifier(stat: Stats) {
+        if (currentAreaSelection === 'all' || currentAreaSelection === 'other') {
+            return statModifiers[stat];
+        }
+
+        const areaAttachments = grouped[currentAreaSelection];
+        const selectedId = selected[currentAreaSelection];
+
+        if (!selectedId || !areaAttachments) return 0;
+
+        const selectedAttachment = areaAttachments.find((a) => a.id === selectedId);
+        return selectedAttachment ? Number(selectedAttachment[`${stat}_modifier`]) || 0 : 0;
+    }
+
     return (
         <>
             <MdOutlineCameraswitch
@@ -171,43 +185,46 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 return (
                                     <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
                                         <span
-                                            className={`${statModifiers[stat] > 0 ? 'text-lime-400' : statModifiers[stat] < 0 ? 'text-red-500' : ''} place-self-end font-extrabold transition-all duration-250`}
+                                            className={`${contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : contextDependentStatModifier(stat) < 0 ? 'text-red-500' : ''} place-self-end font-extrabold transition-all duration-250`}
                                         >
                                             {weapon.type !== 'blade' ? (stat === 'power' ? 'firepower' : stat) : stat}
                                         </span>
                                         <div className="grid grid-cols-2 place-items-center items-center gap-2">
                                             <div className="relative h-6 w-6">
                                                 <FaAngleUp
-                                                    className={`${statModifiers[stat] > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
+                                                    className={`${contextDependentStatModifier(stat) > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
                                                 />
                                                 <FaAngleDown
-                                                    className={`${statModifiers[stat] < 0 ? 'translate-y-0 text-red-500 opacity-100' : '-translate-y-2 opacity-0'} absolute inset-0 text-2xl transition-all duration-250`}
+                                                    className={`${contextDependentStatModifier(stat) < 0 ? 'translate-y-0 text-red-500 opacity-100' : '-translate-y-2 opacity-0'} absolute inset-0 text-2xl transition-all duration-250`}
                                                 />
                                             </div>
                                             <div
-                                                className={`${statModifiers[stat] === 0 ? 'translate-x-2 opacity-0' : ''} ${statModifiers[stat] < 0 ? 'text-red-500' : statModifiers[stat] > 0 ? 'text-lime-400' : 'text-white'} -skew-x-12 text-sm font-bold transition-all`}
+                                                className={`${contextDependentStatModifier(stat) === 0 ? 'translate-x-2 opacity-0' : ''} ${contextDependentStatModifier(stat) < 0 ? 'text-red-500' : contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : 'text-white'} -skew-x-12 text-sm font-bold transition-all`}
                                             >
-                                                {statModifiers[stat] >= 0
-                                                    ? `+${Math.round(statModifiers[stat])}%`
-                                                    : `${Math.round(statModifiers[stat])}%`}
+                                                {contextDependentStatModifier(stat) >= 0
+                                                    ? `+${Math.round(contextDependentStatModifier(stat))}%`
+                                                    : `${Math.round(contextDependentStatModifier(stat))}%`}
                                             </div>
                                         </div>
                                         <div className="relative flex h-3/4 w-full -skew-x-12 border">
                                             <div
                                                 style={{
-                                                    width: stat === 'power' ? `${(weapon['power'] / (maxPower + 1)) * 100}%` : `${weapon[stat]}%`,
+                                                    width:
+                                                        stat === 'power'
+                                                            ? `${(weapon['power'] / (maxPower + 1)) * 100}%`
+                                                            : `${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? weapon[stat] : weapon[stat] + statModifiers[stat] - contextDependentStatModifier(stat)}%`,
                                                 }}
-                                                className="relative z-30 h-full bg-white"
+                                                className="relative z-30 h-full bg-white transition-all"
                                             >
                                                 <div
                                                     style={{
-                                                        width: `${Math.abs(Math.max(Math.min(statModifiers[stat] / (weapon[stat] * 0.01), 0), -100))}%`,
+                                                        width: `${Math.abs(Math.max(Math.min(contextDependentStatModifier(stat) / (weapon[stat] * 0.01), 0), -100))}%`,
                                                     }}
                                                     className="absolute right-0 h-full border-l bg-red-500 transition-all"
                                                 />
                                             </div>
                                             <div
-                                                style={{ width: `${Math.min(Math.max(statModifiers[stat], 0), 100)}%` }}
+                                                style={{ width: `${Math.min(Math.max(contextDependentStatModifier(stat), 0), 100)}%` }}
                                                 className="h-full bg-lime-400 transition-all"
                                             />
                                         </div>
@@ -222,15 +239,17 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
                                 </div>
                                 <div
-                                    className={`${weapon.magsize + statModifiers['magsize'] > weapon.magsize ? 'text-lime-400' : weapon.magsize + statModifiers['magsize'] < weapon.magsize ? 'text-red-500' : ''} transition-all`}
+                                    className={`${weapon.magsize + contextDependentStatModifier('magsize') > weapon.magsize ? 'text-lime-400' : weapon.magsize + contextDependentStatModifier('magsize') < weapon.magsize ? 'text-red-500' : ''} transition-all`}
                                 >
                                     <div>Mag Size</div>
                                     <div className="flex">
                                         <div className="-mt-1 text-4xl">{weapon.magsize}</div>
                                         <div
-                                            className={`${statModifiers['magsize'] !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
+                                            className={`${contextDependentStatModifier('magsize') !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
                                         >
-                                            {statModifiers['magsize'] >= 0 ? `+${statModifiers['magsize']}` : statModifiers['magsize']}
+                                            {contextDependentStatModifier('magsize') >= 0
+                                                ? `+${contextDependentStatModifier('magsize')}`
+                                                : contextDependentStatModifier('magsize')}
                                         </div>
                                     </div>
                                 </div>
@@ -295,7 +314,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     onClick={() => handleSelect(area as Area, 0)}
                                     className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
                                 >
-                                    <div className="border-2 bg-black">
+                                    <div className="skew-x-4 border-2 bg-black">
                                         <CiIceCream className="p-2 text-6xl" />
                                     </div>
                                     <div className="text-xl">Factory Issue</div>
@@ -308,7 +327,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                             onClick={() => handleSelect(area as Area, a.id)}
                                             className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
                                         >
-                                            <div className="relative border-2 bg-black">
+                                            <div className="relative skew-x-4 border-2 bg-black">
                                                 <FaCrosshairs className="p-2 text-6xl" />
                                                 <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
                                             </div>
