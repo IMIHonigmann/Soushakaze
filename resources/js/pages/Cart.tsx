@@ -1,5 +1,6 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
+import { Attachment } from '@/types/types';
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
@@ -13,10 +14,10 @@ export default function Bag() {
 
     const { addToBag: addToWishlistBag, bag: wishlistBag } = useWishlistStore((state) => state);
 
-    const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
+    const weaponIdAttachments: { weapon_id: number; attachments: Attachment[]; quantity: number }[] = [];
     for (let i = 0; i < bag.length; i++) {
-        const attachmentIds = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachment_ids: attachmentIds, quantity: bag[i].quantity });
+        const attachments = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
+        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachments: attachments, quantity: bag[i].quantity });
     }
 
     function placeOrder() {
@@ -61,10 +62,10 @@ export default function Bag() {
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
                                                 <div>
-                                                    {item.weaponName}
-                                                    {Object.entries(item.selectedAttachments).map(([area, id]) => (
+                                                    <h3 className="font-hitmarker-condensed text-6xl">{item.weaponName}</h3>
+                                                    {Object.entries(item.selectedAttachments).map(([area, att]) => (
                                                         <div key={area}>
-                                                            {area}: {id}
+                                                            <span className="uppercase">{area}</span>: {att.name}
                                                         </div>
                                                     ))}
                                                     <button
@@ -87,7 +88,7 @@ export default function Bag() {
                                                     >
                                                         Move to wishlist
                                                     </button>
-                                                    <div>{item.customizedWeaponId}</div>
+                                                    {/* <div>{item.customizedWeaponId}</div> */}
                                                 </div>
                                             </div>
                                             <div className="ml-auto flex items-center gap-4 text-xl">

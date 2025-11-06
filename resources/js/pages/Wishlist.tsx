@@ -1,5 +1,6 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
+import { Attachment } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaGifts } from 'react-icons/fa';
@@ -12,10 +13,10 @@ export default function Bag() {
 
     const { addToBag: addToCartBag } = useCartStore((state) => state);
 
-    const weaponIdAttachments: { weapon_id: number; attachment_ids: number[]; quantity: number }[] = [];
+    const weaponIdAttachments: { weapon_id: number; attachments: Attachment[]; quantity: number }[] = [];
     for (let i = 0; i < bag.length; i++) {
-        const attachmentIds = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachment_ids: attachmentIds, quantity: bag[i].quantity });
+        const attachments = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
+        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachments: attachments, quantity: bag[i].quantity });
     }
 
     return (
@@ -41,9 +42,9 @@ export default function Bag() {
                                             <div className="flex items-center">
                                                 <div>
                                                     {item.weaponName}
-                                                    {Object.entries(item.selectedAttachments).map(([area, id]) => (
+                                                    {Object.entries(item.selectedAttachments).map(([area, att]) => (
                                                         <div key={area}>
-                                                            {area}: {id}
+                                                            {area}: {att.name}
                                                         </div>
                                                     ))}
                                                     <Link

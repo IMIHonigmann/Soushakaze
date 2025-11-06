@@ -1,10 +1,11 @@
+import { Attachment } from '@/types/types';
 import { create } from 'zustand';
 
 export type BagItem = {
     customizedWeaponId: string;
     weaponId: number;
     weaponName: string;
-    selectedAttachments: Record<string, number>;
+    selectedAttachments: Record<string, Attachment>;
     quantity: number;
 };
 

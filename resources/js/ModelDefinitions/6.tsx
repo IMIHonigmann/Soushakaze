@@ -69,7 +69,7 @@ type GLTFResult = GLTF & {
 export default function Model(props: JSX.IntrinsicElements['group']) {
     const { nodes, materials } = useGLTF('/3DModels/PPSH41/scene.gltf') as unknown as GLTFResult;
 
-    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
+    const { selected } = useCustomizerStore();
 
     useEffect(() => {
         console.log(selected);
@@ -89,7 +89,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
             <group rotation={[-1.583, -0.175, 0.201]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
                     <group position={[0, 5.011, -11.913]} rotation={[-0.211, 0, 0]} scale={100}>
-                        {selected.scope === 1 && (
+                        {selected['scope']?.id === 1 && (
                             <group>
                                 <mesh castShadow receiveShadow geometry={nodes.defaultMaterial_14.geometry} material={materials.linza} />
                                 <mesh
@@ -102,7 +102,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                             </group>
                         )}
                     </group>
-                    {selected.underbarrel === 4 && (
+                    {selected['underbarrel']?.id === 4 && (
                         <group>
                             <mesh
                                 castShadow
@@ -223,7 +223,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                         rotation={[-2.268, 0, 0]}
                         scale={100}
                     />
-                    {selected.scope === 1 && (
+                    {selected['scope']?.id === 1 && (
                         <mesh
                             castShadow
                             receiveShadow
@@ -259,7 +259,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                         rotation={[-Math.PI / 2, 0, 0]}
                         scale={100}
                     />
-                    {selected.underbarrel === 5 && (
+                    {selected['underbarrel']?.id === 5 && (
                         <mesh
                             castShadow
                             receiveShadow
@@ -270,7 +270,7 @@ export default function Model(props: JSX.IntrinsicElements['group']) {
                             scale={100}
                         />
                     )}
-                    {selected.underbarrel !== 0 && (
+                    {selected['underbarrel']?.id !== 0 && (
                         <mesh
                             castShadow
                             receiveShadow

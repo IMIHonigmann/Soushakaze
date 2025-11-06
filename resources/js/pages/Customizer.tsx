@@ -1,6 +1,6 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore } from '@/stores/bagStores';
-import { useCustomizerStore } from '@/stores/useCustomizerStore';
+import { factoryIssueAttachment, useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Attachment, Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
@@ -71,8 +71,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleSelect = (area: Area, id: number) => {
-        setSelected(area, id);
+    const handleSelect = (area: Area, attachment: Attachment) => {
+        setSelected(area, attachment);
         setCurrentAreaSelection(area);
     };
 
@@ -108,29 +108,29 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     const statModifiers: Record<Stats, number> = useMemo(() => {
         return Object.fromEntries(
             statTypes.map((stat) => {
-                const sum = Object.entries(grouped).reduce((total, [area, attachments]) => {
-                    const id = selected[area];
-                    if (!id) return total;
-                    const att = attachments.find((a) => a.id === id);
+                const sum = Object.values(selected).reduce((total, att) => {
                     return total + (att ? Number(att[`${stat}_modifier`]) || 0 : 0);
                 }, 0);
                 return [stat, sum];
             }),
         ) as Record<Stats, number>;
-    }, [selected, grouped]);
+    }, [selected]);
 
-    function contextDependentStatModifier(stat: Stats) {
+    const contextModifiers = useMemo(() => {
         if (currentAreaSelection === 'all' || currentAreaSelection === 'other') {
-            return statModifiers[stat];
+            return statModifiers;
         }
 
-        const areaAttachments = grouped[currentAreaSelection];
-        const selectedId = selected[currentAreaSelection];
+        const selectedAtt = selected[currentAreaSelection];
 
-        if (!selectedId || !areaAttachments) return 0;
+        return Object.fromEntries(statTypes.map((stat) => [stat, selectedAtt ? Number(selectedAtt[`${stat}_modifier`]) || 0 : 0])) as Record<
+            Stats,
+            number
+        >;
+    }, [currentAreaSelection, selected, statModifiers]);
 
-        const selectedAttachment = areaAttachments.find((a) => a.id === selectedId);
-        return selectedAttachment ? Number(selectedAttachment[`${stat}_modifier`]) || 0 : 0;
+    function contextDependentStatModifier(stat: Stats) {
+        return contextModifiers[stat];
     }
 
     return (
@@ -151,31 +151,38 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     <div
                         className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
                     >
-                        {Object.entries(grouped).map(([area, attachments]) => (
-                            <div
-                                key={area}
-                                style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
-                            >
-                                <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                <button
-                                    onClick={() => handleClickAttachmentArea(area as Area)}
-                                    style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                    className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                        {Object.entries(grouped).map(([area]) => {
+                            console.log('bruh:', selected['']);
+                            return (
+                                <div
+                                    key={area}
+                                    style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
+                                    className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
                                 >
-                                    <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
-                                        {selected[area] === 0 ? <AiOutlinePlus className="text-6xl" /> : <img alt={`Att-${selected[area]}`} />}
-                                    </div>
-                                    <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
-                                        <div
-                                            className={`${selected[area] === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
-                                        >
-                                            {selected[area] === 0 ? 'empty' : attachments.find((a) => a.id === selected[area])?.name}
+                                    <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
+                                    <button
+                                        onClick={() => handleClickAttachmentArea(area as Area)}
+                                        style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
+                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                    >
+                                        <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
+                                            {selected[area]?.id === 0 ? (
+                                                <AiOutlinePlus className="text-6xl" />
+                                            ) : (
+                                                <img alt={`Att-${selected[area]?.id}`} />
+                                            )}
                                         </div>
-                                    </div>
-                                </button>
-                            </div>
-                        ))}
+                                        <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                            <div
+                                                className={`${selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
+                                            >
+                                                {selected[area]?.id === 0 ? 'empty' : selected[area]?.name}
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            );
+                        })}
                     </div>
                     <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
@@ -311,8 +318,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             <ul className="mx-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:p-4">
                                 <li
                                     key={`standard-${area}`}
-                                    onClick={() => handleSelect(area as Area, 0)}
-                                    className={`${selected[area] === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
+                                    onClick={() => handleSelect(area as Area, factoryIssueAttachment)}
+                                    className={`${selected[area]?.id === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
                                 >
                                     <div className="skew-x-4 border-2 bg-black">
                                         <CiIceCream className="p-2 text-6xl" />
@@ -324,8 +331,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     .map((a) => (
                                         <li
                                             key={a.id}
-                                            onClick={() => handleSelect(area as Area, a.id)}
-                                            className={`${selected[area] === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
+                                            onClick={() => handleSelect(area as Area, a)}
+                                            className={`${selected[area]?.id === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
                                         >
                                             <div className="relative skew-x-4 border-2 bg-black">
                                                 <FaCrosshairs className="p-2 text-6xl" />
