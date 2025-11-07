@@ -145,12 +145,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             <li
                 key={`attachment-${area}-${att.id}`}
                 onClick={() => handleSelect(area as Area, att)}
-                className="relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-all select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
+                className="relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
             >
                 <div
                     className={`absolute inset-0 bg-gradient-to-l from-orange-500 to-transparent transition-opacity duration-200 ${selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-400 hover:opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
                 <div className="pointer-events-none relative z-10 flex items-center gap-4">
                     <div className="relative skew-x-4 border-2 bg-black text-6xl [&>*]:p-2">{children}</div>
                     <div className="text-xl">
@@ -192,7 +192,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
                                         style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
                                     >
                                         <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
                                             {selected[area]?.id === 0 ? (

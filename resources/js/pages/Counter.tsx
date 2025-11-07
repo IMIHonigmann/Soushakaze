@@ -31,6 +31,8 @@ export default function Count({ from, to, duration = 0.3, delay = duration / 3, 
                 scale: 1,
                 transformOrigin: '0% 0%',
                 color: '#ffffff',
+                y: 0,
+                filter: 'blur(0px)',
             },
             {
                 scale: 1.5,
@@ -56,7 +58,8 @@ export default function Count({ from, to, duration = 0.3, delay = duration / 3, 
             .to(
                 divRef.current,
                 {
-                    y: Math.max(Math.min(-1 * (to - from) * 0.125, 10), -10),
+                    y: Math.max(Math.min(-1 * (to - from) * 0.15, 8), -8),
+                    filter: 'blur(2px)',
                     duration: ((duration - delay) / (delay > 0 ? 3 : 2)) * 0.5,
                     ease: 'sine.out',
                     yoyoEase: true,
