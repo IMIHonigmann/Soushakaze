@@ -1,4 +1,5 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
+import { usePrevious } from '@/hooks/usePrevious';
 import { useCartStore } from '@/stores/bagStores';
 import { factoryIssueAttachment, useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Attachment, Weapon } from '@/types/types';
@@ -132,6 +133,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     function contextDependentStatModifier(stat: Stats) {
         return contextModifiers[stat];
     }
+
+    const totalPrice = useMemo(() => {
+        return Number(weapon.price) + statModifiers['price'];
+    }, [statModifiers, weapon.price]);
+
+    const previousPrice = usePrevious(totalPrice);
 
     return (
         <>
@@ -353,7 +360,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         S0USHAK4Z3
                     </h1>
                     <div className="mt-1 text-xl">Total Price (inkl. Tax): </div>
-                    <Count from={Number(weapon.price)} to={Number(weapon.price) + statModifiers['price']} />
+                    <Count className="ml-1" from={previousPrice ?? totalPrice} to={totalPrice} />
                 </div>
             </div>
         </>
