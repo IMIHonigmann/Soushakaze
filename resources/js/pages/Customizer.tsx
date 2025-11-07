@@ -322,32 +322,44 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                 />
                             </div>
-                            <ul className="mx-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:p-4">
+                            <ul className="-mr-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:py-4 [&>*]:pr-12 [&>*]:pl-6">
                                 <li
-                                    key={`standard-${area}`}
+                                    key={`factory-${area}`}
                                     onClick={() => handleSelect(area as Area, factoryIssueAttachment)}
-                                    className={`${selected[area]?.id === 0 ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center justify-start gap-4 transition-[background] duration-300 select-none hover:bg-red-600`}
+                                    className="relative flex cursor-pointer items-center gap-4 overflow-hidden select-none"
                                 >
-                                    <div className="skew-x-4 border-2 bg-black">
-                                        <CiIceCream className="p-2 text-6xl" />
+                                    <div
+                                        className={`absolute inset-0 bg-gradient-to-l from-orange-500 to-transparent transition-opacity duration-200 ${selected[area]?.id === 0 ? 'opacity-100' : 'opacity-0'}`}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-200 hover:opacity-100" />
+                                    <div className="pointer-events-none relative z-10 flex items-center gap-4">
+                                        <div className="skew-x-4 border-2 bg-black">
+                                            <CiIceCream className="p-2 text-6xl" />
+                                        </div>
+                                        <div className="text-xl">Factory Issue</div>
                                     </div>
-                                    <div className="text-xl">Factory Issue</div>
                                 </li>
                                 {attachments
                                     .sort((a1, a2) => a1.price_modifier - a2.price_modifier)
                                     .map((a) => (
                                         <li
-                                            key={a.id}
+                                            key={`attachment-${area}-${a.id}`}
                                             onClick={() => handleSelect(area as Area, a)}
-                                            className={`${selected[area]?.id === a.id ? 'bg-red-600' : 'bg-transparent'} flex cursor-pointer items-center gap-4 transition-all select-none hover:bg-red-600`}
+                                            className="relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-all select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
                                         >
-                                            <div className="relative skew-x-4 border-2 bg-black">
-                                                <FaCrosshairs className="p-2 text-6xl" />
-                                                <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
-                                            </div>
-                                            <div className="text-xl">
-                                                <div>{a.name}</div>
-                                                <div className="-skew-x-12 font-extrabold">{a.price_modifier}€</div>
+                                            <div
+                                                className={`absolute inset-0 bg-gradient-to-l from-orange-500 to-transparent transition-opacity duration-200 ${selected[area]?.id === a.id ? 'opacity-100' : 'opacity-0'}`}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-200 hover:opacity-100" />
+                                            <div className="pointer-events-none relative z-10 flex items-center gap-4">
+                                                <div className="relative skew-x-4 border-2 bg-black">
+                                                    <FaCrosshairs className="p-2 text-6xl" />
+                                                    <FaAngleDoubleUp className="absolute -right-2 -bottom-2 p-2 text-4xl" />
+                                                </div>
+                                                <div className="text-xl">
+                                                    <div>{a.name}</div>
+                                                    <div className="-skew-x-12 font-extrabold">{a.price_modifier}€</div>
+                                                </div>
                                             </div>
                                         </li>
                                     ))}
