@@ -7,7 +7,7 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
@@ -16,6 +16,7 @@ import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import Count from './Counter';
 import CustomizerScene from './CustomizerScene';
+import YouTubePlayer from './YouTubePlayer';
 
 gsap.registerPlugin(ScrambleTextPlugin);
 
@@ -37,6 +38,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         acc[att.area].push(att);
         return acc;
     }, {});
+
+    const [isPlaying, setIsPlaying] = useState(false);
 
     const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
@@ -139,6 +142,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     }, [statModifiers, weapon.price]);
 
     const previousPrice = usePrevious(totalPrice);
+
+    const myPlaylist: string[] = ['53S_ZAvWT3o', 'XGLYpYoXkWw'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
         return (
@@ -360,8 +365,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         </div>
                     ))}
                 </div>
-                <div className="absolute top-4 left-4 font-extrabold">
-                    <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10" />
+                <YouTubePlayer setIsPlaying={setIsPlaying} className="pointer-events-auto text-right" videoIds={myPlaylist} />
+                <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
+                    <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity`}>
+                        <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10`} />
+                    </div>
                     <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
                     </h1>
