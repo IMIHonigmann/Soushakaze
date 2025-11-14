@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import { FaPause, FaPlayCircle } from 'react-icons/fa';
+import { TbPlayerTrackNextFilled } from 'react-icons/tb';
 import YouTube, { YouTubeEvent, YouTubePlayer as YouTubePlayerType } from 'react-youtube';
 
 type VideoData = {
@@ -27,10 +29,11 @@ type VideoData = {
 type Props = {
     videoIds: string[];
     className?: string;
+    isPlaying: boolean;
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const YouTubePlayer = ({ videoIds = [], className, setIsPlaying }: Props) => {
+const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Props) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentTitle, setCurrentTitle] = useState('Loading...');
     const playerRef = useRef<YouTubePlayerType | null>(null);
@@ -81,10 +84,11 @@ const YouTubePlayer = ({ videoIds = [], className, setIsPlaying }: Props) => {
         <div className={className}>
             <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
             <h1>{currentTitle}</h1>
-            <div>
-                <button onClick={playVideo}>Play</button>
-                <button onClick={pauseVideo}>Pause</button>
-                <button onClick={nextVideo}>Next</button>
+            <div className="text-3xl">
+                <button onClick={isPlaying ? pauseVideo : playVideo}>{isPlaying ? <FaPause /> : <FaPlayCircle />}</button>
+                <button onClick={nextVideo}>
+                    <TbPlayerTrackNextFilled />
+                </button>
             </div>
         </div>
     );

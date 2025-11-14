@@ -143,7 +143,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const previousPrice = usePrevious(totalPrice);
 
-    const myPlaylist: string[] = ['53S_ZAvWT3o', 'XGLYpYoXkWw'];
+    const myPlaylist: string[] = ['53S_ZAvWT3o', 'XGLYpYoXkWw', '9knRIIQGUb4'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
         return (
@@ -365,15 +365,15 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         </div>
                     ))}
                 </div>
-                <YouTubePlayer setIsPlaying={setIsPlaying} className="pointer-events-auto text-right" videoIds={myPlaylist} />
+                <YouTubePlayer isPlaying={isPlaying} setIsPlaying={setIsPlaying} className="pointer-events-auto text-right" videoIds={myPlaylist} />
                 <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
-                    <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity`}>
+                    <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
                         <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10`} />
                     </div>
                     <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
                     </h1>
-                    <div className="mt-1 text-xl">Total Price (inkl. Tax): </div>
+                    <div className="z-10 mt-1 text-xl">Total Price (inkl. Tax): </div>
                     <Count className="ml-1" from={previousPrice ?? totalPrice} to={totalPrice} />
                 </div>
             </div>
