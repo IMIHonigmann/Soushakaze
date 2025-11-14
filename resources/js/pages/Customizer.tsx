@@ -143,7 +143,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const previousPrice = usePrevious(totalPrice);
 
-    const myPlaylist: string[] = ['53S_ZAvWT3o', 'XGLYpYoXkWw', '9knRIIQGUb4'];
+    const myPlaylist: string[] = ['9knRIIQGUb4', '53S_ZAvWT3o', 'XGLYpYoXkWw'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
         return (
@@ -170,7 +170,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     return (
         <>
             <MdOutlineCameraswitch
-                className={`scale absolute top-4 right-4 z-5 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
+                className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => setCurrentAreaSelection('all')}
             />
             <CustomizerScene
@@ -365,12 +365,6 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         </div>
                     ))}
                 </div>
-                <YouTubePlayer
-                    isPlaying={isPlaying}
-                    setIsPlaying={setIsPlaying}
-                    className="pointer-events-auto mt-2 flex flex-col items-center justify-center"
-                    videoIds={myPlaylist}
-                />
                 <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
                     <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
                         <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10`} />
@@ -381,6 +375,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     <div className="z-10 mt-1 text-xl">Total Price (inkl. Tax): </div>
                     <Count className="ml-1" from={previousPrice ?? totalPrice} to={totalPrice} />
                 </div>
+                <YouTubePlayer
+                    isPlaying={isPlaying}
+                    setIsPlaying={setIsPlaying}
+                    className="pointer-events-auto z-200 flex -translate-y-10/12 flex-col items-center justify-center transition-all hover:translate-0"
+                    videoIds={myPlaylist}
+                />
             </div>
         </>
     );

@@ -85,31 +85,40 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
     const nextVideo = (increment = 1) => {
         const nextIndex = (currentIndex + increment + videoIds.length) % videoIds.length;
         setCurrentIndex(nextIndex);
-        setCurrentTitle(playerRef.current.getVideoData().title);
         setIsPlaying(true);
     };
 
     return (
         <div className={className}>
-            <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
-            <div className="flex items-center text-2xl [&>*]:px-2">
-                <FaCompactDisc
-                    key={currentIndex}
-                    className={`text-5xl ${isPlaying ? 'animate-spin' : 'animate-ping'}`}
-                    style={{ animationIterationCount: isPlaying ? 'infinite' : '3', animationDuration: isPlaying ? '2s' : '' }}
-                />
-                <span className="text-3xl text-zinc-800">|</span>{' '}
-                <h1 key={currentTitle} className="animate-fade-from-left font-hitmarker-condensed">
-                    {currentTitle}
-                </h1>
-            </div>
-            <div className="flex items-center gap-2 text-2xl">
-                <TbPlayerTrackPrevFilled onClick={() => nextVideo(-1)} className="cursor-pointer" />
-                <button className="text-6xl" onClick={isPlaying ? pauseVideo : playVideo}>
-                    {isPlaying ? <FaPause /> : <FaPlayCircle />}
-                </button>
-                <TbPlayerTrackNextFilled onClick={() => nextVideo()} className="cursor-pointer" />
-            </div>
+            <span
+                className={`min-w-96 rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
+            >
+                <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
+                <div className="flex items-center text-xl [&>*]:px-2">
+                    <FaCompactDisc
+                        key={currentIndex}
+                        className={`text-5xl ${isPlaying ? 'animate-spin' : 'animate-ping'}`}
+                        style={{ animationIterationCount: isPlaying ? 'infinite' : '3', animationDuration: isPlaying ? '2s' : '' }}
+                    />
+                    <span className="text-3xl text-zinc-800">|</span>{' '}
+                    <h1 key={currentTitle} className="animate-fade-from-above font-hitmarker-condensed">
+                        {currentTitle}
+                    </h1>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-2xl">
+                    <TbPlayerTrackPrevFilled
+                        onClick={() => nextVideo(-1)}
+                        className="cursor-pointer transition-all duration-100 active:scale-90 active:text-orange-400"
+                    />
+                    <button
+                        className="text-6xl transition-all duration-100 active:scale-80 active:opacity-50"
+                        onClick={isPlaying ? pauseVideo : playVideo}
+                    >
+                        {isPlaying ? <FaPause /> : <FaPlayCircle />}
+                    </button>
+                    <TbPlayerTrackNextFilled onClick={() => nextVideo()} className="cursor-pointer active:scale-90 active:text-orange-400" />
+                </div>
+            </span>
         </div>
     );
 };

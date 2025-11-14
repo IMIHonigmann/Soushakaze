@@ -81,7 +81,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                         </div>
                     }
                 >
-                    <button
+                    {/* <button
                         className="absolute bottom-0 z-105"
                         onClick={() => {
                             if (window.takeScreenshot) {
@@ -94,7 +94,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                         }}
                     >
                         Take screenshot
-                    </button>
+                    </button> */}
                     <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
