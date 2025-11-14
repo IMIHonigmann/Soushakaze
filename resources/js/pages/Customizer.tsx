@@ -333,7 +333,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         >
                             <div className="m-4 flex items-center justify-between">
                                 <div className="relative">
-                                    <strong className="text-xl tracking-widest uppercase select-none">{area}</strong>
+                                    <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">{area}</strong>
                                     <span
                                         className={`absolute -bottom-1 left-0 h-0.5 origin-left ${currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
                                         style={{ width: '100%' }}
@@ -361,6 +361,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     ))}
                 </div>
                 <div className="absolute top-4 left-4 font-extrabold">
+                    <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10" />
                     <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
                     </h1>
