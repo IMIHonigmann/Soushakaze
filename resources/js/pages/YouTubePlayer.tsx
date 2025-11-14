@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { FaPause, FaPlayCircle } from 'react-icons/fa';
-import { TbPlayerTrackNextFilled } from 'react-icons/tb';
+import { FaCompactDisc, FaPause, FaPlayCircle } from 'react-icons/fa';
+import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from 'react-icons/tb';
 import YouTube, { YouTubeEvent, YouTubePlayer as YouTubePlayerType } from 'react-youtube';
 
 type VideoData = {
@@ -44,6 +44,15 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
         playerVars: {
             autoplay: 1,
             loop: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            rel: 0,
+            iv_load_policy: 3,
+            cc_load_policy: 0,
+            vq: 'tiny',
         },
     };
 
@@ -73,8 +82,8 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
         setIsPlaying(false);
     };
 
-    const nextVideo = () => {
-        const nextIndex = (currentIndex + 1) % videoIds.length;
+    const nextVideo = (increment = 1) => {
+        const nextIndex = (currentIndex + increment + videoIds.length) % videoIds.length;
         setCurrentIndex(nextIndex);
         setCurrentTitle(playerRef.current.getVideoData().title);
         setIsPlaying(true);
@@ -83,12 +92,23 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
     return (
         <div className={className}>
             <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
-            <h1>{currentTitle}</h1>
-            <div className="text-3xl">
-                <button onClick={isPlaying ? pauseVideo : playVideo}>{isPlaying ? <FaPause /> : <FaPlayCircle />}</button>
-                <button onClick={nextVideo}>
-                    <TbPlayerTrackNextFilled />
+            <div className="flex items-center text-2xl [&>*]:px-2">
+                <FaCompactDisc
+                    key={currentIndex}
+                    className={`text-5xl ${isPlaying ? 'animate-spin' : 'animate-ping'}`}
+                    style={{ animationIterationCount: isPlaying ? 'infinite' : '3', animationDuration: isPlaying ? '2s' : '' }}
+                />
+                <span className="text-3xl text-zinc-800">|</span>{' '}
+                <h1 key={currentTitle} className="animate-fade-from-left font-hitmarker-condensed">
+                    {currentTitle}
+                </h1>
+            </div>
+            <div className="flex items-center gap-2 text-2xl">
+                <TbPlayerTrackPrevFilled onClick={() => nextVideo(-1)} className="cursor-pointer" />
+                <button className="text-6xl" onClick={isPlaying ? pauseVideo : playVideo}>
+                    {isPlaying ? <FaPause /> : <FaPlayCircle />}
                 </button>
+                <TbPlayerTrackNextFilled onClick={() => nextVideo()} className="cursor-pointer" />
             </div>
         </div>
     );

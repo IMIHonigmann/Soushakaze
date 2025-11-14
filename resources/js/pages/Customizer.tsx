@@ -365,7 +365,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                         </div>
                     ))}
                 </div>
-                <YouTubePlayer isPlaying={isPlaying} setIsPlaying={setIsPlaying} className="pointer-events-auto text-right" videoIds={myPlaylist} />
+                <YouTubePlayer
+                    isPlaying={isPlaying}
+                    setIsPlaying={setIsPlaying}
+                    className="pointer-events-auto mt-2 flex flex-col items-center justify-center"
+                    videoIds={myPlaylist}
+                />
                 <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
                     <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
                         <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10`} />
