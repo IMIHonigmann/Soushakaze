@@ -232,6 +232,35 @@
         animation: simonsaysahh 0.25s ease-out forwards;
     }
 
+    .animate-beat {
+        animation: beat 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes beat {
+        0%,
+        100% {
+            /* opacity: 1; */
+            transform: scale(1);
+        }
+        50% {
+            /* opacity: 0.5; */
+            transform: scale(1.01);
+        }
+    }
+
+    .animate-spin-720 {
+        animation: spin-720 1s linear infinite;
+    }
+
+    @keyframes spin-720 {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(1080deg);
+        }
+    }
+
     @keyframes simonsaysahh {
         0% {
             border-top-color: transparent;

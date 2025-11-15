@@ -143,7 +143,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const previousPrice = usePrevious(totalPrice);
 
-    const myPlaylist: string[] = ['9knRIIQGUb4', '53S_ZAvWT3o', 'XGLYpYoXkWw'];
+    const myPlaylist: string[] = ['9knRIIQGUb4', '53S_ZAvWT3o', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
         return (
@@ -334,7 +334,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 pointerEvents: currentAreaSelection === area ? 'auto' : 'none',
                                 right: currentAreaSelection === area ? '0' : '-30%',
                             }}
-                            className="absolute top-0 right-0 h-full border-l bg-black transition-all duration-300"
+                            className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
                         >
                             <div className="m-4 flex items-center justify-between">
                                 <div className="relative">
@@ -367,7 +367,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 </div>
                 <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
                     <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
-                        <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-orange-500/20 via-transparent to-orange-600/10`} />
+                        <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
                     </div>
                     <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
@@ -378,7 +378,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 <YouTubePlayer
                     isPlaying={isPlaying}
                     setIsPlaying={setIsPlaying}
-                    className="pointer-events-auto z-200 flex -translate-y-10/12 flex-col items-center justify-center transition-all hover:translate-0"
+                    className={`pointer-events-none z-200 flex -translate-y-10/12 flex-col items-center justify-center transition-all hover:translate-0 ${isPlaying ? 'animate-beat hover:animate-none' : ''}`}
                     videoIds={myPlaylist}
                 />
             </div>

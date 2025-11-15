@@ -89,21 +89,37 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
     };
 
     return (
-        <div className={className}>
+        <div className={className} style={{ animationDuration: '0.5s' }}>
             <span
-                className={`min-w-96 rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
+                className={`pointer-events-auto min-w-96 rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
             >
                 <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
-                <div className="flex items-center text-xl [&>*]:px-2">
+                <div className="mb-2 flex items-center text-xl [&>*]:px-2">
                     <FaCompactDisc
                         key={currentIndex}
-                        className={`text-5xl ${isPlaying ? 'animate-spin' : 'animate-ping'}`}
-                        style={{ animationIterationCount: isPlaying ? 'infinite' : '3', animationDuration: isPlaying ? '2s' : '' }}
+                        className={`text-5xl ${isPlaying ? 'animate-spin-720 text-orange-500 ease-in-out' : 'animate-ping'}`}
+                        style={{
+                            animationIterationCount: isPlaying ? 'infinite' : '3',
+                            animationDuration: isPlaying ? '2s' : '',
+                        }}
                     />
-                    <span className="text-3xl text-zinc-800">|</span>{' '}
-                    <h1 key={currentTitle} className="animate-fade-from-above font-hitmarker-condensed">
-                        {currentTitle}
-                    </h1>
+                    <span className="text-3xl text-zinc-800">|</span>
+                    <a
+                        href={`https://www.youtube.com/watch?v=${videoIds[currentIndex]}`}
+                        className="transition-colors hover:text-orange-500"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <div className="group relative">
+                            <h1 key={currentTitle} className="animate-fade-from-above font-hitmarker-condensed">
+                                {currentTitle}
+                            </h1>
+                            <span
+                                className={`absolute -bottom-1 left-0 h-0.5 origin-left scale-x-0 transform bg-orange-500 transition-transform duration-200 ease-out group-hover:scale-x-100`}
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                    </a>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-2xl">
                     <TbPlayerTrackPrevFilled
