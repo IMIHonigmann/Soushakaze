@@ -155,11 +155,11 @@ return new class extends Migration {
                 'name' => 'Collapsible Stock',
                 'area' => 'stock',
                 'price_modifier' => 149.99,
-                'power_modifier' => 0,
+                'power_modifier' => 11,
                 'accuracy_modifier' => 4,
                 'mobility_modifier' => 5,
                 'handling_modifier' => 6,
-                'magsize_modifier' => 0,
+                'magsize_modifier' => 1,
             ],
             [
                 'name' => 'Fixed Stock',
@@ -271,6 +271,17 @@ return new class extends Migration {
                 'handling_modifier' => 6,
                 'magsize_modifier' => 0,
             ],
+            [
+                'name' => 'Vaccum Barrel',
+                'area' => 'barrel',
+                'price_modifier' => 359.99,
+                'power_modifier' => 11,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => -3,
+                'handling_modifier' => -6,
+                'magsize_modifier' => 0,
+            ]
+
         ];
 
         foreach ($attachments as $attachment) {
@@ -394,6 +405,12 @@ return new class extends Migration {
             ],
 
             // Attachments for PPSH41 (weapon_id 6)
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 18, // Vaccum Barrel
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             [
                 'weapon_id' => 6, // PPSH41
                 'attachment_id' => 1, // Red Dot Sight

@@ -7,10 +7,11 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
-import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaCrosshairs } from 'react-icons/fa';
+import { FaAngleDoubleUp, FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
@@ -146,6 +147,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     const myPlaylist: string[] = ['9knRIIQGUb4', '53S_ZAvWT3o', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
+        const childArray = React.Children.toArray(children).filter(Boolean);
+        const childCount = childArray.length;
         return (
             <li
                 key={`attachment-${area}-${att.id}`}
@@ -157,7 +160,26 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
                 <div className="pointer-events-none relative z-10 flex items-center gap-4">
-                    <div className="relative skew-x-4 border-2 bg-black text-6xl [&>*]:p-2">{children}</div>
+                    <div className="relative h-16 w-16 skew-x-3 border-2 bg-black">
+                        <div
+                            className={`relative grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
+                                childCount === 2
+                                    ? 'place-items-center gap-0 p-2 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
+                                    : childCount === 3
+                                      ? 'place-items-center p-2 text-5xl [&>*:last-child]:col-span-2 [&>*:last-child]:justify-self-center'
+                                      : childCount === 4
+                                        ? 'place-items-center text-5xl'
+                                        : 'text-6xl'
+                            }`}
+                        >
+                            {childCount >= 5 ? <GiStarFormation /> : children}
+                        </div>
+                        <div className="absolute -right-0.5 bottom-0 rounded-full p-1">
+                            {childArray.length < 4 && (childArray[0] as any).props?.id !== 'factory_issue' && (
+                                <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
+                            )}
+                        </div>
+                    </div>
                     <div className="text-xl">
                         <div>{att.name}</div>
                         {att.id !== 0 && <div className="-skew-x-12 font-extrabold">{att.price_modifier}€</div>}
@@ -351,14 +373,17 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             </div>
                             <ul className="-mr-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:py-4 [&>*]:pr-12 [&>*]:pl-6">
                                 <AttachmentListElement area={area as Area} att={factoryIssueAttachment}>
-                                    <CiIceCream />
+                                    <CiIceCream id="factory_issue" />
                                 </AttachmentListElement>
                                 {attachments
                                     .sort((a1, a2) => a1.price_modifier - a2.price_modifier)
                                     .map((a) => (
                                         <AttachmentListElement area={area as Area} att={a}>
-                                            <FaCrosshairs />
-                                            <FaAngleDoubleUp className="absolute -right-2 -bottom-2 text-4xl" />
+                                            {a.power_modifier > 0 && <GiCornerExplosion />}
+                                            {a.mobility_modifier > 0 && <GiFeather />}
+                                            {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                            {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                            {a.magsize_modifier > 0 && <GiHeavyBullets />}
                                         </AttachmentListElement>
                                     ))}
                             </ul>
