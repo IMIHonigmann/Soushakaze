@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDoubleUp, FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import { FaBoltLightning } from 'react-icons/fa6';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
@@ -162,9 +163,9 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 <div className="pointer-events-none relative z-10 flex items-center gap-4">
                     <div className="relative h-16 w-16 skew-x-3 border-2 bg-black">
                         <div
-                            className={`relative grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
+                            className={`relative z-10 grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
                                 childCount === 2
-                                    ? 'place-items-center gap-0 p-2 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
+                                    ? 'place-items-center gap-0 p-2.5 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
                                     : childCount === 3
                                       ? 'place-items-center p-2 text-5xl [&>*:last-child]:col-span-2 [&>*:last-child]:justify-self-center'
                                       : childCount === 4
@@ -172,12 +173,16 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                         : 'text-6xl'
                             }`}
                         >
-                            {childCount >= 5 ? <GiStarFormation /> : children}
+                            {childCount >= 5 ? <GiStarFormation className="text-yellow-400 drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]" /> : children}
                         </div>
-                        <div className="absolute -right-0.5 bottom-0 rounded-full p-1">
-                            {childArray.length < 4 && (childArray[0] as any).props?.id !== 'factory_issue' && (
-                                <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]" />
-                            )}
+                        <div className="absolute -right-0.5 bottom-0 z-20 rounded-full p-1">
+                            {childArray.length < 4 &&
+                                (childArray[0] as any).props?.id !== 'factory_issue' &&
+                                (childCount > 1 ? (
+                                    <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
+                                ) : (
+                                    <FaBoltLightning className="text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
+                                ))}
                         </div>
                     </div>
                     <div className="text-xl">
