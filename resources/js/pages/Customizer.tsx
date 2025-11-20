@@ -145,7 +145,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const previousPrice = usePrevious(totalPrice);
 
-    const myPlaylist: string[] = ['9knRIIQGUb4', '53S_ZAvWT3o', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
+    const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
 
     function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
         const childArray = React.Children.toArray(children).filter(Boolean);

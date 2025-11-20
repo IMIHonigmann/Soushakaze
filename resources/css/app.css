@@ -248,6 +248,39 @@
         }
     }
 
+    .animate-scroll-text {
+        animation:
+            fade-from-above 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+            scroll-text 8s linear 0.5s infinite;
+    }
+
+    @keyframes scroll-text {
+        0% {
+            opacity: 0;
+            transform: translateX(0);
+        }
+        4%,
+        20% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        70%,
+        80% {
+            transform: translateX(calc(-100% + 24rem));
+        }
+        96% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(calc(-100% + 24rem));
+        }
+    }
+
+    .animate-scroll-text:not(:hover) {
+        animation-play-state: running;
+    }
+
     .animate-spin-720 {
         animation: spin-720 1s linear infinite;
     }

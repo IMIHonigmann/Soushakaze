@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaCompactDisc, FaPause, FaPlayCircle } from 'react-icons/fa';
 import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from 'react-icons/tb';
 import YouTube, { YouTubeEvent, YouTubePlayer as YouTubePlayerType } from 'react-youtube';
@@ -37,6 +37,14 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentTitle, setCurrentTitle] = useState('Loading...');
     const playerRef = useRef<YouTubePlayerType | null>(null);
+    const isInertiaVisit = useRef(false);
+
+    useEffect(() => {
+        const navigationType = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        isInertiaVisit.current = navigationType?.type === 'navigate' && document.referrer.includes(window.location.host);
+        isInertiaVisit.current = document.referrer !== '' && document.referrer.includes(window.location.host);
+        setIsPlaying(isInertiaVisit.current);
+    }, [setIsPlaying]);
 
     const opts = {
         height: '390',
@@ -62,6 +70,14 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
         setCurrentTitle(playerRef.current.getVideoData().title);
     };
 
+    const onStateChange = (event: YouTubeEvent) => {
+        if (event.data === 1) {
+            setIsPlaying(true);
+        } else if (event.data === 2) {
+            setIsPlaying(false);
+        }
+    };
+
     const onEnd = () => {
         const nextIndex = (currentIndex + 1) % videoIds.length;
         setCurrentIndex(nextIndex);
@@ -70,34 +86,37 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
     const playVideo = () => {
         if (playerRef.current) {
             playerRef.current.playVideo();
-            console.log('Currently playing:', playerRef.current.getVideoData().title);
         }
-        setIsPlaying(true);
     };
 
     const pauseVideo = () => {
         if (playerRef.current) {
             playerRef.current.pauseVideo();
         }
-        setIsPlaying(false);
     };
 
     const nextVideo = (increment = 1) => {
         const nextIndex = (currentIndex + increment + videoIds.length) % videoIds.length;
         setCurrentIndex(nextIndex);
-        setIsPlaying(true);
     };
 
     return (
         <div className={className} style={{ animationDuration: '0.5s' }}>
             <span
-                className={`pointer-events-auto min-w-96 rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
+                className={`pointer-events-auto w-lg rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
             >
-                <YouTube className="hidden" videoId={videoIds[currentIndex]} opts={opts} onReady={onReady} onEnd={onEnd} />
+                <YouTube
+                    className="hidden"
+                    videoId={videoIds[currentIndex]}
+                    opts={opts}
+                    onStateChange={onStateChange}
+                    onReady={onReady}
+                    onEnd={onEnd}
+                />
                 <div className="mb-2 flex items-center text-xl [&>*]:px-2">
                     <FaCompactDisc
                         key={currentIndex}
-                        className={`text-5xl ${isPlaying ? 'animate-spin-720 text-orange-500 ease-in-out' : 'animate-ping'}`}
+                        className={`text-5xl ${isPlaying ? 'animate-spin-720 text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.8)] ease-in-out' : 'animate-ping transition-all duration-1000'}`}
                         style={{
                             animationIterationCount: isPlaying ? 'infinite' : '3',
                             animationDuration: isPlaying ? '2s' : '',
@@ -111,13 +130,14 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
                         rel="noopener noreferrer"
                     >
                         <div className="group relative">
-                            <h1 key={currentTitle} className="animate-fade-from-above font-hitmarker-condensed">
-                                {currentTitle}
-                            </h1>
-                            <span
-                                className={`absolute -bottom-1 left-0 h-0.5 origin-left scale-x-0 transform bg-orange-500 transition-transform duration-200 ease-out group-hover:scale-x-100`}
-                                style={{ width: '100%' }}
-                            />
+                            <div className="relative w-96 overflow-hidden">
+                                <h1
+                                    key={currentTitle}
+                                    className="animate-fade-from-above animate-scroll-text inline-block min-w-full overflow-hidden font-hitmarker-condensed whitespace-nowrap hover:underline"
+                                >
+                                    {currentTitle}
+                                </h1>
+                            </div>
                         </div>
                     </a>
                 </div>

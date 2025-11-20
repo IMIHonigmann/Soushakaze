@@ -280,6 +280,26 @@ return new class extends Migration {
                 'mobility_modifier' => -3,
                 'handling_modifier' => -6,
                 'magsize_modifier' => 0,
+            ],
+            [
+                'name' => 'Short Stock',
+                'area' => 'stock',
+                'price_modifier' => 89.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => 9,
+                'handling_modifier' => -5,
+                'magsize_modifier' => 0,
+            ],
+            [
+                'name' => 'Skeleton Stock',
+                'area' => 'stock',
+                'price_modifier' => 129.99,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => 4,
+                'handling_modifier' => 6,
+                'magsize_modifier' => 0,
             ]
 
         ];
@@ -507,7 +527,18 @@ return new class extends Migration {
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 19,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 20,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             // Existing and other weapons
             [
                 'weapon_id' => 3, // Desert Eagle
