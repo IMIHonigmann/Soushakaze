@@ -32,6 +32,7 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
     const [totalPrice, setTotalPrice] = useState(0);
     const [shippingCost, setShippingCost] = useState(0);
     const [premiumShipping, setPremiumShipping] = useState(false);
+    const thresholdDifference = Math.pow(10, Math.floor(Math.log10(freeShippingThreshold)));
 
     useEffect(() => {
         setTotalPrice(bag.reduce((total, item) => total + item.customizedPrice * item.quantity, 0));
@@ -66,7 +67,7 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
                                 </div>
                                 <div
                                     className={`grid grid-cols-[auto_1fr] grid-rows-2 items-center bg-zinc-900 transition-all duration-500 ease-in-out ${
-                                        totalPrice > freeShippingThreshold
+                                        totalPrice > freeShippingThreshold || totalPrice < freeShippingThreshold - thresholdDifference
                                             ? 'max-h-0 translate-x-[-50vw] overflow-hidden p-0 opacity-0'
                                             : 'max-h-40 translate-x-[0vw] p-4 opacity-100'
                                     }`}

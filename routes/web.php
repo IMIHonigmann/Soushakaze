@@ -89,7 +89,7 @@ Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->na
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
 Route::get('cart', function () {
-    return Inertia::render('Cart', ['freeShippingThreshold' => 49999.99, 'standardShippingCost' => 4.90, 'premiumShippingExtraCost' => 10]);
+    return Inertia::render('Cart', ['freeShippingThreshold' => 3599.99, 'standardShippingCost' => 4.90, 'premiumShippingExtraCost' => 10]);
 })->name('cart');
 Route::get('wishlist', function () {
     return Inertia::render('Wishlist');
