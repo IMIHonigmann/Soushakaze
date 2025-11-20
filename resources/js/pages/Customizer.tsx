@@ -332,8 +332,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                     onClick={() =>
                         addToBag({
                             customizedWeaponId: makeSelectionKey(weapon.id, { ...selected }),
-                            weaponId: weapon.id,
-                            weaponName: weapon.name,
+                            customizedPrice: totalPrice,
+                            weapon: weapon,
                             selectedAttachments: { ...selected },
                             quantity: 1,
                         })

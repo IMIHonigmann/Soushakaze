@@ -1,10 +1,10 @@
-import { Attachment } from '@/types/types';
+import { Attachment, Weapon } from '@/types/types';
 import { create } from 'zustand';
 
 export type BagItem = {
     customizedWeaponId: string;
-    weaponId: number;
-    weaponName: string;
+    weapon: Weapon;
+    customizedPrice: number;
     selectedAttachments: Record<string, Attachment>;
     quantity: number;
 };
@@ -41,8 +41,8 @@ export const createBagStore = (bagName: string) =>
                         ...existing,
                         quantity: (existing.quantity ?? 0) + (newItem.quantity ?? 1),
                         selectedAttachments: { ...newItem.selectedAttachments },
-                        weaponId: newItem.weaponId,
-                        weaponName: newItem.weaponName,
+                        weapon: newItem.weapon,
+                        customizedPrice: newItem.customizedPrice,
                     };
                     newBag = [...state.bag];
                     newBag[idx] = merged;
