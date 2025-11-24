@@ -16,6 +16,7 @@ import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBu
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
+import { playLower } from './AttAudio';
 import Count from './Counter';
 import CustomizerScene from './CustomizerScene';
 import YouTubePlayer from './YouTubePlayer';
@@ -77,7 +78,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleSelect = (area: Area, attachment: Attachment) => {
+    const handleSelect = (area: Area, attachment: Attachment, sound = 'select_attachment_subtle') => {
+        if (selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
         setSelected(area, attachment);
         setCurrentAreaSelection(area);
     };
@@ -108,6 +110,11 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
     }, [currentAreaSelection, setCameraControls]);
 
     function handleClickAttachmentArea(area: Area) {
+        if (currentAreaSelection === 'all' || currentAreaSelection === 'other') {
+            playLower('/sounds/switchto_attachments.mp3');
+        } else if (currentAreaSelection !== area) {
+            playLower('/sounds/switch_attachment_area.mp3');
+        }
         setCurrentAreaSelection(area);
     }
 
@@ -147,13 +154,13 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
 
-    function AttachmentListElement({ area, att, children }: { area: Area; att: Attachment; children?: React.ReactNode }) {
+    function AttachmentListElement({ area, att, children, sound }: { area: Area; att: Attachment; children?: React.ReactNode; sound?: string }) {
         const childArray = React.Children.toArray(children).filter(Boolean);
         const childCount = childArray.length;
         return (
             <li
                 key={`attachment-${area}-${att.id}`}
-                onClick={() => handleSelect(area as Area, att)}
+                onClick={() => handleSelect(area as Area, att, sound)}
                 className="relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
             >
                 <div
@@ -176,7 +183,8 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                             {childCount >= 5 ? <GiStarFormation className="text-yellow-400 drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]" /> : children}
                         </div>
                         <div className="absolute -right-0.5 bottom-0 z-20 rounded-full p-1">
-                            {childArray.length < 4 &&
+                            {childArray.length > 0 &&
+                                childArray.length < 4 &&
                                 (childArray[0] as any).props?.id !== 'factory_issue' &&
                                 (childCount > 1 ? (
                                     <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
@@ -198,7 +206,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         <>
             <MdOutlineCameraswitch
                 className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
-                onClick={() => setCurrentAreaSelection('all')}
+                onClick={() => goBackTo3D('all')}
             />
             <CustomizerScene
                 weaponId={weapon.id}
@@ -372,12 +380,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     />
                                 </div>
                                 <IoIosReturnLeft
-                                    onClick={() => setCurrentAreaSelection('other')}
+                                    onClick={() => goBackTo3D('other')}
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                 />
                             </div>
                             <ul className="-mr-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:py-4 [&>*]:pr-12 [&>*]:pl-6">
-                                <AttachmentListElement area={area as Area} att={factoryIssueAttachment}>
+                                <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
                                     <CiIceCream id="factory_issue" />
                                 </AttachmentListElement>
                                 {attachments
@@ -414,4 +422,9 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             </div>
         </>
     );
+
+    function goBackTo3D(area: Area): void {
+        playLower('/sounds/switchto_selection_all.mp3');
+        setCurrentAreaSelection(area);
+    }
 }

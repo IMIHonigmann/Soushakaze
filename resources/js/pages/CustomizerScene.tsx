@@ -3,6 +3,7 @@ import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { lazy, memo, Suspense, useCallback, useMemo, useRef } from 'react';
+import { playLower } from './AttAudio';
 import { Area } from './Customizer';
 
 const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
@@ -110,7 +111,7 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                             maxDistance={7}
                             minPolarAngle={Math.PI / 6}
                             maxPolarAngle={Math.PI / 1.8}
-                            onControlEnd={() => setCurrentAreaSelection('other')}
+                            onControlEnd={() => handleControlEnd()}
                         />
                         <EffectComposer>
                             <SMAA />
@@ -123,6 +124,11 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
             </div>
         </>
     );
+
+    function handleControlEnd(): void {
+        playLower('/sounds/switch_attachment_area.mp3');
+        setCurrentAreaSelection('other');
+    }
 }
 
 declare global {

@@ -56,7 +56,7 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
 
     return (
         <>
-            <div className="mx-48">
+            <div className="mx-32">
                 <Navbar />
                 <div className="mx-32">
                     <div className="grid min-h-[100svh] w-full grid-cols-[2.5fr_1fr] gap-20">
@@ -220,16 +220,16 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
                                     Checkout
                                 </button>
                                 <span className="self-start">We accept</span>
-                                <div className="grid grid-cols-5 place-items-center items-center text-5xl">
-                                    <FaBitcoin />
+                                <div className="grid grid-cols-5 place-items-center items-center text-6xl">
                                     <FaCcVisa />
                                     <FaCcMastercard />
-                                    <FaCcAmex />
+                                    <FaBitcoin className="scale-80" />
+                                    <FaCcDinersClub />
                                     <FaCcPaypal />
                                     <FaCcApplePay />
-                                    <SiSepa className="rounded border-2 px-1" />
-                                    <FaCcDinersClub />
-                                    <SiKlarna className="rounded-md border-2 px-1" />
+                                    <SiSepa className="scale-80 rounded-md border-2 bg-white px-1 text-black" />
+                                    <FaCcAmex />
+                                    <SiKlarna className="scale-80 rounded-md border-2 bg-white px-1 text-black" />
                                     <FaCcDiscover />
                                 </div>
                             </div>
