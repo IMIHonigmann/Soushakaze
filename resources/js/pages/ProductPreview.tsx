@@ -1,21 +1,35 @@
+import { displayStars } from '@/helpers/displayStars';
+import { getRelativeTime } from '@/helpers/getRelativeTime';
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
 import { Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaBookmark, FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
+import { IoLanguageSharp } from 'react-icons/io5';
 import Navbar from './Navbar';
+
+type Review = {
+    id: number;
+    user_id: number;
+    weapon_id: number;
+    rating: number;
+    review: string;
+    title: string;
+    created_at: string;
+    updated_at: string;
+};
 
 type Props = {
     weapon: Weapon;
-    reviews: any;
+    reviews: Review[];
     avgRating: number;
 };
 
 export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     console.log(weapon);
     console.log(reviews);
-    console.log(avgRating);
+    console.log('avg', avgRating);
 
     const { addToBag } = useCartStore((state) => state);
     const { addToBag: addToWishlist, bag: wishlistBag, deleteFromBag: deleteFromWishlistBag } = useWishlistStore((state) => state);
@@ -36,14 +50,14 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <li>6</li>
                         <li>7</li>
                     </ul>
-                    <div className="flex h-[900px] items-center border-2 border-white">
+                    <div className="flex h-[900px] min-w-xl items-center border-2 border-white">
                         <img alt={weapon.name} src={`data:image/png;base64,${weapon.image_base64}`} />
                     </div>
                 </div>
                 <div>
                     <div className="flex flex-col gap-4 text-4xl">
                         <h1 className="">On--</h1>
-                        <div className="font-extrabold">{weapon.name}</div>
+                        <div className="font-hitmarker-condensed text-7xl font-extrabold">{weapon.name}</div>
                         <div className="text-3xl">
                             €{weapon.price} <span className="text-gray-300 opacity-75">VAT included</span>
                         </div>
@@ -68,8 +82,8 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                             onClick={() =>
                                 addToBag({
                                     customizedWeaponId: makeSelectionKey(weapon.id, {}),
-                                    weaponId: weapon.id,
-                                    weaponName: weapon.name,
+                                    weapon,
+                                    customizedPrice: weapon.price,
                                     selectedAttachments: {},
                                     quantity: 1,
                                 })
@@ -87,8 +101,8 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                                 if (existingWeaponIdx === -1) {
                                     addToWishlist({
                                         customizedWeaponId: makeSelectionKey(weapon.id, {}),
-                                        weaponId: weapon.id,
-                                        weaponName: weapon.name,
+                                        weapon,
+                                        customizedPrice: weapon.price,
                                         selectedAttachments: {},
                                         quantity: 1,
                                     });
@@ -113,8 +127,41 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <FaFontAwesomeFlag />
                         <span>Report a legal concern</span>
                     </span>
+                    <div className="mt-6 font-hitmarker-condensed text-5xl">
+                        Ratings
+                        <div className="mt-2 flex gap-2 text-4xl">
+                            <span>{avgRating.toFixed(2)}</span>
+                            <span>{displayStars(avgRating.toString())}</span>
+                        </div>
+                    </div>
+                    {(() => {
+                        const highestReview = reviews.reduce((max, review) => {
+                            if (review.rating > max.rating) return review;
+                            if (review.rating === max.rating && review.created_at > max.created_at) return review;
+                            return max;
+                        }, reviews[0]);
+
+                        return (
+                            highestReview && (
+                                <div className="mt-6 flex flex-col gap-y-1 border p-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-3xl">{displayStars(highestReview.rating.toString())}</span>
+                                        <p>{getRelativeTime(highestReview.created_at)}</p>
+                                    </div>
+                                    <h1 className="font-hitmarker-condensed text-3xl">{highestReview.title}</h1>
+                                    <p>{highestReview.review}</p>
+                                    <div className="flex items-center gap-1">
+                                        <IoLanguageSharp className="mt-2 text-2xl" />{' '}
+                                        <span className="text-sm opacity-75">Original language: {'German'}</span>
+                                    </div>
+                                </div>
+                            )
+                        );
+                    })()}
+                    <div className="mt-4 border p-3 text-center">All reviews</div>
                 </div>
             </div>
+            <div className="mt-12">Other Weapons: //to be implemented</div>
             <p className="mt-96 text-9xl">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nisl aliquam enim, nec
                 dictum urna quam nec urna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum

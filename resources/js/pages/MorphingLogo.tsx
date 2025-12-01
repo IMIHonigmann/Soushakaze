@@ -92,7 +92,7 @@ export default function MorphingLogo() {
                             width="108.65234375px"
                             height="83.75px"
                             viewBox="-18.974609375 -63.359375 108.65234375 83.75"
-                            className="hover:text-red-500"
+                            className="transition-transform hover:text-red-500 active:scale-75"
                         >
                             <g id="sou-g">
                                 <path
@@ -109,7 +109,7 @@ export default function MorphingLogo() {
                             width="110.5322265625px"
                             height="83.75px"
                             viewBox="-18.974609375 -63.359375 110.5322265625 83.75"
-                            className="hover:text-orange-400"
+                            className="transition-transform hover:text-orange-400 active:scale-75"
                         >
                             <g id="sha-g">
                                 <path
@@ -127,7 +127,7 @@ export default function MorphingLogo() {
                         width="126.1328125px"
                         height="82.96875px"
                         viewBox="-18.095703125 -62.96875 126.1328125 82.96875"
-                        className="hover:text-yellow-300"
+                        className="transition-transform hover:text-yellow-300 active:scale-75"
                     >
                         <g id="kaze-g">
                             <path

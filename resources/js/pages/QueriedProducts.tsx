@@ -1,3 +1,4 @@
+import { displayStars } from '@/helpers/displayStars';
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Range, getTrackBackground } from 'react-range';
@@ -86,17 +87,6 @@ export default function QueriedProducts({ weapons, message }: Props) {
         const newMaxValue = Math.max(newMinValue + ROF_MIN_DIFF, Math.min(values[1], maxRof));
         setRofValues([newMinValue, newMaxValue]);
     };
-
-    function displayStars(unparsedRating: string) {
-        const num = parseFloat(unparsedRating);
-        if (isNaN(num) || num <= 0) return '';
-
-        const rounded = Math.round(Math.max(0, Math.min(5, num)) * 2) / 2;
-        const full = Math.floor(rounded);
-        const hasHalf = rounded - full === 0.5;
-
-        return '★'.repeat(full) + (hasHalf ? '½' : '') + '☆'.repeat(5 - full - Number(hasHalf));
-    }
 
     return (
         <div className="mx-32">

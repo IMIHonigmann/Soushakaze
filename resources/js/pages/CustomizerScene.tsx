@@ -3,7 +3,6 @@ import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { lazy, memo, Suspense, useCallback, useMemo, useRef } from 'react';
-import { playLower } from './AttAudio';
 import { Area } from './Customizer';
 
 const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
@@ -126,7 +125,6 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
     );
 
     function handleControlEnd(): void {
-        playLower('/sounds/switch_attachment_area.mp3');
         setCurrentAreaSelection('other');
     }
 }
