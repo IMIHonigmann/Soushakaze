@@ -7,6 +7,7 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaBookmark, FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
 import { IoLanguageSharp } from 'react-icons/io5';
+import { RxCross1 } from 'react-icons/rx';
 import Navbar from './Navbar';
 
 type Review = {
@@ -33,6 +34,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
 
     const { addToBag } = useCartStore((state) => state);
     const { addToBag: addToWishlist, bag: wishlistBag, deleteFromBag: deleteFromWishlistBag } = useWishlistStore((state) => state);
+    const [reviewsVisible, setReviewsVisible] = useState(false);
 
     const [bookmarked, setBookmarked] = useState(wishlistBag.some((item) => item.customizedWeaponId === makeSelectionKey(weapon.id, {})));
 
@@ -127,13 +129,15 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         <FaFontAwesomeFlag />
                         <span>Report a legal concern</span>
                     </span>
-                    <div className="mt-6 font-hitmarker-condensed text-5xl">
-                        Ratings
-                        <div className="mt-2 flex gap-2 text-4xl">
-                            <span>{avgRating.toFixed(2)}</span>
-                            <span>{displayStars(avgRating.toString())}</span>
+                    {avgRating && (
+                        <div className="mt-6 font-hitmarker-condensed text-5xl">
+                            Ratings
+                            <div className="mt-2 flex gap-2 text-4xl">
+                                <span>{avgRating?.toFixed(2)}</span>
+                                <span>{displayStars(avgRating?.toString())}</span>
+                            </div>
                         </div>
-                    </div>
+                    )}
                     {(() => {
                         const highestReview = reviews.reduce((max, review) => {
                             if (review.rating > max.rating) return review;
@@ -151,14 +155,21 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                                     <h1 className="font-hitmarker-condensed text-3xl">{highestReview.title}</h1>
                                     <p>{highestReview.review}</p>
                                     <div className="flex items-center gap-1">
-                                        <IoLanguageSharp className="mt-2 text-2xl" />{' '}
+                                        <IoLanguageSharp className="text-2xl" />{' '}
                                         <span className="text-sm opacity-75">Original language: {'German'}</span>
                                     </div>
                                 </div>
                             )
                         );
                     })()}
-                    <div className="mt-4 border p-3 text-center">All reviews</div>
+                    {avgRating && (
+                        <button
+                            className="mt-4 block w-full border-4 p-3 text-center transition-all hover:bg-zinc-800"
+                            onClick={() => setReviewsVisible(true)}
+                        >
+                            All reviews
+                        </button>
+                    )}
                 </div>
             </div>
             <div className="mt-12">Other Weapons: //to be implemented</div>
@@ -173,6 +184,49 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                 posuere. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Proin vel ante a orci tempus eleifend
                 ut et magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </p>
+            <div
+                className={`fixed top-0 left-0 ${reviewsVisible ? '' : 'pointer-events-none opacity-0'} flex h-screen w-screen flex-col items-center justify-center bg-black/75 transition-all`}
+                onClick={() => setReviewsVisible(false)}
+            >
+                <div
+                    className={`${reviewsVisible ? '' : 'translate-y-6'} flex h-3/4 w-1/3 flex-col gap-y-4 overflow-y-scroll border border-zinc-800 bg-zinc-900 p-4 transition-transform`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="flex justify-between">
+                        <h1 className="font-hitmarker-condensed text-5xl">All ratings</h1>
+                        <RxCross1
+                            className="ml-auto cursor-pointer text-4xl transition-colors hover:bg-zinc-950"
+                            onClick={() => setReviewsVisible(false)}
+                        />
+                    </div>
+                    <div>
+                        <div className="flex justify-between font-hitmarker-condensed">
+                            <span>Rating*</span>
+                            <span>67 Ratings*</span>
+                        </div>
+                        <div>LineRatings*</div>
+                        <p>Customer reviews based on a verified purchase will have a ‘Verified Purchase’ tag.</p>
+                        <a>
+                            <div className="underline">Learn how ratings and reviews work.</div>
+                        </a>
+                    </div>
+                    <ul>
+                        {reviews.map((review, index) => (
+                            <li key={index} className="mt-6 flex flex-col gap-y-1 border p-3">
+                                <div className="flex justify-between">
+                                    <span className="text-3xl">{displayStars(review.rating.toString())}</span>
+                                    <p>{getRelativeTime(review.created_at)}</p>
+                                </div>
+                                <h1 className="font-hitmarker-condensed text-3xl">{review.title}</h1>
+                                <p>{review.review}</p>
+                                <div className="flex items-center gap-1">
+                                    <IoLanguageSharp className="text-2xl" /> <span className="text-sm opacity-75">Original language: {'German'}</span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
         </div>
     );
 }
