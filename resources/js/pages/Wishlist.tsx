@@ -16,13 +16,13 @@ export default function Bag() {
     const weaponIdAttachments: { weapon_id: number; attachments: Attachment[]; quantity: number }[] = [];
     for (let i = 0; i < bag.length; i++) {
         const attachments = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: bag[i].weaponId, attachments: attachments, quantity: bag[i].quantity });
+        weaponIdAttachments.push({ weapon_id: bag[i].weapon.id, attachments: attachments, quantity: bag[i].quantity });
     }
 
     return (
         <>
-            <div className="mx-32">
-                <Navbar />
+            <Navbar />
+            <main>
                 <div className="mx-32">
                     <div className="my-8 flex gap-4 text-5xl">
                         <FaGifts />
@@ -41,7 +41,7 @@ export default function Bag() {
                                             <div className="border-2 p-20">🖼️</div>
                                             <div className="flex items-center">
                                                 <div>
-                                                    {item.weaponName}
+                                                    {item.weapon.name}
                                                     {Object.entries(item.selectedAttachments).map(([area, att]) => (
                                                         <div key={area}>
                                                             {area}: {att.name}
@@ -51,9 +51,9 @@ export default function Bag() {
                                                         className="mt-6 cursor-pointer hover:underline"
                                                         onClick={() =>
                                                             addToCartBag({
-                                                                customizedWeaponId: makeSelectionKey(item.weaponId, item.selectedAttachments),
-                                                                weaponId: item.weaponId,
-                                                                weaponName: item.weaponName,
+                                                                customizedWeaponId: makeSelectionKey(item.weapon.id, item.selectedAttachments),
+                                                                customizedPrice: item.customizedPrice,
+                                                                weapon: item.weapon,
                                                                 selectedAttachments: item.selectedAttachments,
                                                                 quantity: 1,
                                                             })
@@ -84,7 +84,7 @@ export default function Bag() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
             <br />
         </>
     );

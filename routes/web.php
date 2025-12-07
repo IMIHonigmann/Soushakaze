@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('profile', function (Request $request) {
+    Route::get('/profile', function (Request $request) {
         return Inertia::render('Profile', [
             'user' => $request->user(),
         ]);
@@ -83,7 +83,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->back()->with('success', 'Image uploaded.');
     })->name('add-image');
 });
-
 
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');

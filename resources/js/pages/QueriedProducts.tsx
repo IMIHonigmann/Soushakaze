@@ -89,9 +89,9 @@ export default function QueriedProducts({ weapons, message }: Props) {
     };
 
     return (
-        <div className="mx-32">
+        <>
             <Navbar formRef={formRef} upperSearchInputRef={searchInputRef} />
-            <div className="grid grid-cols-4 justify-items-center gap-20">
+            <main className="grid grid-cols-4 justify-items-center gap-20">
                 <div className="col-span-1">
                     {message && <h1 className="mb-8 text-5xl">'{message}'</h1>}
                     <form
@@ -311,7 +311,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                         </Link>
                     ))}
                 </div>
-            </div>
-        </div>
+            </main>
+        </>
     );
 }

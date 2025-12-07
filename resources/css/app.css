@@ -353,6 +353,10 @@
         @apply bg-background text-foreground;
     }
 
+    main {
+        margin-inline: 8rem;
+    }
+
     button {
         cursor: pointer;
     }

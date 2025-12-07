@@ -242,7 +242,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                                 {selected[area]?.id === 0 ? (
                                                     <AiOutlinePlus className="text-6xl" />
                                                 ) : (
-                                                    <DynamicIcon className="scale-110">
+                                                    <DynamicIcon className="scale-125">
                                                         {a.power_modifier > 0 && <GiCornerExplosion />}
                                                         {a.mobility_modifier > 0 && <GiFeather />}
                                                         {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}

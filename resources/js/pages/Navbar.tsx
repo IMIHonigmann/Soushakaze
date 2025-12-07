@@ -38,7 +38,7 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
     }
 
     return (
-        <div className="group">
+        <div className="group mx-32">
             <div className="grid grid-cols-[1fr_2fr_3fr_auto] items-center gap-16 py-8 text-xl">
                 <Link href={route('front-page')} className="cursor-pointer text-4xl font-extrabold">
                     <MorphingLogo />
@@ -66,7 +66,9 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                     />
                 </div>
                 <div className="flex justify-between gap-6">
-                    <FaUser />
+                    <Link href="/profile">
+                        <FaUser />
+                    </Link>
                     <VisualBag bag={cart} routeName={'cart'}>
                         <FaCartShopping className="text-2xl" />
                     </VisualBag>
