@@ -235,8 +235,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
-                                        style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                        className={`mt-2 flex flex-grow flex-col items-center rounded-sm border ${currentAreaSelection !== 'all' && currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full`}
+                                        className={`mt-2 flex flex-grow flex-col items-center rounded-sm border ${currentAreaSelection !== 'all' && currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} ${currentAreaSelection === area && currentAreaSelection !== 'other' && currentAreaSelection !== 'all' ? 'shadow-[0_10px_15px_-5px_rgba(249,115,22,0.7)]' : ''} border-zinc-600 transition-all duration-150 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full`}
                                     >
                                         <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-sm bg-zinc-700">
                                             <div key={selected[area]?.id} className="animate-fade-from-below">
