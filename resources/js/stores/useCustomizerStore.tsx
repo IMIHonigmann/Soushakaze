@@ -1,16 +1,31 @@
 import { Attachment } from '@/types/types';
 import { create } from 'zustand';
-import { Area } from '../pages/Customizer';
+
+export const areas = [
+    'muzzle',
+    'scope',
+    'magazine',
+    'grip',
+    'stock',
+    'barrel',
+    'laser',
+    'flashlight',
+    'bipod',
+    'underbarrel',
+    'other',
+    'all',
+] as const;
+
+export type Area = (typeof areas)[number];
 
 interface CustomizerState {
     selected: Record<string, Attachment>;
     currentAreaSelection: Area;
     setSelected: (area: string, attachment: Attachment) => void;
     setCurrentAreaSelection: (area: Area) => void;
-    initializeSelections: (grouped: Record<string, Attachment[]>) => void;
 }
 
-export const factoryIssueAttachment = {
+export const factoryIssueAttachment: Attachment = {
     id: 0,
     name: 'Factory Issue',
     price_modifier: 0,
@@ -24,22 +39,18 @@ export const factoryIssueAttachment = {
 
 export const useCustomizerStore = create<CustomizerState>((set) => {
     return {
-        selected: {},
+        selected: Object.values(areas).reduce(
+            (acc, area) => {
+                acc[area] = factoryIssueAttachment;
+                return acc;
+            },
+            {} as Record<string, Attachment>,
+        ),
         currentAreaSelection: 'all',
         setSelected: (area, attachment) =>
             set((state) => ({
                 selected: { ...state.selected, [area]: attachment },
             })),
         setCurrentAreaSelection: (area) => set({ currentAreaSelection: area }),
-        initializeSelections: (grouped) =>
-            set(() => {
-                const initial: Record<string, Attachment> = {};
-                Object.entries(grouped).forEach(([area, attachments]) => {
-                    if (attachments.length > 0) {
-                        initial[area] = factoryIssueAttachment;
-                    }
-                });
-                return { selected: initial };
-            }),
     };
 });

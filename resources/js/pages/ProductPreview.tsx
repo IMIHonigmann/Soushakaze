@@ -189,27 +189,32 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                 onClick={() => setReviewsVisible(false)}
             >
                 <div
-                    className={`${reviewsVisible ? '' : 'translate-y-6'} flex h-3/4 w-1/3 flex-col gap-y-4 overflow-y-scroll border border-zinc-800 bg-zinc-900 p-4 transition-transform`}
+                    className={`${reviewsVisible ? '' : 'translate-y-6 scale-95'} flex h-3/4 w-1/3 flex-col gap-y-4 overflow-y-scroll border border-zinc-800 bg-zinc-900 p-4 transition-transform`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="flex justify-between">
                         <h1 className="font-hitmarker-condensed text-5xl">All ratings</h1>
                         <RxCross1
-                            className="ml-auto cursor-pointer text-4xl transition-colors hover:bg-zinc-950"
+                            className={` ${reviewsVisible ? '' : 'rotate-180'} ml-auto cursor-pointer text-4xl transition-all hover:bg-zinc-950`}
                             onClick={() => setReviewsVisible(false)}
                         />
                     </div>
-                    <div>
-                        <div className="flex justify-between font-hitmarker-condensed">
-                            <span>Rating*</span>
-                            <span>67 Ratings*</span>
-                        </div>
-                        <div>LineRatings*</div>
-                        <p>Customer reviews based on a verified purchase will have a ‘Verified Purchase’ tag.</p>
-                        <a>
-                            <div className="underline">Learn how ratings and reviews work.</div>
-                        </a>
+
+                    <div className="flex items-center justify-between font-hitmarker-condensed">
+                        <span className="flex items-center gap-2 text-4xl">
+                            <span>{avgRating?.toFixed(2)}</span>
+                            <span>{displayStars(avgRating?.toString())}</span>
+                        </span>
+                        <span className="text-2xl">{reviews.length} Ratings</span>
                     </div>
+
+                    <div>LineRatings*</div>
+                    <p>
+                        Customer reviews based on a verified purchase will have a ‘Verified Purchase’ tag.{' '}
+                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">
+                            <span className="underline transition-opacity hover:opacity-75">Learn how ratings and reviews work.</span>
+                        </a>
+                    </p>
                     <ul>
                         {reviews.map((review, index) => (
                             <li key={index} className="mt-6 flex flex-col gap-y-1 border p-3">

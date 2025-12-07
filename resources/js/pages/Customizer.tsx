@@ -1,7 +1,7 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { usePrevious } from '@/hooks/usePrevious';
 import { useCartStore } from '@/stores/bagStores';
-import { factoryIssueAttachment, useCustomizerStore } from '@/stores/useCustomizerStore';
+import { Area, factoryIssueAttachment, useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Attachment, Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
@@ -26,8 +26,6 @@ gsap.registerPlugin(ScrambleTextPlugin);
 const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize', 'price'] as const;
 export type Stats = (typeof statTypes)[number];
 
-export type Area = 'muzzle' | 'scope' | 'magazine' | 'grip' | 'stock' | 'barrel' | 'laser' | 'flashlight' | 'bipod' | 'underbarrel' | 'other' | 'all';
-
 interface Props {
     weapon: Weapon;
     maxPower: number;
@@ -44,7 +42,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection, initializeSelections } = useCustomizerStore();
+    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
 
     const weaponNameRef = useRef(null);
@@ -72,11 +70,6 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
             tl.kill();
         };
     }, [weapon.name]);
-
-    useEffect(() => {
-        initializeSelections(grouped);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const handleSelect = (area: Area, attachment: Attachment, sound = 'select_attachment_subtle') => {
         if (selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
@@ -154,45 +147,56 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
 
-    function AttachmentListElement({ area, att, children, sound }: { area: Area; att: Attachment; children?: React.ReactNode; sound?: string }) {
+    function DynamicIcon({ children, className }: { children: React.ReactNode; className?: string }) {
         const childArray = React.Children.toArray(children).filter(Boolean);
         const childCount = childArray.length;
+
+        return (
+            <div className={`relative h-16 w-16 border-2 bg-black ${className}`}>
+                <div
+                    className={`relative z-10 grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
+                        childCount === 2
+                            ? 'place-items-center gap-0 p-2.5 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
+                            : childCount === 3
+                              ? 'place-items-center p-2 text-5xl [&>*:last-child]:col-span-2 [&>*:last-child]:justify-self-center'
+                              : childCount === 4
+                                ? 'place-items-center text-5xl'
+                                : 'text-6xl'
+                    }`}
+                >
+                    {childCount >= 5 ? <GiStarFormation className="text-yellow-400 drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]" /> : children}
+                </div>
+                <div className="absolute -right-0.5 bottom-0 z-20 rounded-full p-1">
+                    {childArray.length > 0 &&
+                        childArray.length < 4 &&
+                        (childArray[0] as any).props?.id !== 'factory_issue' &&
+                        (childCount > 1 ? (
+                            <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
+                        ) : (
+                            <FaBoltLightning className="text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
+                        ))}
+                </div>
+            </div>
+        );
+    }
+
+    function AttachmentListElement({ area, att, children, sound }: { area: Area; att: Attachment; children?: React.ReactNode; sound?: string }) {
         return (
             <li
                 key={`attachment-${area}-${att.id}`}
                 onClick={() => handleSelect(area as Area, att, sound)}
-                className="relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
+                className="group relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
             >
                 <div
                     className={`absolute inset-0 bg-gradient-to-l from-orange-500 to-transparent transition-opacity duration-200 ${selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
                 <div className="pointer-events-none relative z-10 flex items-center gap-4">
-                    <div className="relative h-16 w-16 skew-x-3 border-2 bg-black">
-                        <div
-                            className={`relative z-10 grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
-                                childCount === 2
-                                    ? 'place-items-center gap-0 p-2.5 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
-                                    : childCount === 3
-                                      ? 'place-items-center p-2 text-5xl [&>*:last-child]:col-span-2 [&>*:last-child]:justify-self-center'
-                                      : childCount === 4
-                                        ? 'place-items-center text-5xl'
-                                        : 'text-6xl'
-                            }`}
-                        >
-                            {childCount >= 5 ? <GiStarFormation className="text-yellow-400 drop-shadow-[0_0_12px_rgba(255,215,0,0.8)]" /> : children}
-                        </div>
-                        <div className="absolute -right-0.5 bottom-0 z-20 rounded-full p-1">
-                            {childArray.length > 0 &&
-                                childArray.length < 4 &&
-                                (childArray[0] as any).props?.id !== 'factory_issue' &&
-                                (childCount > 1 ? (
-                                    <FaAngleDoubleUp className="text-xl text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
-                                ) : (
-                                    <FaBoltLightning className="text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.9)]" />
-                                ))}
-                        </div>
-                    </div>
+                    <DynamicIcon
+                        className={`skew-x-3 transition-transform duration-150 ease-out group-hover:scale-105 ${selected[area].id === att.id ? 'scale-110' : ''}`}
+                    >
+                        {children}
+                    </DynamicIcon>
                     <div className="text-xl">
                         <div>{att.name}</div>
                         {att.id !== 0 && <div className="-skew-x-12 font-extrabold">{att.price_modifier}€</div>}
@@ -217,13 +221,13 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                 <div
                     className={`absolute bottom-10 z-101 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
                 >
-                    <div
+                    <ul
                         className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
                     >
                         {Object.entries(grouped).map(([area]) => {
-                            console.log('bruh:', selected['']);
+                            const a = selected[area];
                             return (
-                                <div
+                                <li
                                     key={area}
                                     style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
                                     className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
@@ -238,7 +242,13 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                             {selected[area]?.id === 0 ? (
                                                 <AiOutlinePlus className="text-6xl" />
                                             ) : (
-                                                <img alt={`Att-${selected[area]?.id}`} />
+                                                <DynamicIcon>
+                                                    {a.power_modifier > 0 && <GiCornerExplosion />}
+                                                    {a.mobility_modifier > 0 && <GiFeather />}
+                                                    {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                                    {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                                    {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                                </DynamicIcon>
                                             )}
                                         </div>
                                         <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
@@ -249,10 +259,10 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                             </div>
                                         </div>
                                     </button>
-                                </div>
+                                </li>
                             );
                         })}
-                    </div>
+                    </ul>
                     <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
                             {statTypes.map((stat) => {
@@ -391,7 +401,7 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                 {attachments
                                     .sort((a1, a2) => a1.price_modifier - a2.price_modifier)
                                     .map((a) => (
-                                        <AttachmentListElement area={area as Area} att={a}>
+                                        <AttachmentListElement key={a.id} area={area as Area} att={a}>
                                             {a.power_modifier > 0 && <GiCornerExplosion />}
                                             {a.mobility_modifier > 0 && <GiFeather />}
                                             {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}

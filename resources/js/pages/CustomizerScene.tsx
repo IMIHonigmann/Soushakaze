@@ -1,9 +1,9 @@
+import { Area } from '@/stores/useCustomizerStore';
 import { router } from '@inertiajs/react';
 import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { lazy, memo, Suspense, useCallback, useMemo, useRef } from 'react';
-import { Area } from './Customizer';
 
 const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
 
