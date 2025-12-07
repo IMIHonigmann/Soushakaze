@@ -236,27 +236,30 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
                                         style={{ boxShadow: currentAreaSelection === area ? '0 0 10px rgba(249,115,22,0.7)' : undefined }}
-                                        className="mt-2 flex flex-grow flex-col items-center rounded-sm border border-zinc-600 transition-shadow hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full"
+                                        className={`mt-2 flex flex-grow flex-col items-center rounded-sm border ${currentAreaSelection !== 'all' && currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} border-zinc-600 transition-all hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full`}
                                     >
-                                        <div className="flex h-3/4 items-center justify-center rounded-t-sm bg-zinc-700">
-                                            {selected[area]?.id === 0 ? (
-                                                <AiOutlinePlus className="text-6xl" />
-                                            ) : (
-                                                <DynamicIcon>
-                                                    {a.power_modifier > 0 && <GiCornerExplosion />}
-                                                    {a.mobility_modifier > 0 && <GiFeather />}
-                                                    {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                                    {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                                    {a.magsize_modifier > 0 && <GiHeavyBullets />}
-                                                </DynamicIcon>
-                                            )}
+                                        <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-sm bg-zinc-700">
+                                            <div key={selected[area]?.id} className="animate-fade-from-below">
+                                                {selected[area]?.id === 0 ? (
+                                                    <AiOutlinePlus className="text-6xl" />
+                                                ) : (
+                                                    <DynamicIcon className="scale-110">
+                                                        {a.power_modifier > 0 && <GiCornerExplosion />}
+                                                        {a.mobility_modifier > 0 && <GiFeather />}
+                                                        {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                                        {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                                        {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                                    </DynamicIcon>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="flex h-2/6 items-center justify-center rounded-b-sm border-t border-zinc-600 bg-zinc-800">
-                                            <div
-                                                className={`${selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} line-clamp-2 px-1 text-xs break-words uppercase`}
+                                        <div className="flex h-2/6 items-center justify-center overflow-x-hidden rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                            <h3
+                                                key={selected[area]?.id}
+                                                className={`${selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} animate-fade-from-left line-clamp-2 px-1 text-xs break-words uppercase`}
                                             >
                                                 {selected[area]?.id === 0 ? 'empty' : selected[area]?.name}
-                                            </div>
+                                            </h3>
                                         </div>
                                     </button>
                                 </li>
