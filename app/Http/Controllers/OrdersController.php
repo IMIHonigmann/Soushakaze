@@ -21,6 +21,8 @@ class OrdersController extends Controller
             'id' => $orderId,
             'user_id' => $userId,
             'expected_arrival_date' => now()->addDays(3),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         foreach ($customizedWeapons as $weapon) {
