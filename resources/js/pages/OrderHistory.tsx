@@ -1,4 +1,4 @@
-import { Weapon } from '@/types/types';
+import { Attachment, Weapon } from '@/types/types';
 import { useEffect, useState } from 'react';
 import { FaTruck } from 'react-icons/fa6';
 
@@ -12,7 +12,10 @@ type Order = {
 };
 
 type OrderedWeapons = Order & {
-    weapons: Pick<Weapon, 'id' | 'name' | 'price' | 'seller_id' | 'manufacturer_id'>[];
+    weapons: (Pick<Weapon, 'id' | 'name' | 'price' | 'seller_id' | 'manufacturer_id'> & {
+        attachments: Pick<Attachment, 'id' | 'name' | 'area' | 'price_modifier'>[];
+        modified_price: number;
+    })[];
 };
 
 type Props = {
@@ -68,6 +71,7 @@ export default function OrderHistory({ user, orders }: Props) {
                     {order.weapons.map((weapon, windex) => (
                         <div className="p-3" key={`${index}-${windex}`}>
                             <div>{weapon.name}</div>
+                            <div>{weapon.modified_price}€</div>
                         </div>
                     ))}
                 </li>

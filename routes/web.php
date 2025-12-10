@@ -44,11 +44,37 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         'weapons.seller_id as seller_id',
                         'weapons.manufacturer_id as manufacturer_id',
                         'weapons.type as type',
-                        'custom_weapon_ids.*'  // Add customization details if needed
+                        'custom_weapon_ids.id as custom_weapon_id',
+                        'custom_weapon_ids.*'
+
                     )
-                    ->get();
+                    ->get()
+                    ->map(function ($weapon) {
+                        $attachments = DB::table('usercreated_weapons_attachments')
+                            ->leftJoin('attachments', 'usercreated_weapons_attachments.attachment_id', '=', 'attachments.id')
+                            ->where('usercreated_weapons_attachments.custom_weapon_id', $weapon->custom_weapon_id)
+                            ->select(
+                                'attachments.id as id',
+                                'attachments.name as name',
+                                'attachments.area as area',
+                                'attachments.price_modifier as price_modifier'
+                            )
+                            ->get();
+
+                        $weapon->attachments = $attachments;
+                        $sum = $weapon->price;
+                        foreach ($weapon->attachments as $attachment) {
+                            $sum += $attachment->price_modifier;
+                        }
+                        $weapon->modified_price = $sum;
+                        return $weapon;
+                    });
 
                 $order->weapons = $weapons;
+                foreach ($order->weapons as $weapon) {
+                    foreach ($weapon->attachments as $attachment) {
+                    }
+                }
                 return $order;
             });
 
