@@ -22,6 +22,7 @@ interface CustomizerState {
     selected: Record<string, Attachment>;
     currentAreaSelection: Area;
     setSelected: (area: string, attachment: Attachment) => void;
+    setAllSelected: (newSelected: Record<string, Attachment>) => void;
     setCurrentAreaSelection: (area: Area) => void;
 }
 
@@ -50,6 +51,10 @@ export const useCustomizerStore = create<CustomizerState>((set) => {
         setSelected: (area, attachment) =>
             set((state) => ({
                 selected: { ...state.selected, [area]: attachment },
+            })),
+        setAllSelected: (newSelected: Record<string, Attachment>) =>
+            set(() => ({
+                selected: newSelected,
             })),
         setCurrentAreaSelection: (area) => set({ currentAreaSelection: area }),
     };

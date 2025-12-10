@@ -42,8 +42,15 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
 
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const { selected, currentAreaSelection, setSelected, setCurrentAreaSelection } = useCustomizerStore();
+    const { selected, currentAreaSelection, setSelected, setAllSelected, setCurrentAreaSelection } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
+
+    useEffect(() => {
+        const availableAreas = new Set(Object.keys(grouped));
+        const newSelected = Object.fromEntries(Object.entries(selected).filter(([area]) => availableAreas.has(area)));
+        setAllSelected(newSelected);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const weaponNameRef = useRef(null);
 
