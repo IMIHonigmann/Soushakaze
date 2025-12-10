@@ -1,7 +1,9 @@
-import { Area } from '@/pages/Customizer';
+import { Area } from '@/stores/useCustomizerStore';
 
 export type Weapon = {
     id: number;
+    seller_id?: number | null;
+    manufacturer_id?: number | null;
     avg_rating: string;
     name: string;
     rate_of_fire: number;

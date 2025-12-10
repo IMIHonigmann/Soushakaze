@@ -25,9 +25,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('profile');
 
-    Route::get('orderHistory', function (Request $request) {
+    Route::get('/profile/orders', function (Request $request) {
         $user = $request->user();
-        $orders = DB::table('orders')->where('user_id', $user->id)->get();
+        $orders = DB::table('orders')
+            ->where('orders.user_id', $user->id)
+            ->select('orders.*')
+            ->get()
+            ->map(function ($order) {
+                // Get all weapons for this order
+                $weapons = DB::table('orders_weapons')
+                    ->join('custom_weapon_ids', 'orders_weapons.custom_weapon_id', '=', 'custom_weapon_ids.id')
+                    ->join('weapons', 'custom_weapon_ids.weapon_id', '=', 'weapons.id')
+                    ->where('orders_weapons.order_id', $order->id)
+                    ->select(
+                        'weapons.id as weapon_id',
+                        'weapons.name as name',
+                        'weapons.price as price',
+                        'weapons.seller_id as seller_id',
+                        'weapons.manufacturer_id as manufacturer_id',
+                        'weapons.type as type',
+                        'custom_weapon_ids.*'  // Add customization details if needed
+                    )
+                    ->get();
+
+                $order->weapons = $weapons;
+                return $order;
+            });
+
         return Inertia::render('OrderHistory', ['orders' => $orders, 'user' => $user]);
     })->name('order-history');
 

@@ -25,7 +25,7 @@ class OrdersController extends Controller
 
         foreach ($customizedWeapons as $weapon) {
             $weaponId = $weapon['weapon_id'];
-            $attachmentIds = $weapon['attachment_ids'];
+            $attachments = $weapon['attachments'];
             $quantity = $weapon['quantity'];
             error_log('quantity: ' . $quantity);
 
@@ -35,13 +35,13 @@ class OrdersController extends Controller
                 'custom_weapon_id' => $customWeaponId
             ];
 
-            DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId]);
+            DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId, 'weapon_id' => $weaponId]);
 
-            foreach ($attachmentIds as $attachmentId) {
-                $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
+
+            foreach ($attachments as $attachment) {
+                $attachmentIdOrNull = $attachment['id'] === 0 ? null : $attachment['id'];
                 $ordersToInsert[] = [
                     'custom_weapon_id' => $customWeaponId,
-                    'weapon_id' => $weaponId,
                     'attachment_id' => $attachmentIdOrNull,
                     'created_at' => now(),
                     'updated_at' => now(),

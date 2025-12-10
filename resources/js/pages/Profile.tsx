@@ -42,7 +42,7 @@ export default function Profile({ user }: Props) {
                         <ul className="ml-4 space-y-1">
                             {tabs.map((tab, index) => (
                                 <li className="hover:bg-zinc-800" key={index} id={tab.toLowerCase()}>
-                                    <Link className="block h-full w-full" href={tab}>
+                                    <Link className="block h-full w-full" href={`profile/${tab.toLowerCase()}`}>
                                         {tab}
                                     </Link>
                                 </li>

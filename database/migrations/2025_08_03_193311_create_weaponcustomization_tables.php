@@ -11,9 +11,6 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('custom_weapon_ids', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-        });
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
             $table->foreignId('seller_id')->nullable();
@@ -32,6 +29,11 @@ return new class extends Migration {
             $table->timestamps();
         });
         DB::statement("ALTER TABLE weapons MODIFY image_blob MEDIUMBLOB");
+
+        Schema::create('custom_weapon_ids', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
+        });
 
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
@@ -77,7 +79,6 @@ return new class extends Migration {
                 ->references('id')
                 ->on('custom_weapon_ids')
                 ->onDelete('cascade');
-            $table->foreignId('weapon_id')->constrained('weapons')->onDelete('cascade');
             $table->foreignId('attachment_id')->nullable()->constrained('attachments')->onDelete('cascade');
             $table->timestamps();
         });
