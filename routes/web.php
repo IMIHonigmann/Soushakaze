@@ -62,11 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                             ->get();
 
                         $weapon->attachments = $attachments;
-                        $sum = $weapon->price;
-                        foreach ($weapon->attachments as $attachment) {
-                            $sum += $attachment->price_modifier;
-                        }
-                        $weapon->modified_price = $sum;
+                        $weapon->modified_price = $weapon->price + $weapon->attachments->sum('price_modifier');
                         return $weapon;
                     });
 
