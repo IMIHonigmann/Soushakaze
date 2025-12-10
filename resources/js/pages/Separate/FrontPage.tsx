@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { useEffect, useRef, useState } from 'react';
-import Layout from './layouts/MainLayout';
+import Layout from '../layouts/MainLayout';
 
 gsap.registerPlugin(SplitText);
 
@@ -69,7 +69,7 @@ export default function FrontPage() {
                     Sign Up Now
                 </Link>
             </h1>
-            <Layout>
+            <Layout className="mx-32">
                 <div className="mt-16 grid grid-cols-[60%_40%]">
                     <div>
                         <section className="flex flex-col place-items-start gap-8">

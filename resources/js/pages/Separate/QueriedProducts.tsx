@@ -2,9 +2,9 @@ import { displayStars } from '@/helpers/displayStars';
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Range, getTrackBackground } from 'react-range';
-import { Weapon } from '../types/types';
-import CategoryItem from './CategoryItem';
-import Navbar from './Navbar';
+import { Weapon } from '../../types/types';
+import CategoryItem from '../CategoryItem';
+import Navbar from '../Navbar';
 
 type Props = {
     searchQuery: string;

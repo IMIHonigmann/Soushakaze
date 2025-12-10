@@ -80,7 +80,7 @@ class ProductsController extends Controller
             });
         $count = $weapons->count();
 
-        return Inertia::render('QueriedProducts', [
+        return Inertia::render('Separate/QueriedProducts', [
             'weapons' => $weapons,
             'message' => $qWeaponName
         ]);

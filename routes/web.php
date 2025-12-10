@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', function (Request $request) {
-        return Inertia::render('Profile', [
+        return Inertia::render('Profile/Profile', [
             'user' => $request->user(),
         ]);
     })->name('profile');
@@ -74,7 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 return $order;
             });
 
-        return Inertia::render('OrderHistory', ['orders' => $orders, 'user' => $user]);
+        return Inertia::render('Profile/OrderHistory', ['orders' => $orders, 'user' => $user]);
     })->name('order-history');
 
     Route::get('composeReview', function (Request $request) {
@@ -151,7 +151,7 @@ Route::get('morphTest', function (Request $request) {
 })->name('morph-test');
 
 Route::get('frontpage', function (Request $request) {
-    return Inertia::render('FrontPage');
+    return Inertia::render('Separate/FrontPage');
 })->name('front-page');
 
 

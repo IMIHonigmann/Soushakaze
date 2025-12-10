@@ -24,7 +24,7 @@ class CustomizerController extends Controller
             ->get();
         $maxPower = DB::table('weapons')->max('power');
 
-        return Inertia::render('Customizer', [
+        return Inertia::render('Separate/Customizer', [
             'weapon' => $weapon,
             'maxPower' => $maxPower,
             'attachments' => $attachments

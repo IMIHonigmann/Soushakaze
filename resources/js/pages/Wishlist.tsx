@@ -5,7 +5,6 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaGifts } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
-import Layout from './layouts/MainLayout';
 
 export default function Bag() {
     const { bag, deleteFromBag } = useWishlistStore((state) => state);
@@ -20,7 +19,7 @@ export default function Bag() {
     }
 
     return (
-        <Layout>
+        <>
             <div className="mx-32">
                 <div className="my-8 flex gap-4 text-5xl">
                     <FaGifts />
@@ -82,6 +81,6 @@ export default function Bag() {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }

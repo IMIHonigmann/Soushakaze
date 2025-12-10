@@ -18,7 +18,6 @@ import { GiAmmoBox } from 'react-icons/gi';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { RxCross1 } from 'react-icons/rx';
 import { SiKlarna, SiSepa } from 'react-icons/si';
-import Layout from './layouts/MainLayout';
 
 type Props = {
     freeShippingThreshold: number;
@@ -55,7 +54,7 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
     }
 
     return (
-        <Layout className="mx-64">
+        <>
             <div className="grid min-h-[100svh] w-full grid-cols-[2.5fr_1fr] gap-20">
                 <div className="flex flex-col">
                     <div className="flex flex-col gap-y-6">
@@ -232,6 +231,6 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
             </div>
 
             <br />
-        </Layout>
+        </>
     );
 }

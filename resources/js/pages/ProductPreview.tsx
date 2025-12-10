@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { FaBookmark, FaFontAwesomeFlag, FaRegBookmark } from 'react-icons/fa';
 import { IoLanguageSharp } from 'react-icons/io5';
 import { RxCross1 } from 'react-icons/rx';
-import Layout from './layouts/MainLayout';
 
 type Review = {
     id: number;
@@ -39,7 +38,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
     const [bookmarked, setBookmarked] = useState(wishlistBag.some((item) => item.customizedWeaponId === makeSelectionKey(weapon.id, {})));
 
     return (
-        <Layout>
+        <>
             <div className="grid grid-cols-2 justify-items-center text-xl">
                 <div className="sticky top-10 flex w-3/4 items-stretch justify-between gap-4 self-start">
                     <ul className="flex flex-col gap-4 [&>*]:border-2 [&>*]:p-8">
@@ -231,6 +230,6 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                     </ul>
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }

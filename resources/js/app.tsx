@@ -1,15 +1,31 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
+import Layout from './pages/layouts/MainLayout';
+import ProfileLayout from './pages/layouts/ProfileLayout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-    title: (title) => title ? `${title} - ${appName}` : appName,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    title: (title) => (title ? `${title} - ${appName}` : appName),
+    resolve: (name) => {
+        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
+        const page = pages[`./pages/${name}.tsx`];
+
+        if (!page.default.layout) {
+            if (name.startsWith('Profile/')) {
+                page.default.layout = (page) => <ProfileLayout>{page}</ProfileLayout>;
+            } else if (name.startsWith('Separate/')) {
+                page.default.layout = { page };
+            } else {
+                page.default.layout = (page) => <Layout>{page}</Layout>;
+            }
+        }
+
+        return page;
+    },
     setup({ el, App, props }) {
         const root = createRoot(el);
 

@@ -16,10 +16,10 @@ import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBu
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
-import { playLower } from './AttAudio';
-import Count from './Counter';
-import CustomizerScene from './CustomizerScene';
-import YouTubePlayer from './YouTubePlayer';
+import { playLower } from '../AttAudio';
+import Count from '../Counter';
+import CustomizerScene from '../CustomizerScene';
+import YouTubePlayer from '../YouTubePlayer';
 
 gsap.registerPlugin(ScrambleTextPlugin);
 
