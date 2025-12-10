@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { useEffect, useRef, useState } from 'react';
-import Navbar from './Navbar';
+import Layout from './layouts/MainLayout';
 
 gsap.registerPlugin(SplitText);
 
@@ -69,8 +69,7 @@ export default function FrontPage() {
                     Sign Up Now
                 </Link>
             </h1>
-            <Navbar />
-            <main className="mx-32">
+            <Layout>
                 <div className="mt-16 grid grid-cols-[60%_40%]">
                     <div>
                         <section className="flex flex-col place-items-start gap-8">
@@ -124,7 +123,8 @@ export default function FrontPage() {
                         className="fade-in-image w-full place-self-center transition-all duration-2000 ease-in-out hover:translate-y-96 hover:scale-[600%]"
                     />
                 </div>
-            </main>
+            </Layout>
+
             <div className="flex justify-between bg-zinc-800 p-8">
                 {Array.from({ length: 10 }, (_, i) => (
                     <div key={i}>Element {i + 1}</div>

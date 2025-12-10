@@ -5,7 +5,7 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { FaGifts } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
-import Navbar from './Navbar';
+import Layout from './layouts/MainLayout';
 
 export default function Bag() {
     const { bag, deleteFromBag } = useWishlistStore((state) => state);
@@ -20,72 +20,68 @@ export default function Bag() {
     }
 
     return (
-        <>
-            <Navbar />
-            <main>
-                <div className="mx-32">
-                    <div className="my-8 flex gap-4 text-5xl">
-                        <FaGifts />
-                        <span className="font-extrabold">Your wishlist ({bag.length} Items)</span>
-                    </div>
-                    <div className="flex flex-col justify-start py-1 text-xl"></div>
-                    <div className="grid min-h-[100svh] w-full grid-cols-[3fr_1fr] gap-20">
-                        <div className="flex flex-col divide-y-2">
-                            {bag.length > 0 ? (
-                                <>
-                                    {bag.map((item, idx) => (
-                                        <div
-                                            key={item.customizedWeaponId}
-                                            className={`flex gap-8 p-12 ${deletingItems[item.customizedWeaponId] ? 'animate-scale-inward' : ''}`}
-                                        >
-                                            <div className="border-2 p-20">🖼️</div>
-                                            <div className="flex items-center">
-                                                <div>
-                                                    {item.weapon.name}
-                                                    {Object.entries(item.selectedAttachments).map(([area, att]) => (
-                                                        <div key={area}>
-                                                            {area}: {att.name}
-                                                        </div>
-                                                    ))}
-                                                    <Link
-                                                        className="mt-6 cursor-pointer hover:underline"
-                                                        onClick={() =>
-                                                            addToCartBag({
-                                                                customizedWeaponId: makeSelectionKey(item.weapon.id, item.selectedAttachments),
-                                                                customizedPrice: item.customizedPrice,
-                                                                weapon: item.weapon,
-                                                                selectedAttachments: item.selectedAttachments,
-                                                                quantity: 1,
-                                                            })
-                                                        }
-                                                        href={route('cart')}
-                                                    >
-                                                        Add to cart
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                            <div className="ml-auto flex items-center gap-4 text-xl">
-                                                <span
-                                                    onClick={() => {
-                                                        setDeletingItems((prev) => ({ ...prev, [item.customizedWeaponId]: true }));
-                                                        setTimeout(() => deleteFromBag(idx), 500);
-                                                    }}
-                                                    className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
+        <Layout>
+            <div className="mx-32">
+                <div className="my-8 flex gap-4 text-5xl">
+                    <FaGifts />
+                    <span className="font-extrabold">Your wishlist ({bag.length} Items)</span>
+                </div>
+                <div className="flex flex-col justify-start py-1 text-xl"></div>
+                <div className="grid min-h-[100svh] w-full grid-cols-[3fr_1fr] gap-20">
+                    <div className="flex flex-col divide-y-2">
+                        {bag.length > 0 ? (
+                            <>
+                                {bag.map((item, idx) => (
+                                    <div
+                                        key={item.customizedWeaponId}
+                                        className={`flex gap-8 p-12 ${deletingItems[item.customizedWeaponId] ? 'animate-scale-inward' : ''}`}
+                                    >
+                                        <div className="border-2 p-20">🖼️</div>
+                                        <div className="flex items-center">
+                                            <div>
+                                                {item.weapon.name}
+                                                {Object.entries(item.selectedAttachments).map(([area, att]) => (
+                                                    <div key={area}>
+                                                        {area}: {att.name}
+                                                    </div>
+                                                ))}
+                                                <Link
+                                                    className="mt-6 cursor-pointer hover:underline"
+                                                    onClick={() =>
+                                                        addToCartBag({
+                                                            customizedWeaponId: makeSelectionKey(item.weapon.id, item.selectedAttachments),
+                                                            customizedPrice: item.customizedPrice,
+                                                            weapon: item.weapon,
+                                                            selectedAttachments: item.selectedAttachments,
+                                                            quantity: 1,
+                                                        })
+                                                    }
+                                                    href={route('cart')}
                                                 >
-                                                    <RxCross1 />
-                                                </span>
+                                                    Add to cart
+                                                </Link>
                                             </div>
                                         </div>
-                                    ))}
-                                </>
-                            ) : (
-                                <div className="flex h-full min-h-screen items-center justify-center">Bag is empty</div>
-                            )}
-                        </div>
+                                        <div className="ml-auto flex items-center gap-4 text-xl">
+                                            <span
+                                                onClick={() => {
+                                                    setDeletingItems((prev) => ({ ...prev, [item.customizedWeaponId]: true }));
+                                                    setTimeout(() => deleteFromBag(idx), 500);
+                                                }}
+                                                className="cursor-pointer self-start p-2 text-3xl hover:bg-zinc-900"
+                                            >
+                                                <RxCross1 />
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <div className="flex h-full min-h-screen items-center justify-center">Bag is empty</div>
+                        )}
                     </div>
                 </div>
-            </main>
-            <br />
-        </>
+            </div>
+        </Layout>
     );
 }

@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react';
+import Layout from './layouts/MainLayout';
 
 type Props = {};
 
@@ -15,7 +16,7 @@ export default function ComposeReview({}: Props) {
     };
 
     return (
-        <div>
+        <Layout>
             <h1>Compose Review</h1>
             <form onSubmit={handleSubmit}>
                 <div>
@@ -30,6 +31,6 @@ export default function ComposeReview({}: Props) {
                 </div>
                 <button type="submit">Submit</button>
             </form>
-        </div>
+        </Layout>
     );
 }
