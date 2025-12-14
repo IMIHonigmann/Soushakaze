@@ -14,8 +14,34 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('/checkout', function (Request $request) {
+        $user = $request->user();
+
+        $user->stripe_id = '';
+        $user->save();
+
+        $stripePriceId = '';
+        $quantity = 1;
+
+        return $request->user()->checkout([$stripePriceId => $quantity], [
+            'success_url' => route('checkout-success'),
+            'cancel_url' => route('checkout-cancel'),
+            'customer_update' => [
+                'address' => 'auto',
+            ],
+        ]);
+    })->name('checkout');
+
+    Route::get('/checkout/success', function () {
+        return Inertia::render('Success');
+    })->name('checkout-success');
+
+    Route::get('/checkout/cancel', function () {
+        return Inertia::render('Cancel');
+    })->name('checkout-cancel');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
