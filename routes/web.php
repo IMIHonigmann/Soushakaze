@@ -20,18 +20,64 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/checkout', function (Request $request) {
         $user = $request->user();
 
-        $user->stripe_id = '';
-        $user->save();
+        if (!$user->hasStripeId()) {
+            $user->createAsStripeCustomer();
+        }
 
-        $stripePriceId = '';
-        $quantity = 1;
+        $cartItems = $request->input('cart', []);
+        $decodedItem = null;
+        $processedCart = [];
+        for ($i = 0; $i < count($cartItems); $i++) {
+            $item = $cartItems[$i];
+            if (isset($item)) {
+                if (preg_match('/^(.+?):(.+?):(\d+):(\d+):(.+)$/', $item, $matches)) {
+                    $weaponName = $matches[1];
+                    $customizedPrice = $matches[2];
+                    $quantity = $matches[3];
+                    $weaponId = $matches[4];
+                    $urlDecoded = urldecode($matches[5]);
+                    $decodedItem = json_decode($urlDecoded, true);
 
-        return $request->user()->checkout([$stripePriceId => $quantity], [
-            'success_url' => route('checkout-success'),
+                    $processedCart[$i] = [
+                        'weapon_name' => $weaponName,
+                        'attachments' => $decodedItem,
+                        'customized_price' => $customizedPrice,
+                        'quantity' => $quantity
+                    ];
+                }
+            }
+        }
+
+        if (empty($cartItems)) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty.');
+        }
+
+        $lineItems = [];
+        foreach ($processedCart as $item) {
+            $attachmentsList = '';
+            $attachmentNames = array_map(fn($att) => $att['name'] ?? '', $item['attachments']);
+            $attachmentsList = implode(', ', array_filter($attachmentNames, fn($name) => strtolower($name) !== 'factory issue'));
+
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => $item['weapon_name'] ?? 'Custom Weapon',
+                        'description' => !empty($attachmentsList)
+                            ? 'Attachments: ' . $attachmentsList
+                            : 'Base weapon',
+                    ],
+                    'unit_amount' => round(($item['customized_price'] ?? 0) * 100),
+                ],
+                'quantity' => $item['quantity'] ?? 1,
+            ];
+        }
+
+
+        return $user->checkout($lineItems, [
+            'success_url' => route('checkout-success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout-cancel'),
-            'customer_update' => [
-                'address' => 'auto',
-            ],
+            'customer_update' => ['address' => 'auto'],
         ]);
     })->name('checkout');
 

@@ -1,7 +1,5 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { useCartStore, useWishlistStore } from '@/stores/bagStores';
-import { Attachment } from '@/types/types';
-import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import {
     FaBitcoin,
@@ -43,14 +41,9 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
 
     const { addToBag: addToWishlistBag, bag: wishlistBag } = useWishlistStore((state) => state);
 
-    const weaponIdAttachments: { weapon_id: number; attachments: Attachment[]; quantity: number }[] = [];
+    const weaponIdAttachments: string[] = [];
     for (let i = 0; i < bag.length; i++) {
-        const attachments = bag[i]?.selectedAttachments ? Object.values(bag[i].selectedAttachments) : [];
-        weaponIdAttachments.push({ weapon_id: bag[i].weapon.id, attachments: attachments, quantity: bag[i].quantity });
-    }
-
-    function placeOrder() {
-        router.post(route('place-order'), { weaponid_attachments: weaponIdAttachments });
+        weaponIdAttachments.push(`${bag[i].weapon.name}:${bag[i].customizedPrice}:${bag[i].quantity}:${bag[i].customizedWeaponId}`);
     }
 
     return (
@@ -203,15 +196,16 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
                                 <span>ફ</span> <span className="ml-2 text-sm">Points</span>
                             </span>
                         </div>
-                        <button
-                            onClick={async () => {
-                                if (bag.length === 0) return;
-                                placeOrder();
-                            }}
-                            disabled={bag.length === 0}
-                            className="block w-full rounded-xs bg-blue-500 px-4 py-2 text-white transition-all duration-200 hover:shadow-[0_0_20px_rgba(43,127,254,0.7)] hover:invert disabled:opacity-50"
-                        >
-                            Checkout
+                        <button disabled={bag.length === 0}>
+                            <a
+                                onClick={async () => {
+                                    if (bag.length === 0) return;
+                                }}
+                                href={route('checkout', { cart: weaponIdAttachments })}
+                                className="block w-full rounded-xs bg-blue-500 px-4 py-2 text-white transition-all duration-200 hover:shadow-[0_0_20px_rgba(43,127,254,0.7)] hover:invert disabled:opacity-50"
+                            >
+                                Checkout
+                            </a>
                         </button>
                         <span className="self-start">We accept</span>
                         <div className="grid grid-cols-5 place-items-center items-center text-6xl">
