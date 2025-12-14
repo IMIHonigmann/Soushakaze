@@ -26,6 +26,9 @@ return new class extends Migration {
             $table->integer('extra_mags')->default(2);
             $table->integer('magsize')->default(8);
             $table->decimal('price', 10, 2);
+            $table->decimal('price_modification_coefficient', 10, 2)->default(1.00);
+            $table->timestamp('next_sale_startdate')->nullable();
+            $table->timestamp('next_sale_enddate')->nullable();
             $table->binary('image_blob')->nullable();
             $table->timestamps();
         });

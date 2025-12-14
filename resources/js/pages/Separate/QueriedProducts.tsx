@@ -279,51 +279,75 @@ export default function QueriedProducts({ weapons, message }: Props) {
                     </form>
                 </div>
                 <div className="col-span-3 col-start-2 flex w-full flex-col content-start gap-8 place-self-start text-xl">
-                    {weapons.map((weapon, id) => (
-                        <div className="relative">
-                            <Link
-                                className={`group grid grid-cols-2 grid-rows-1 place-items-stretch border-2 p-8 text-center ${weapon.stock_quantity <= 0 ? 'opacity-50' : ''}`}
-                                href={route('product.show', { weaponId: weapon.id })}
-                                key={id}
-                            >
-                                <div
-                                    className={`flex h-full w-full items-center justify-center rounded-md transition-transform ease-out ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
+                    {weapons.map((weapon, id) => {
+                        const now = new Date();
+                        const isOnSale =
+                            weapon.price_modification_coefficient < 1 &&
+                            weapon.next_sale_startdate &&
+                            weapon.next_sale_enddate &&
+                            now >= new Date(weapon.next_sale_startdate) &&
+                            now <= new Date(weapon.next_sale_enddate);
+                        return (
+                            <div className="relative">
+                                <Link
+                                    className={`group grid grid-cols-2 grid-rows-1 place-items-stretch border-2 p-8 text-center ${weapon.stock_quantity <= 0 ? 'opacity-50' : ''}`}
+                                    href={route('product.show', { weaponId: weapon.id })}
+                                    key={id}
                                 >
-                                    <img
-                                        src={`data:image/png;base64,${weapon.image_base64}`}
-                                        alt={weapon.name}
-                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-125"
-                                    />
-                                </div>
-                                <div
-                                    className={`mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8 ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
-                                >
-                                    <div className="text-2xl">
-                                        <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
-                                            {weapon.name}
-                                        </div>
-                                        {weapon.stock_quantity < 5 && weapon.stock_quantity > 0 && (
-                                            <div className="text-red-600">Only {weapon.stock_quantity} left in stock</div>
-                                        )}
-
-                                        {!isNaN(parseFloat(weapon.avg_rating)) && (
-                                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
-                                                {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
+                                    <div
+                                        className={`flex h-full w-full items-center justify-center rounded-md transition-transform ease-out ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
+                                    >
+                                        <img
+                                            src={`data:image/png;base64,${weapon.image_base64}`}
+                                            alt={weapon.name}
+                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-125"
+                                        />
+                                    </div>
+                                    <div
+                                        className={`mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8 ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
+                                    >
+                                        <div className="text-2xl">
+                                            <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
+                                                {weapon.name}
                                             </div>
-                                        )}
+                                            {weapon.stock_quantity < 5 && weapon.stock_quantity > 0 && (
+                                                <div className="text-red-600">Only {weapon.stock_quantity} left in stock</div>
+                                            )}
+
+                                            {!isNaN(parseFloat(weapon.avg_rating)) && (
+                                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
+                                                    {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div
+                                            className={`block translate-y-0 -skew-x-12 text-end font-black transition-transform ${isOnSale ? 'text-5xl' : 'text-6xl'}`}
+                                        >
+                                            {isOnSale ? (
+                                                <>
+                                                    <span className="relative inline-block opacity-50">
+                                                        €{weapon.price}
+                                                        <span className="absolute bottom-0.5 left-0.5 h-0.5 w-full origin-bottom-left -rotate-12 bg-current"></span>
+                                                    </span>
+                                                    <div className="flex justify-end gap-4 text-6xl">
+                                                        <span className="bg-red-600">{weapon.price_modification_coefficient * 100 - 100}%</span>
+                                                        <span>€{(weapon.price * weapon.price_modification_coefficient).toFixed(2)}</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>€{weapon.price}</>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="block translate-y-0 -skew-x-12 text-end text-6xl font-black transition-transform">
-                                        €{weapon.price}
+                                </Link>
+                                {weapon.stock_quantity <= 0 && (
+                                    <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center font-hitmarker-condensed text-9xl text-white">
+                                        OUT OF STOCK
                                     </div>
-                                </div>
-                            </Link>
-                            {weapon.stock_quantity <= 0 && (
-                                <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center font-hitmarker-condensed text-9xl text-white">
-                                    OUT OF STOCK
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </main>
         </>

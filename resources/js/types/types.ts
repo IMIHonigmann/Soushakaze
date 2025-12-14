@@ -17,6 +17,9 @@ export type Weapon = {
     magsize: number;
     price: number;
     image_base64: string;
+    price_modification_coefficient: number;
+    next_sale_startdate?: string | null;
+    next_sale_enddate?: string | null;
 };
 
 export type Attachment = {
