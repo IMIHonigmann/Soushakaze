@@ -45,7 +45,7 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                 </Link>
                 <nav className="flex justify-between">
                     <Link href={route('queried-products')}>Shop</Link>
-                    <span>On Sale</span>
+                    <Link href={route('queried-products', { on_sale: '1' })}>On Sale</Link>
                     <span>New Arrivals</span>
                     <span>Brands</span>
                 </nav>

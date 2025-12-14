@@ -43,7 +43,6 @@ class ProductsController extends Controller
         ]);
     }
 
-
     public function getByQuery(Request $request)
     {
         $qWeaponName = trim((string) $request->query('name', ''));
@@ -52,6 +51,7 @@ class ProductsController extends Controller
         $qPowerUpper = trim((string) $request->query('power_upperlimit', ''));
         $qPowerLower = trim((string) $request->query('power_lowerlimit', ''));
         $qWeaponTypes = $request->query('weaponTypes', []);
+        $qOnSale = $request->query('on_sale', '');
         if (is_string($qWeaponTypes)) {
             $qWeaponTypes = [$qWeaponTypes];
         }
@@ -69,6 +69,7 @@ class ProductsController extends Controller
             ->when($qRofUpper !== '' && $qRofLower === '', fn($query) => $query->where('rate_of_fire', '<=', $qRofUpper))
             ->when($qPowerLower !== '', fn($query) => $query->where('power', '>=', $qPowerLower))
             ->when($qPowerUpper !== '', fn($query) => $query->where('power', '<=', $qPowerUpper))
+            ->when($qOnSale == 1, fn($query) => $query->where('price_modification_coefficient', '<', 1.00)->where('next_sale_startdate', '<=', now())->where('next_sale_enddate', '>=', now()))
             ->when(count($qCheckedWeaponTypes) > 0, fn($query) => $query->whereIn('type', $qCheckedWeaponTypes))
             ->get()
             ->map(function ($weapon) {
