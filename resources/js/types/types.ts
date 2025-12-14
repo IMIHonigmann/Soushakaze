@@ -4,6 +4,7 @@ export type Weapon = {
     id: number;
     seller_id?: number | null;
     manufacturer_id?: number | null;
+    stock_quantity: number;
     avg_rating: string;
     name: string;
     rate_of_fire: number;

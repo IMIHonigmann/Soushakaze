@@ -66,13 +66,13 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                     />
                 </div>
                 <div className="flex justify-between gap-6">
-                    <Link href="/profile">
+                    <Link href="/profile" className="navbutton">
                         <FaUser />
                     </Link>
-                    <VisualBag bag={cart} routeName={'cart'}>
+                    <VisualBag bag={cart} routeName={'cart'} className="navbutton">
                         <FaCartShopping className="text-2xl" />
                     </VisualBag>
-                    <VisualBag className="bg-orange-500" bag={wishlist} routeName={'wishlist'}>
+                    <VisualBag spanClassName="bg-orange-500" bag={wishlist} className="navbutton" routeName={'wishlist'}>
                         <FaRegBookmark className="text-2xl" />
                     </VisualBag>
                 </div>

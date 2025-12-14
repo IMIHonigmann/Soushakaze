@@ -278,37 +278,51 @@ export default function QueriedProducts({ weapons, message }: Props) {
                         </div>
                     </form>
                 </div>
-                <div className="col-span-3 col-start-2 flex h-fit w-full flex-col content-start gap-8 place-self-start text-xl [&>*]:p-8">
+                <div className="col-span-3 col-start-2 flex w-full flex-col content-start gap-8 place-self-start text-xl">
                     {weapons.map((weapon, id) => (
-                        <Link
-                            className="group grid max-h-96 w-full grid-cols-2 grid-rows-1 place-items-stretch border-2 text-center"
-                            href={route('product.show', { weaponId: weapon.id })}
-                            key={id}
-                        >
-                            <div className="flex h-full w-full scale-100 items-center justify-center rounded-md transition-transform ease-out">
-                                <img
-                                    src={`data:image/png;base64,${weapon.image_base64}`}
-                                    alt={weapon.name}
-                                    className="h-full w-full scale-125 transform object-cover transition-transform duration-300 group-hover:scale-[135%]"
-                                />
-                            </div>
-                            <div className="mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8">
-                                <div className="text-2xl">
-                                    <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
-                                        {weapon.name}
-                                    </div>
-
-                                    {!isNaN(parseFloat(weapon.avg_rating)) && (
-                                        <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
-                                            {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
+                        <div className="relative">
+                            <Link
+                                className={`group grid grid-cols-2 grid-rows-1 place-items-stretch border-2 p-8 text-center ${weapon.stock_quantity <= 0 ? 'opacity-50' : ''}`}
+                                href={route('product.show', { weaponId: weapon.id })}
+                                key={id}
+                            >
+                                <div
+                                    className={`flex h-full w-full items-center justify-center rounded-md transition-transform ease-out ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
+                                >
+                                    <img
+                                        src={`data:image/png;base64,${weapon.image_base64}`}
+                                        alt={weapon.name}
+                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-125"
+                                    />
+                                </div>
+                                <div
+                                    className={`mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8 ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
+                                >
+                                    <div className="text-2xl">
+                                        <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
+                                            {weapon.name}
                                         </div>
-                                    )}
+                                        {weapon.stock_quantity < 5 && weapon.stock_quantity > 0 && (
+                                            <div className="text-red-600">Only {weapon.stock_quantity} left in stock</div>
+                                        )}
+
+                                        {!isNaN(parseFloat(weapon.avg_rating)) && (
+                                            <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
+                                                {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="block translate-y-0 -skew-x-12 text-end text-6xl font-black transition-transform">
+                                        €{weapon.price}
+                                    </div>
                                 </div>
-                                <div className="block translate-y-0 -skew-x-12 text-end text-6xl font-black transition-transform">
-                                    €{weapon.price}
+                            </Link>
+                            {weapon.stock_quantity <= 0 && (
+                                <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center font-hitmarker-condensed text-9xl text-white">
+                                    OUT OF STOCK
                                 </div>
-                            </div>
-                        </Link>
+                            )}
+                        </div>
                     ))}
                 </div>
             </main>

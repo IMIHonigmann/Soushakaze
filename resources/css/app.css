@@ -353,6 +353,10 @@
         @apply bg-background text-foreground;
     }
 
+    .navbutton {
+        @apply relative scale-100 cursor-pointer transition-[transform_colors] ease-out hover:scale-125 hover:text-lime-500;
+    }
+
     main {
         margin-inline: 12rem;
     }

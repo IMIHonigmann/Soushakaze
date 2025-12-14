@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->foreignId('manufacturer_id')->nullable();
             $table->string('name');
             $table->integer(column: 'rate_of_fire');
+            $table->integer('stock_quantity')->default(0);
             $table->enum('type', ['handgun', 'smg', 'shotgun', 'blade']);
             $table->integer('power');
             $table->integer('accuracy')->default(0);
