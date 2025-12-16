@@ -43,7 +43,7 @@ export default function Bag({ freeShippingThreshold, standardShippingCost, premi
 
     const weaponIdAttachments: string[] = [];
     for (let i = 0; i < bag.length; i++) {
-        weaponIdAttachments.push(`${bag[i].weapon.name}:${bag[i].customizedPrice}:${bag[i].quantity}:${bag[i].customizedWeaponId}`);
+        weaponIdAttachments.push(`${bag[i].quantity}:${bag[i].customizedWeaponId}`);
     }
 
     return (

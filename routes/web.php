@@ -27,31 +27,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
 
         $cartItems = $request->input('cart', []);
-        $decodedItem = null;
         $processedCart = [];
         for ($i = 0; $i < count($cartItems); $i++) {
             $item = $cartItems[$i];
             if (isset($item)) {
-                if (preg_match('/^(.+?):(.+?):(\d+):(\d+):(.+)$/', $item, $matches)) {
-                    $weaponName = $matches[1];
-                    $customizedPrice = $matches[2];
-                    $quantity = $matches[3];
-                    $weaponId = $matches[4];
-                    $urlDecoded = urldecode($matches[5]);
+                if (preg_match('/^(.+?):(.+?):(.+)$/', $item, $matches)) {
+                    $quantity = $matches[1];
+                    $weaponId = $matches[2];
+                    $urlDecoded = urldecode($matches[3]);
                     $decodedAttachments = json_decode($urlDecoded, true);
                     $attachmentIds = [];
-
 
                     foreach ($decodedAttachments as $attachment) {
                         $attachmentIds[] = $attachment['id'];
                     }
 
-                    $weaponPrice = DB::table('weapons')->where('id', $weaponId)->select('price')->first()->price;
+                    $weapon = DB::table('weapons')->where('id', $weaponId)->first();
                     $attachmentPrice = DB::table('attachments')->whereIn('id', $attachmentIds)->sum('price_modifier');
-                    $modifiedPrice = $weaponPrice + $attachmentPrice;
+                    $modifiedPrice = $weapon->price + $attachmentPrice;
 
                     $processedCart[$i] = [
-                        'weapon_name' => $weaponName,
+                        'weapon_name' => $weapon->name,
                         'attachments' => $decodedAttachments,
                         'serverside_modified_price' => $modifiedPrice,
                         'quantity' => $quantity
