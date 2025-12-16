@@ -11,9 +11,11 @@ class OrdersController extends Controller
 {
     public function placeOrder(Request $request)
     {
-        $customizedWeapons = $request->weaponid_attachments;
-        $ordersToInsert = [];
         $userId = $request->user()->id;
+        $sessionId = $request->query('session_id');
+        $pendingCart = DB::table('pending_carts')->where('user_id', $userId)->first();
+        $customizedWeapons = json_decode($pendingCart->trimmed_cart_data);
+        $ordersToInsert = [];
         $orderId = Str::uuid()->toString();
         $orderWeapons = [];
 
@@ -26,9 +28,9 @@ class OrdersController extends Controller
         ]);
 
         foreach ($customizedWeapons as $weapon) {
-            $weaponId = $weapon['weapon_id'];
-            $attachments = $weapon['attachments'];
-            $quantity = $weapon['quantity'];
+            $weaponId = $weapon->weapon_id;
+            $attachmentIds = $weapon->attachments;
+            $quantity = $weapon->quantity;
             error_log('quantity: ' . $quantity);
 
             $customWeaponId = Str::uuid()->toString();
@@ -40,8 +42,8 @@ class OrdersController extends Controller
             DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId, 'weapon_id' => $weaponId]);
 
 
-            foreach ($attachments as $attachment) {
-                $attachmentIdOrNull = $attachment['id'] === 0 ? null : $attachment['id'];
+            foreach ($attachmentIds as $attachmentId) {
+                $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
                 $ordersToInsert[] = [
                     'custom_weapon_id' => $customWeaponId,
                     'attachment_id' => $attachmentIdOrNull,
@@ -56,6 +58,8 @@ class OrdersController extends Controller
             DB::table('orders_weapons')->insert($orderWeapons);
         }
 
-        return Inertia::render('OrderPlaced', ['message' => 'Order has been processed successfully']);
+        DB::table('pending_carts')->where('user_id', $userId)->delete();
+
+        return Inertia::render('Success', ['message' => 'Order has been processed successfully']);
     }
 }

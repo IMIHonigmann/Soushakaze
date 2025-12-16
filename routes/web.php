@@ -28,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         $cartItems = $request->input('cart', []);
         $processedCart = [];
+        $weaponId_attachments = [];
+
         for ($i = 0; $i < count($cartItems); $i++) {
             $item = $cartItems[$i];
             if (isset($item)) {
@@ -36,20 +38,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     $weaponId = $matches[2];
                     $urlDecoded = urldecode($matches[3]);
                     $decodedAttachments = json_decode($urlDecoded, true);
-                    $attachmentIds = [];
 
                     foreach ($decodedAttachments as $attachment) {
                         $attachmentIds[] = $attachment['id'];
                     }
 
-                    $weapon = DB::table('weapons')->where('id', $weaponId)->first();
                     $attachmentPrice = DB::table('attachments')->whereIn('id', $attachmentIds)->sum('price_modifier');
+                    $weapon = DB::table('weapons')->where('id', $weaponId)->first();
                     $modifiedPrice = $weapon->price + $attachmentPrice;
 
                     $processedCart[$i] = [
                         'weapon_name' => $weapon->name,
                         'attachments' => $decodedAttachments,
                         'serverside_modified_price' => $modifiedPrice,
+                        'quantity' => $quantity
+                    ];
+
+                    $weaponId_attachments[$i] = [
+                        'weapon_id' => $weapon->id,
+                        'attachments' => $attachmentIds,
                         'quantity' => $quantity
                     ];
                 }
@@ -81,9 +88,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ];
         }
 
+        $cartId = DB::table('pending_carts')->insertGetId([
+            'id' => uuid_create(),
+            'user_id' => $user->id,
+            'trimmed_cart_data' => json_encode($weaponId_attachments),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return $user->checkout($lineItems, [
-            'success_url' => route('checkout-success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => route('place-order') . '?session_id={CHECKOUT_SESSION_ID}&cart_id=' . $cartId,
             'cancel_url' => route('checkout-cancel'),
             'customer_update' => ['address' => 'auto'],
         ]);
@@ -182,7 +196,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('order-history')->with('success', 'Review submitted successfully.');
     })->name('send-review');
 
-    Route::post('placeOrder', [OrdersController::class, 'placeOrder'])->name('place-order');
+    Route::get('placeOrder', [OrdersController::class, 'placeOrder'])->name('place-order');
 
 
     Route::post('addImage', function (Request $request) {
