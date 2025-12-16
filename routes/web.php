@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use function Laravel\Prompts\select;
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -36,12 +38,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     $quantity = $matches[3];
                     $weaponId = $matches[4];
                     $urlDecoded = urldecode($matches[5]);
-                    $decodedItem = json_decode($urlDecoded, true);
+                    $decodedAttachments = json_decode($urlDecoded, true);
+                    $attachmentIds = [];
+
+
+                    foreach ($decodedAttachments as $attachment) {
+                        $attachmentIds[] = $attachment['id'];
+                    }
+
+                    $weaponPrice = DB::table('weapons')->where('id', $weaponId)->select('price')->first()->price;
+                    $attachmentPrice = DB::table('attachments')->whereIn('id', $attachmentIds)->sum('price_modifier');
+                    $modifiedPrice = $weaponPrice + $attachmentPrice;
 
                     $processedCart[$i] = [
                         'weapon_name' => $weaponName,
-                        'attachments' => $decodedItem,
-                        'customized_price' => $customizedPrice,
+                        'attachments' => $decodedAttachments,
+                        'serverside_modified_price' => $modifiedPrice,
                         'quantity' => $quantity
                     ];
                 }
@@ -67,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                             ? 'Attachments: ' . $attachmentsList
                             : 'Base weapon',
                     ],
-                    'unit_amount' => round(($item['customized_price'] ?? 0) * 100),
+                    'unit_amount' => round(($item['serverside_modified_price'] ?? 999999999) * 100),
                 ],
                 'quantity' => $item['quantity'] ?? 1,
             ];
