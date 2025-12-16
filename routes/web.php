@@ -97,9 +97,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
 
         return $user->checkout($lineItems, [
-            'success_url' => route('place-order') . '?session_id={CHECKOUT_SESSION_ID}&cart_id=' . $cartId,
+            'success_url' => route('place-order') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('checkout-cancel'),
             'customer_update' => ['address' => 'auto'],
+            'metadata' => [
+                'cart_id' => $cartId,
+            ]
         ]);
     })->name('checkout');
 

@@ -17,15 +17,30 @@ class OrdersController extends Controller
             return redirect()->route('cart')->with('error', 'Invalid checkout session.');
         }
 
+        $existingOrder = DB::table('orders')->where('stripe_session_id', $sessionId)->first();
+        if ($existingOrder) {
+            return Inertia::render('Success', ['message' => 'Order already processed']);
+        }
+
         $stripe = new StripeClient(env('STRIPE_SECRET'));
         $session = $stripe->checkout->sessions->retrieve($sessionId);
-
         if ($session->payment_status !== 'paid') {
             return redirect()->route('cart')->with('error', 'Payment not completed.');
         }
 
+        if ($session->customer !== $request->user()->stripe_id) {
+            abort(403, 'Unauthorized access to checkout session');
+        }
+
         $userId = $request->user()->id;
-        $pendingCart = DB::table('pending_carts')->where('user_id', $userId)->first();
+        $pendingCart = DB::table('pending_carts')->where('id', $session->metadata->cart_id ?? null)->first();
+        if (!$pendingCart) {
+            return redirect()->route('cart')->with('error', 'Cart not found.');
+        }
+        if ($pendingCart->user_id !== $userId) {
+            abort(403, 'Unauthorized access to cart');
+        }
+
         $customizedWeapons = json_decode($pendingCart->trimmed_cart_data);
         $ordersToInsert = [];
         $orderId = Str::uuid()->toString();
@@ -34,6 +49,7 @@ class OrdersController extends Controller
         DB::table('orders')->insert([
             'id' => $orderId,
             'user_id' => $userId,
+            'stripe_session_id' => $sessionId,
             'expected_arrival_date' => now()->addDays(3),
             'created_at' => now(),
             'updated_at' => now(),
@@ -70,7 +86,7 @@ class OrdersController extends Controller
             DB::table('orders_weapons')->insert($orderWeapons);
         }
 
-        DB::table('pending_carts')->where('user_id', $userId)->delete();
+        DB::table('pending_carts')->where('id', $session->metadata->cart_id)->delete();
 
         return Inertia::render('Success', ['message' => 'Order has been processed successfully']);
     }

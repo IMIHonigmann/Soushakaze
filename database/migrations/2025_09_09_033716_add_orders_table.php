@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('stripe_session_id')->unique()->nullable();
             $table->string('status')->default('pending');
             $table->timestamp('expected_arrival_date')->nullable();
             $table->timestamps();
