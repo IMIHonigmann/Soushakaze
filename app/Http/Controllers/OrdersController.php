@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Stripe\StripeClient;
@@ -28,11 +30,17 @@ class OrdersController extends Controller
             return redirect()->route('cart')->with('error', 'Payment not completed.');
         }
 
+        $userId = $request->user()->id;
         if ($session->customer !== $request->user()->stripe_id) {
+            Log::warning('Session hijacking attempt', [
+                'user_id' => $userId,
+                'session_id' => $sessionId,
+                'session_customer' => $session->customer,
+                'user_stripe_id' => $request->user()->stripe_id
+            ]);
             abort(403, 'Unauthorized access to checkout session');
         }
 
-        $userId = $request->user()->id;
         $pendingCart = DB::table('pending_carts')->where('id', $session->metadata->cart_id ?? null)->first();
         if (!$pendingCart) {
             return redirect()->route('cart')->with('error', 'Cart not found.');
@@ -55,39 +63,46 @@ class OrdersController extends Controller
             'updated_at' => now(),
         ]);
 
-        foreach ($customizedWeapons as $weapon) {
-            $weaponId = $weapon->weapon_id;
-            $attachmentIds = $weapon->attachments;
-            $quantity = $weapon->quantity;
-            error_log('quantity: ' . $quantity);
+        DB::beginTransaction();
+        try {
+            foreach ($customizedWeapons as $weapon) {
+                $weaponId = $weapon->weapon_id;
+                $attachmentIds = $weapon->attachments;
+                $quantity = $weapon->quantity;
+                error_log('quantity: ' . $quantity);
 
-            $customWeaponId = Str::uuid()->toString();
-            $orderWeapons[] = [
-                'order_id' => $orderId,
-                'custom_weapon_id' => $customWeaponId
-            ];
-
-            DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId, 'weapon_id' => $weaponId]);
-
-
-            foreach ($attachmentIds as $attachmentId) {
-                $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
-                $ordersToInsert[] = [
-                    'custom_weapon_id' => $customWeaponId,
-                    'attachment_id' => $attachmentIdOrNull,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                $customWeaponId = Str::uuid()->toString();
+                $orderWeapons[] = [
+                    'order_id' => $orderId,
+                    'custom_weapon_id' => $customWeaponId
                 ];
+
+                DB::table('custom_weapon_ids')->insert(['id' => $customWeaponId, 'weapon_id' => $weaponId]);
+
+                foreach ($attachmentIds as $attachmentId) {
+                    $attachmentIdOrNull = $attachmentId === 0 ? null : $attachmentId;
+                    $ordersToInsert[] = [
+                        'custom_weapon_id' => $customWeaponId,
+                        'attachment_id' => $attachmentIdOrNull,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                if (!empty($ordersToInsert)) {
+                    DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
+                    DB::table('orders_weapons')->insert($orderWeapons);
+                }
+
+                DB::table('pending_carts')->where('id', $session->metadata->cart_id)->delete();
+
+                DB::commit();
+
+                return Inertia::render('Success', ['message' => 'Order has been processed successfully']);
             }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cart')->with('error', 'Failed to create order. Try again using the session_id' . $sessionId);
         }
-
-        if (!empty($ordersToInsert)) {
-            DB::table('usercreated_weapons_attachments')->insert($ordersToInsert);
-            DB::table('orders_weapons')->insert($orderWeapons);
-        }
-
-        DB::table('pending_carts')->where('id', $session->metadata->cart_id)->delete();
-
-        return Inertia::render('Success', ['message' => 'Order has been processed successfully']);
     }
 }
