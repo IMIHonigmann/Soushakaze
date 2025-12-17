@@ -85,7 +85,11 @@ export default function FrontPage() {
                                     >
                                         {wordValues[index].kanji}
                                     </span>
-                                    <strong ref={wordRef} className="changing-word text-[#50d71e]" style={{ color: wordValues[index].color }}>
+                                    <strong
+                                        ref={wordRef}
+                                        className="changing-word font-hitmarker-condensed text-[#50d71e]"
+                                        style={{ color: wordValues[index].color }}
+                                    >
                                         {wordValues[index].word}
                                     </strong>
                                 </span>{' '}

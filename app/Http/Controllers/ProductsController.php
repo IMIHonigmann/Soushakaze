@@ -22,7 +22,12 @@ class ProductsController extends Controller
     public function getById(int $weaponId)
     {
 
-        $weapon = DB::table('weapons')->where('id', $weaponId)->first();
+        $weapon = DB::table('weapons')
+            ->where('weapons.id', $weaponId)
+            ->join('manufacturers', 'weapons.manufacturer_id', '=', 'manufacturers.id')
+            ->join('sellers', 'weapons.seller_id', '=', 'sellers.id')
+            ->select('weapons.*', 'manufacturers.name as manufacturer_name', 'sellers.name as seller_name')
+            ->first();
 
 
         if (isset($weapon->image_blob)) {
@@ -71,6 +76,9 @@ class ProductsController extends Controller
             ->when($qPowerUpper !== '', fn($query) => $query->where('power', '<=', $qPowerUpper))
             ->when($qOnSale == 1, fn($query) => $query->where('price_modification_coefficient', '<', 1.00)->where('next_sale_startdate', '<=', now())->where('next_sale_enddate', '>=', now()))
             ->when(count($qCheckedWeaponTypes) > 0, fn($query) => $query->whereIn('type', $qCheckedWeaponTypes))
+            ->join('manufacturers', 'manufacturer_id', '=', 'manufacturers.id')
+            ->join('sellers', 'seller_id', '=', 'sellers.id')
+            ->select('weapons.*', 'manufacturers.name as manufacturer_name', 'sellers.name as seller_name')
             ->get()
             ->map(function ($weapon) {
                 if (isset($weapon->image_blob)) {

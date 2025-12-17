@@ -8,7 +8,7 @@ import Navbar from '../Navbar';
 
 type Props = {
     searchQuery: string;
-    weapons: Weapon[];
+    weapons: (Weapon & { manufacturer_name: string; seller_name: string })[];
     message: string;
 };
 
@@ -307,15 +307,18 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                         className={`mt-4 ml-6 flex h-full w-full flex-col divide-y-2 [&>*]:p-8 ${weapon.stock_quantity <= 0 ? 'opacity-20' : ''}`}
                                     >
                                         <div className="text-2xl">
-                                            <div className="translate-y-0 text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform group-hover:translate-x-1">
+                                            <h1 className="text-left font-hitmarker-condensed text-5xl font-extrabold transition-transform">
                                                 {weapon.name}
+                                            </h1>
+                                            <div className="text-left text-lg text-zinc-400">
+                                                <div>By {weapon.manufacturer_name}</div> <div>Sold by {weapon.seller_name}</div>
                                             </div>
                                             {weapon.stock_quantity < 5 && weapon.stock_quantity > 0 && (
-                                                <div className="text-red-600">Only {weapon.stock_quantity} left in stock</div>
+                                                <div className="text-left text-red-600">Only {weapon.stock_quantity} left in stock</div>
                                             )}
 
                                             {!isNaN(parseFloat(weapon.avg_rating)) && (
-                                                <div className="block translate-y-0 text-left transition-transform group-hover:translate-x-1">
+                                                <div className="block translate-y-0 text-left transition-transform">
                                                     {displayStars(weapon.avg_rating)} {parseFloat(weapon.avg_rating).toFixed(1)}/5
                                                 </div>
                                             )}
@@ -341,7 +344,7 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                     </div>
                                 </Link>
                                 {weapon.stock_quantity <= 0 && (
-                                    <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center font-hitmarker-condensed text-9xl text-white">
+                                    <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center font-hitmarker-condensed text-9xl text-red-600">
                                         OUT OF STOCK
                                     </div>
                                 )}

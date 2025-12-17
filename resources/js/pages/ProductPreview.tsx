@@ -21,7 +21,7 @@ type Review = {
 };
 
 type Props = {
-    weapon: Weapon;
+    weapon: Weapon & { manufacturer_name: string; seller_name: string };
     reviews: Review[];
     avgRating: number;
 };
@@ -56,10 +56,11 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                 </div>
                 <div>
                     <div className="flex flex-col gap-4 text-4xl">
-                        <h1 className="">On--</h1>
+                        <h1 className="">{weapon.seller_name}</h1>
                         <div className="font-hitmarker-condensed text-7xl font-extrabold">{weapon.name}</div>
                         <div className="text-3xl">
-                            €{weapon.price} <span className="text-gray-300 opacity-75">VAT included</span>
+                            €{(weapon.price * weapon.price_modification_coefficient).toFixed(2)}{' '}
+                            <span className="text-gray-300 opacity-75">VAT included</span>
                         </div>
 
                         <div className="mt-8 text-xl">
@@ -118,7 +119,7 @@ export default function ProductPreview({ weapon, reviews, avgRating }: Props) {
                         </button>
                     </div>
                     <ul className="mt-36 [&>*]:border-2 [&>*]:p-4">
-                        <li>Sold by H&K, shipped by Soushakaze.--</li>
+                        <li>Sold by {weapon.seller_name}, shipped by Soushakaze.</li>
                         <li>Free delivery and returns</li>
                         <li>30 day return policy</li>
                         <li>Sell it back</li>
