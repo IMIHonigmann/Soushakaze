@@ -11,10 +11,28 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        Schema::create('manufacturers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('sellers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('weapons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seller_id')->nullable();
-            $table->foreignId('manufacturer_id')->nullable();
+            $table->foreignId('seller_id')->constrained();
+            $table->foreignId('manufacturer_id')->constrained();
             $table->string('name');
             $table->integer(column: 'rate_of_fire');
             $table->integer('stock_quantity')->default(0);
@@ -41,8 +59,8 @@ return new class extends Migration {
 
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seller_id')->nullable();
-            $table->foreignId('manufacturer_id')->nullable();
+            $table->foreignId('seller_id')->constrained();
+            $table->foreignId('manufacturer_id')->constrained();
             $table->string('name');
             $table->decimal('price_modifier', 10, 2);
             $table->enum('area', [
