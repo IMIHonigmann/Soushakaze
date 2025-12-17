@@ -430,7 +430,267 @@ return new class extends Migration {
 
 
         DB::table('weapons_attachments')->insert([
-            // ...existing mapping rows...
+            [
+                'weapon_id' => 1, // Katana
+                'attachment_id' => 2, // Suppressor
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 1, // Red Dot Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 3, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 4, // Laser Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 5, // Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 6, // Collapsible Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 7, // Fixed Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 8, // 4x Scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 9, // Holographic Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 10, // Bipod
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 14, // Tactical Light
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 15, // Grip Tape
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 16, // Compensator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 2, // H&K MP5
+                'attachment_id' => 17, // Angled Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // Attachments for PPSH41 (weapon_id 6)
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 18, // Vaccum Barrel
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 1, // Red Dot Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 3, // Extended Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 4, // Laser Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 5, // Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 6, // Collapsible Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 7, // Fixed Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 8, // 4x Scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 9, // Holographic Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 10, // Bipod
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 14, // Tactical Light
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 15, // Grip Tape
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 16, // Compensator
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 17, // Angled Foregrip
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 19,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 6, // PPSH41
+                'attachment_id' => 20,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            // Existing and other weapons
+            [
+                'weapon_id' => 3, // Desert Eagle
+                'attachment_id' => 7, // Fixed Stock
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 3, // Desert Eagle
+                'attachment_id' => 8, // 4x Scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 4, // Remington 870
+                'attachment_id' => 9, // Holographic Sight
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 4, // Remington 870
+                'attachment_id' => 10, // Bipod
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 5, // Combat Knife
+                'attachment_id' => 11, // Muzzle Brake
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 5, // Combat Knife
+                'attachment_id' => 12, // Flash Hider
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'weapon_id' => 1, // Katana
+                'attachment_id' => 13, // Drum Magazine
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         // Map for manufacturers and sellers (by index, adjust as needed)
