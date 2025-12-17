@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class CustomizerController extends Controller
 {
-    public function index($weaponId)
+    public function index(Request $request, int $weaponId)
     {
         $weapon = DB::table('weapons')
             ->where('id', $weaponId)
@@ -27,7 +27,8 @@ class CustomizerController extends Controller
         return Inertia::render('Separate/Customizer', [
             'weapon' => $weapon,
             'maxPower' => $maxPower,
-            'attachments' => $attachments
+            'attachments' => $attachments,
+            'query' => $request->query(),
         ]);
     }
 

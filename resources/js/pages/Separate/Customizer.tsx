@@ -30,9 +30,10 @@ interface Props {
     weapon: Weapon;
     maxPower: number;
     attachments: Attachment[];
+    query: Record<Area, number>;
 }
 
-export default function Customizer({ weapon, maxPower, attachments }: Props) {
+export default function Customizer({ weapon, maxPower, attachments, query }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
     const grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
         acc[att.area] = acc[att.area] || [];
@@ -49,6 +50,12 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         const availableAreas = new Set(Object.keys(grouped));
         const newSelected = Object.fromEntries(Object.entries(selected).filter(([area]) => availableAreas.has(area)));
         setAllSelected(newSelected);
+        const queryAttachmentIds = Object.entries(query);
+        queryAttachmentIds.forEach(([area, attId]) => {
+            const att = grouped[area]?.find((a) => a.id == attId);
+            if (!att) return;
+            setSelected(area, att);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -78,9 +85,15 @@ export default function Customizer({ weapon, maxPower, attachments }: Props) {
         };
     }, [weapon.name]);
 
+    const updateQueryParams = (area: Area, attachmentId: number) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set(area, attachmentId.toString());
+        window.history.replaceState({}, '', url);
+    };
     const handleSelect = (area: Area, attachment: Attachment, sound = 'select_attachment_subtle') => {
         if (selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
         setSelected(area, attachment);
+        updateQueryParams(area, attachment.id);
         setCurrentAreaSelection(area);
     };
 
