@@ -175,7 +175,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('order-history');
 
     Route::get('composeReview', function (Request $request) {
-        return Inertia::render('ComposeReview');
+        $weapon = DB::table('weapons')->join('sellers', 'seller_id', '=', 'sellers.id')->where('weapons.id', $request->query('weaponId'))->select('weapons.*', 'sellers.name as seller_name')->first();
+
+        return Inertia::render('ComposeReview', [
+            'weapon' => $weapon
+        ]);
     })->name('compose-review');
 
     Route::post('sendReview', function (Request $request) {

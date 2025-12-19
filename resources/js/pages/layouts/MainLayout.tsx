@@ -4,7 +4,7 @@ export default function Layout({ children, className }: { children: React.ReactN
     return (
         <>
             <Navbar />
-            <main className={className}>{children}</main>
+            <main className={`mb-12 ${className}`}>{children}</main>
         </>
     );
 }
