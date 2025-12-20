@@ -1,15 +1,15 @@
+import WeaponModel from '@/ModelDefinitions/WeaponModel';
 import { Area } from '@/stores/useCustomizerStore';
+import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
 import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import React, { lazy, memo, Suspense, useCallback, useMemo, useRef } from 'react';
-
-const weaponModules = import.meta.glob('../ModelDefinitions/*.tsx');
+import React, { memo, Suspense, useCallback, useRef, useState } from 'react';
 
 interface Props {
     cameraControlsRef: React.RefObject<any>;
-    weaponId: number | null;
+    weapon: Weapon;
     setCurrentAreaSelection: (area: Area) => void;
 }
 
@@ -31,45 +31,28 @@ function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: 
     return null;
 }
 
-function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection }: Props) {
+function CustomizerScene({ cameraControlsRef, weapon, setCurrentAreaSelection }: Props) {
     const canvasRef = useRef(null);
-    const [, setScreenshotDataURL] = React.useState<string | null>(null);
+    const [, setScreenshotDataURL] = useState<string | null>(null);
 
     const handleScreenshot = useCallback(
         (dataURL: string) => {
             setScreenshotDataURL(dataURL);
             router.post('/addImage', {
                 image: dataURL,
-                weapon_id: weaponId,
+                weapon_id: weapon.id,
             });
 
             // Download logic
             const link = document.createElement('a');
             link.href = dataURL;
-            link.download = `weapon-${weaponId}-screenshot.png`;
+            link.download = `weapon-${weapon.id}-screenshot.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         },
-        [weaponId],
+        [weapon],
     );
-
-    const WeaponModel = useMemo(() => {
-        if (!weaponId) return null;
-
-        return lazy(() => {
-            const path = `../ModelDefinitions/${weaponId}.tsx`;
-            const module: () => Promise<any> = weaponModules[path];
-
-            if (!module) {
-                return Promise.resolve({ default: () => null });
-            }
-
-            return module().then((model) => ({
-                default: model.default || model[weaponId] || (() => null),
-            }));
-        });
-    }, [weaponId]);
 
     return (
         <>
@@ -81,26 +64,12 @@ function CustomizerScene({ cameraControlsRef, weaponId, setCurrentAreaSelection 
                         </div>
                     }
                 >
-                    {/* <button
-                        className="absolute bottom-0 z-105"
-                        onClick={() => {
-                            if (window.takeScreenshot) {
-                                cameraControlsRef.current.setLookAt(0, 0, 5, 0, 0, 0, false);
-                                const take = window.takeScreenshot;
-                                setTimeout(() => {
-                                    take?.();
-                                }, 100);
-                            }
-                        }}
-                    >
-                        Take screenshot
-                    </button> */}
                     <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
 
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
-                            {WeaponModel ? <WeaponModel /> : null}
+                            {WeaponModel ? <WeaponModel weapon={weapon} /> : null}
                         </Stage>
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
 

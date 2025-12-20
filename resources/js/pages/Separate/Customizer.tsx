@@ -233,7 +233,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 onClick={() => goBackTo3D('all')}
             />
             <CustomizerScene
-                weaponId={weapon.id}
+                weapon={weapon}
                 setCurrentAreaSelection={setCurrentAreaSelection}
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
