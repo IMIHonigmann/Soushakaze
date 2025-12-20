@@ -9,7 +9,7 @@ Title: PPSH-41 TACTICAL
 import { useCustomizerStore } from '@/stores/useCustomizerStore';
 import { Weapon } from '@/types/types';
 import { useGLTF } from '@react-three/drei';
-import { JSX, useEffect, useMemo } from 'react';
+import { JSX, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 
@@ -39,24 +39,55 @@ type ModelProps = JSX.IntrinsicElements['group'] & {
 export default function Model({ weapon, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.gltf`) as unknown as GLTFResult;
 
-    const { selected, currentAreaSelection } = useCustomizerStore();
+    const { selected, currentAreaSelection, grouped } = useCustomizerStore();
+
+    const dbAttachmentsToMaterialsObject = useMemo(() => {
+        const map: Record<string, string[]> = {};
+        map['Foregrip'] = ['defaultMaterial_19'];
+        map['Red Dot Sight'] = ['defaultMaterial_13', 'defaultMaterial_14', 'defaultMaterial_15'];
+        map['Laser Sight'] = Array.from({ length: 10 }, (_, i) => `defaultMaterial_${i + 1}`);
+        map['Laser Sight'].push('defaultMaterial');
+
+        return map;
+    }, []);
+
+    const initAppliedRef = useRef(false);
 
     useEffect(() => {
-        const dbAttachmentsToMaterialsObject: Record<string, string> = {};
-        dbAttachmentsToMaterialsObject['Foregrip'] = 'defaultMaterial_19';
+        if (!grouped || initAppliedRef.current) return;
 
-        Object.values(dbAttachmentsToMaterialsObject).forEach((nodeName) => {
-            const n = nodes[nodeName];
-            if (n && 'visible' in n) n.visible = false;
+        Object.values(dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
+            nodeNames.forEach((nodeName) => {
+                const n = nodes[nodeName];
+                if (n && 'visible' in n) n.visible = false;
+            });
         });
 
-        Object.values(selected).forEach((areaAttachmentSelection) => {
-            if (!areaAttachmentSelection) return;
-            const nodeName = dbAttachmentsToMaterialsObject[areaAttachmentSelection.name];
+        Object.values(selected).forEach((selAtt) => {
+            (dbAttachmentsToMaterialsObject[selAtt.name] ?? []).forEach((nodeName) => {
+                const n = nodes[nodeName];
+                if (n && 'visible' in n) n.visible = true;
+            });
+        });
+    }, [dbAttachmentsToMaterialsObject, grouped, nodes, selected]);
+
+    useEffect(() => {
+        if (!grouped) return;
+
+        (grouped[currentAreaSelection] ?? []).forEach((att) => {
+            (dbAttachmentsToMaterialsObject[att.name] ?? []).forEach((nodeName) => {
+                const n = nodes[nodeName];
+                if (n && 'visible' in n) n.visible = false;
+            });
+        });
+
+        const currentSelectedMaterialNames = dbAttachmentsToMaterialsObject[selected[currentAreaSelection]?.name];
+        if (!currentSelectedMaterialNames) return;
+        currentSelectedMaterialNames.forEach((nodeName) => {
             const n = nodes[nodeName];
             if (n) n.visible = true;
         });
-    }, [currentAreaSelection, nodes, selected]);
+    }, [currentAreaSelection, dbAttachmentsToMaterialsObject, grouped, nodes, selected]);
 
     useMemo(() => {
         if (materials.material) {

@@ -43,7 +43,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
 
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const { selected, currentAreaSelection, setSelected, setAllSelected, setCurrentAreaSelection } = useCustomizerStore();
+    const { selected, currentAreaSelection, setSelected, setAllSelected, setCurrentAreaSelection, initGrouped } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
 
     useEffect(() => {
@@ -56,6 +56,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
             if (!att) return;
             setSelected(area, att);
         });
+        initGrouped(grouped);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

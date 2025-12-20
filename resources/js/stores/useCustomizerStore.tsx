@@ -21,9 +21,11 @@ export type Area = (typeof areas)[number];
 interface CustomizerState {
     selected: Record<string, Attachment>;
     currentAreaSelection: Area;
+    grouped: Record<string, Attachment[]>;
     setSelected: (area: string, attachment: Attachment) => void;
     setAllSelected: (newSelected: Record<string, Attachment>) => void;
     setCurrentAreaSelection: (area: Area) => void;
+    initGrouped: (newGrouped: Record<string, Attachment[]>) => void;
 }
 
 export const factoryIssueAttachment: Attachment = {
@@ -57,5 +59,7 @@ export const useCustomizerStore = create<CustomizerState>((set) => {
                 selected: newSelected,
             })),
         setCurrentAreaSelection: (area) => set({ currentAreaSelection: area }),
+        grouped: {},
+        initGrouped: (newGrouped) => set({ grouped: newGrouped }),
     };
 });
