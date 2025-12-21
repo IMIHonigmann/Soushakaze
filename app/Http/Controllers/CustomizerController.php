@@ -22,7 +22,11 @@ class CustomizerController extends Controller
             ->join('attachments', 'weapons_attachments.attachment_id', '=', 'attachments.id')
             ->orderBy('price_modifier', 'asc')
             ->select('attachments.*')
-            ->get();
+            ->get()
+            ->groupBy('area')
+            ->map(function ($group) {
+                return $group->values();
+            });
         $maxPower = DB::table('weapons')->max('power');
 
         return Inertia::render('Separate/Customizer', [

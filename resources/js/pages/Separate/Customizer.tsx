@@ -30,18 +30,13 @@ export type Stats = (typeof statTypes)[number];
 interface Props {
     weapon: Weapon;
     maxPower: number;
-    attachments: Attachment[];
+    attachments: Record<string, Attachment[]>;
     query: Record<Area, number>;
 }
 
 export default function Customizer({ weapon, maxPower, attachments, query }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
-    state.grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
-        acc[att.area] = acc[att.area] || [];
-        acc[att.area].push(att);
-        return acc;
-    }, {});
-
+    state.grouped = attachments;
     const [isPlaying, setIsPlaying] = useState(false);
 
     const { addToBag } = useCartStore((state) => state);
