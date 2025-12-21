@@ -63,6 +63,7 @@
         "tailwindcss-animate": "^1.0.7",
         "three": "^0.179.1",
         "typescript": "^5.7.2",
+        "valtio": "^2.2.0",
         "vite": "^7.0.4",
         "zustand": "^5.0.7"
     },

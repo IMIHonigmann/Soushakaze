@@ -1,4 +1,19 @@
-import { Area } from '@/stores/useCustomizerStore';
+export const areas = [
+    'muzzle',
+    'scope',
+    'magazine',
+    'grip',
+    'stock',
+    'barrel',
+    'laser',
+    'flashlight',
+    'bipod',
+    'underbarrel',
+    'other',
+    'all',
+] as const;
+
+export type Area = (typeof areas)[number];
 
 export type Weapon = {
     id: number;

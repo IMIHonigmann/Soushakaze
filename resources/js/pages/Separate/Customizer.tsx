@@ -1,8 +1,8 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { usePrevious } from '@/hooks/usePrevious';
 import { useCartStore } from '@/stores/bagStores';
-import { Area, factoryIssueAttachment, useCustomizerStore } from '@/stores/useCustomizerStore';
-import { Attachment, Weapon } from '@/types/types';
+import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
+import { Area, Attachment, Weapon } from '@/types/types';
 import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
@@ -16,6 +16,7 @@ import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBu
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
+import { useSnapshot } from 'valtio';
 import { playLower } from '../AttAudio';
 import Count from '../Counter';
 import CustomizerScene from '../CustomizerScene';
@@ -35,7 +36,7 @@ interface Props {
 
 export default function Customizer({ weapon, maxPower, attachments, query }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
-    const grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
+    state.grouped = attachments.reduce<Record<string, Attachment[]>>((acc, att) => {
         acc[att.area] = acc[att.area] || [];
         acc[att.area].push(att);
         return acc;
@@ -43,22 +44,22 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
 
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const { selected, currentAreaSelection, setSelected, setAllSelected, setCurrentAreaSelection, initGrouped } = useCustomizerStore();
     const { addToBag } = useCartStore((state) => state);
 
     useEffect(() => {
-        const availableAreas = new Set(Object.keys(grouped));
-        const newSelected = Object.fromEntries(Object.entries(selected).filter(([area]) => availableAreas.has(area)));
-        setAllSelected(newSelected);
+        const availableAreas = new Set(Object.keys(snap.grouped));
+        const newSelected = Object.fromEntries(Object.entries(snap.selected).filter(([area]) => availableAreas.has(area)));
+        state.selected = newSelected;
         const queryAttachmentIds = Object.entries(query);
         queryAttachmentIds.forEach(([area, attId]) => {
-            const att = grouped[area]?.find((a) => a.id == attId);
+            const att = snap.grouped[area]?.find((a) => a.id == attId);
             if (!att) return;
-            setSelected(area, att);
+            state.selected[area] = att;
         });
-        initGrouped(grouped);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const snap = useSnapshot(state);
 
     const weaponNameRef = useRef(null);
 
@@ -92,10 +93,10 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         window.history.replaceState({}, '', url);
     };
     const handleSelect = (area: Area, attachment: Attachment, sound = 'select_attachment_subtle') => {
-        if (selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
-        setSelected(area, attachment);
+        if (snap.selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
+        state.selected[area] = attachment;
         updateQueryParams(area, attachment.id);
-        setCurrentAreaSelection(area);
+        state.currentAreaSelection = area;
     };
 
     const setCameraControls = useCallback(
@@ -118,43 +119,43 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
             all: [vec3(0, -0.35, 0), vec3(0, 0, 5)],
         };
 
-        const [target, position] = CAMERA_POSITIONS[currentAreaSelection] ?? CAMERA_POSITIONS.all!;
-        if (currentAreaSelection === 'other') return;
+        const [target, position] = CAMERA_POSITIONS[snap.currentAreaSelection] ?? CAMERA_POSITIONS.all!;
+        if (snap.currentAreaSelection === 'other') return;
         setCameraControls(target, position);
-    }, [currentAreaSelection, setCameraControls]);
+    }, [setCameraControls, snap.currentAreaSelection]);
 
     function handleClickAttachmentArea(area: Area) {
-        if (currentAreaSelection === 'all' || currentAreaSelection === 'other') {
+        if (snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other') {
             playLower('/sounds/switchto_attachments.mp3');
-        } else if (currentAreaSelection !== area) {
+        } else if (snap.currentAreaSelection !== area) {
             playLower('/sounds/switch_attachment_area.mp3');
         }
-        setCurrentAreaSelection(area);
+        state.currentAreaSelection = area;
     }
 
     const statModifiers: Record<Stats, number> = useMemo(() => {
         return Object.fromEntries(
             statTypes.map((stat) => {
-                const sum = Object.values(selected).reduce((total, att) => {
+                const sum = Object.values(snap.selected).reduce((total, att) => {
                     return total + (att ? Number(att[`${stat}_modifier`]) || 0 : 0);
                 }, 0);
                 return [stat, sum];
             }),
         ) as Record<Stats, number>;
-    }, [selected]);
+    }, [snap.selected]);
 
     const contextModifiers = useMemo(() => {
-        if (currentAreaSelection === 'all' || currentAreaSelection === 'other') {
+        if (snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other') {
             return statModifiers;
         }
 
-        const selectedAtt = selected[currentAreaSelection];
+        const selectedAtt = snap.selected[state.currentAreaSelection];
 
         return Object.fromEntries(statTypes.map((stat) => [stat, selectedAtt ? Number(selectedAtt[`${stat}_modifier`]) || 0 : 0])) as Record<
             Stats,
             number
         >;
-    }, [currentAreaSelection, selected, statModifiers]);
+    }, [snap.currentAreaSelection, snap.selected, statModifiers]);
 
     function contextDependentStatModifier(stat: Stats) {
         return contextModifiers[stat];
@@ -175,7 +176,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         return (
             <div className={`relative h-16 w-16 border-2 bg-black ${className}`}>
                 <div
-                    className={`relative z-10 grid h-full w-full grid-cols-2 grid-rows-2 [&>*]:p-2 ${
+                    className={`relative z-10 grid h-full w-full grid-cols-2 grid-rows-2 *:p-2 ${
                         childCount === 2
                             ? 'place-items-center gap-0 p-2.5 text-5xl [&>*:first-child]:col-start-2 [&>*:last-child]:col-start-1 [&>*:last-child]:row-start-2'
                             : childCount === 3
@@ -209,12 +210,12 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 className="group relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
             >
                 <div
-                    className={`absolute inset-0 bg-gradient-to-l from-orange-500 to-transparent transition-opacity duration-200 ${selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset-0 bg-linear-to-l from-orange-500 to-transparent transition-opacity duration-200 ${snap.selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
                 <div className="pointer-events-none relative z-10 flex items-center gap-4">
                     <DynamicIcon
-                        className={`skew-x-3 transition-transform duration-150 ease-out group-hover:scale-105 ${selected[area].id === att.id ? 'scale-110' : ''}`}
+                        className={`skew-x-3 transition-transform duration-150 ease-out group-hover:scale-105 ${snap.selected[area].id === att.id ? 'scale-110' : ''}`}
                     >
                         {children}
                     </DynamicIcon>
@@ -230,37 +231,33 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     return (
         <>
             <MdOutlineCameraswitch
-                className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
+                className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => goBackTo3D('all')}
             />
-            <CustomizerScene
-                weapon={weapon}
-                setCurrentAreaSelection={setCurrentAreaSelection}
-                cameraControlsRef={cameraControlsRef}
-            ></CustomizerScene>
+            <CustomizerScene weapon={weapon} cameraControlsRef={cameraControlsRef}></CustomizerScene>
             <div className="flex justify-center">
                 <div
-                    className={`absolute bottom-10 z-101 grid w-full ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
+                    className={`absolute bottom-10 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
                 >
                     <ul
-                        className={`${currentAreaSelection === 'other' || currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
+                        className={`${snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
                     >
-                        {Object.entries(grouped).map(([area]) => {
-                            const a = selected[area];
+                        {Object.entries(snap.grouped).map(([area]) => {
+                            const a = snap.selected[area];
                             return (
                                 <li
                                     key={area}
-                                    style={{ transform: currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                    className={`z-30 flex h-40 ${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
+                                    style={{ transform: snap.currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
+                                    className={`z-30 flex h-40 ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
                                 >
                                     <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
                                     <button
                                         onClick={() => handleClickAttachmentArea(area as Area)}
-                                        className={`mt-2 flex flex-grow flex-col items-center rounded-sm border ${currentAreaSelection !== 'all' && currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} ${currentAreaSelection === area && currentAreaSelection !== 'other' && currentAreaSelection !== 'all' ? 'shadow-[0_10px_15px_-5px_rgba(249,115,22,0.7)]' : ''} border-zinc-600 transition-all duration-150 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:w-full`}
+                                        className={`mt-2 flex grow flex-col items-center rounded-sm border ${snap.currentAreaSelection !== 'all' && state.currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} ${state.currentAreaSelection === area && state.currentAreaSelection !== 'other' && state.currentAreaSelection !== 'all' ? 'shadow-[0_10px_15px_-5px_rgba(249,115,22,0.7)]' : ''} border-zinc-600 transition-all duration-150 *:w-full hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]`}
                                     >
                                         <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-sm bg-zinc-700">
-                                            <div key={selected[area]?.id} className="animate-fade-from-below">
-                                                {selected[area]?.id === 0 ? (
+                                            <div key={snap.selected[area]?.id} className="animate-fade-from-below">
+                                                {snap.selected[area]?.id === 0 ? (
                                                     <AiOutlinePlus className="text-6xl" />
                                                 ) : (
                                                     <DynamicIcon className="scale-125">
@@ -275,10 +272,10 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                         </div>
                                         <div className="flex h-2/6 items-center justify-center overflow-x-hidden rounded-b-sm border-t border-zinc-600 bg-zinc-800">
                                             <h3
-                                                key={selected[area]?.id}
-                                                className={`${selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} animate-fade-from-left line-clamp-2 px-1 text-xs break-words uppercase`}
+                                                key={snap.selected[area]?.id}
+                                                className={`${snap.selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} animate-fade-from-left line-clamp-2 px-1 text-xs wrap-break-word uppercase`}
                                             >
-                                                {selected[area]?.id === 0 ? 'empty' : selected[area]?.name}
+                                                {snap.selected[area]?.id === 0 ? 'empty' : state.selected[area]?.name}
                                             </h3>
                                         </div>
                                     </button>
@@ -286,7 +283,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                             );
                         })}
                     </ul>
-                    <div className="mt-auto mb-[0.875rem] grid grid-cols-[80%_20%] transition-all">
+                    <div className="mt-auto mb-3.5 grid grid-cols-[80%_20%] transition-all">
                         <div className="flex flex-col gap-y-2 uppercase">
                             {statTypes.map((stat) => {
                                 const skipItems = new Set(['magsize', 'price']);
@@ -321,7 +318,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                                     width:
                                                         stat === 'power'
                                                             ? `${(weapon['power'] / (maxPower + 1)) * 100}%`
-                                                            : `${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? weapon[stat] : weapon[stat] + statModifiers[stat] - contextDependentStatModifier(stat)}%`,
+                                                            : `${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? weapon[stat] : weapon[stat] + statModifiers[stat] - contextDependentStatModifier(stat)}%`,
                                                 }}
                                                 className="relative z-30 h-full bg-white transition-all"
                                             >
@@ -369,13 +366,13 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     <div />
                 </div>
                 <Link
-                    className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)] [&>*]:px-2"
+                    className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 *:px-2 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]"
                     onClick={() =>
                         addToBag({
-                            customizedWeaponId: makeSelectionKey(weapon.id, { ...selected }),
+                            customizedWeaponId: makeSelectionKey(weapon.id, { ...snap.selected }),
                             customizedPrice: totalPrice,
                             weapon: weapon,
-                            selectedAttachments: { ...selected },
+                            selectedAttachments: { ...snap.selected },
                             quantity: 1,
                         })
                     }
@@ -388,19 +385,22 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 </Link>
             </div>
             <div
-                style={{ backgroundColor: currentAreaSelection === 'other' || currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)' }}
+                style={{
+                    backgroundColor:
+                        snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)',
+                }}
                 className="pointer-events-none absolute top-0 right-0 z-100 h-full w-screen transition-all duration-400"
             >
                 {/* Attachment Selection List */}
                 <div>
-                    {Object.entries(grouped).map(([area, attachments]) => (
+                    {Object.entries(snap.grouped).map(([area, attachments]) => (
                         <div
                             key={area}
                             style={{
-                                transform: `translateX(${currentAreaSelection === 'all' || currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
-                                opacity: currentAreaSelection === area ? 1 : 0,
-                                pointerEvents: currentAreaSelection === area ? 'auto' : 'none',
-                                right: currentAreaSelection === area ? '0' : '-30%',
+                                transform: `translateX(${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
+                                opacity: snap.currentAreaSelection === area ? 1 : 0,
+                                pointerEvents: snap.currentAreaSelection === area ? 'auto' : 'none',
+                                right: snap.currentAreaSelection === area ? '0' : '-30%',
                             }}
                             className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
                         >
@@ -408,7 +408,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 <div className="relative">
                                     <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">{area}</strong>
                                     <span
-                                        className={`absolute -bottom-1 left-0 h-0.5 origin-left ${currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
+                                        className={`absolute -bottom-1 left-0 h-0.5 origin-left ${snap.currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
                                         style={{ width: '100%' }}
                                     />
                                 </div>
@@ -417,28 +417,26 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                     className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                 />
                             </div>
-                            <ul className="-mr-2 flex flex-col divide-y-2 [&>*]:min-w-72 [&>*]:py-4 [&>*]:pr-12 [&>*]:pl-6">
+                            <ul className="-mr-2 flex flex-col divide-y-2 *:min-w-72 *:py-4 *:pr-12 *:pl-6">
                                 <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
                                     <CiIceCream id="factory_issue" />
                                 </AttachmentListElement>
-                                {attachments
-                                    .sort((a1, a2) => a1.price_modifier - a2.price_modifier)
-                                    .map((a) => (
-                                        <AttachmentListElement key={a.id} area={area as Area} att={a}>
-                                            {a.power_modifier > 0 && <GiCornerExplosion />}
-                                            {a.mobility_modifier > 0 && <GiFeather />}
-                                            {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                            {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                            {a.magsize_modifier > 0 && <GiHeavyBullets />}
-                                        </AttachmentListElement>
-                                    ))}
+                                {attachments.map((a) => (
+                                    <AttachmentListElement key={a.id} area={area as Area} att={a}>
+                                        {a.power_modifier > 0 && <GiCornerExplosion />}
+                                        {a.mobility_modifier > 0 && <GiFeather />}
+                                        {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                        {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                        {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                    </AttachmentListElement>
+                                ))}
                             </ul>
                         </div>
                     ))}
                 </div>
                 <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
                     <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
-                        <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
+                        <div className={`pointer-events-none fixed inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
                     </div>
                     <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                         S0USHAK4Z3
@@ -458,6 +456,6 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
 
     function goBackTo3D(area: Area): void {
         playLower('/sounds/switchto_selection_all.mp3');
-        setCurrentAreaSelection(area);
+        state.currentAreaSelection = area;
     }
 }

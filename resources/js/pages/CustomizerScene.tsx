@@ -1,5 +1,5 @@
 import WeaponModel from '@/ModelDefinitions/WeaponModel';
-import { Area } from '@/stores/useCustomizerStore';
+import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
 import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
@@ -10,7 +10,6 @@ import React, { memo, Suspense, useCallback, useRef, useState } from 'react';
 interface Props {
     cameraControlsRef: React.RefObject<any>;
     weapon: Weapon;
-    setCurrentAreaSelection: (area: Area) => void;
 }
 
 function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {
@@ -31,7 +30,7 @@ function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: 
     return null;
 }
 
-function CustomizerScene({ cameraControlsRef, weapon, setCurrentAreaSelection }: Props) {
+function CustomizerScene({ cameraControlsRef, weapon }: Props) {
     const canvasRef = useRef(null);
     const [, setScreenshotDataURL] = useState<string | null>(null);
 
@@ -94,7 +93,7 @@ function CustomizerScene({ cameraControlsRef, weapon, setCurrentAreaSelection }:
     );
 
     function handleControlEnd(): void {
-        setCurrentAreaSelection('other');
+        state.currentAreaSelection = 'other';
     }
 }
 

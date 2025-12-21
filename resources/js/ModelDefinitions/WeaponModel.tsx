@@ -6,12 +6,13 @@ Source: https://sketchfab.com/3d-models/ppsh-41-tactical-d7d785b781a94df5b9a4956
 Title: PPSH-41 TACTICAL
 */
 
-import { useCustomizerStore } from '@/stores/useCustomizerStore';
+import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
 import { useGLTF } from '@react-three/drei';
 import { JSX, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
+import { useSnapshot } from 'valtio';
 
 type GLTFResult = GLTF & {
     nodes: Record<string, THREE.Mesh>;
@@ -39,7 +40,7 @@ type ModelProps = JSX.IntrinsicElements['group'] & {
 export default function Model({ weapon, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.gltf`) as unknown as GLTFResult;
 
-    const { selected, currentAreaSelection, grouped } = useCustomizerStore();
+    const snap = useSnapshot(state);
 
     const dbAttachmentsToMaterialsObject = useMemo(() => {
         const map: Record<string, string[]> = {};
@@ -54,7 +55,7 @@ export default function Model({ weapon, ...props }: ModelProps) {
     const initAppliedRef = useRef(false);
 
     useEffect(() => {
-        if (!grouped || initAppliedRef.current) return;
+        if (!snap.grouped || initAppliedRef.current) return;
 
         Object.values(dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
             nodeNames.forEach((nodeName) => {
@@ -63,31 +64,31 @@ export default function Model({ weapon, ...props }: ModelProps) {
             });
         });
 
-        Object.values(selected).forEach((selAtt) => {
+        Object.values(snap.selected).forEach((selAtt) => {
             (dbAttachmentsToMaterialsObject[selAtt.name] ?? []).forEach((nodeName) => {
                 const n = nodes[nodeName];
                 if (n && 'visible' in n) n.visible = true;
             });
         });
-    }, [dbAttachmentsToMaterialsObject, grouped, nodes, selected]);
+    }, [dbAttachmentsToMaterialsObject, nodes, snap.grouped, snap.selected]);
 
     useEffect(() => {
-        if (!grouped) return;
+        if (!snap.grouped) return;
 
-        (grouped[currentAreaSelection] ?? []).forEach((att) => {
+        (snap.grouped[state.currentAreaSelection] ?? []).forEach((att) => {
             (dbAttachmentsToMaterialsObject[att.name] ?? []).forEach((nodeName) => {
                 const n = nodes[nodeName];
                 if (n && 'visible' in n) n.visible = false;
             });
         });
 
-        const currentSelectedMaterialNames = dbAttachmentsToMaterialsObject[selected[currentAreaSelection]?.name];
+        const currentSelectedMaterialNames = dbAttachmentsToMaterialsObject[snap.selected[state.currentAreaSelection]?.name];
         if (!currentSelectedMaterialNames) return;
         currentSelectedMaterialNames.forEach((nodeName) => {
             const n = nodes[nodeName];
             if (n) n.visible = true;
         });
-    }, [currentAreaSelection, dbAttachmentsToMaterialsObject, grouped, nodes, selected]);
+    }, [dbAttachmentsToMaterialsObject, nodes, snap.grouped, snap.selected]);
 
     useMemo(() => {
         if (materials.material) {

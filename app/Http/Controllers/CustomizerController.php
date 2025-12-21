@@ -20,6 +20,7 @@ class CustomizerController extends Controller
         $attachments = DB::table('weapons_attachments')
             ->where('weapon_id', $weaponId)
             ->join('attachments', 'weapons_attachments.attachment_id', '=', 'attachments.id')
+            ->orderBy('price_modifier', 'asc')
             ->select('attachments.*')
             ->get();
         $maxPower = DB::table('weapons')->max('power');
