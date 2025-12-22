@@ -1,8 +1,7 @@
-import WeaponModel from '@/ModelDefinitions/WeaponModel';
-import { state } from '@/stores/customizerProxy';
+import WeaponModel from '@/pages/Separate/Customizer/WeaponModel';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
-import { CameraControls, ContactShadows, Stage } from '@react-three/drei';
+import { ContactShadows, Stage } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { memo, Suspense, useCallback, useRef, useState } from 'react';
@@ -66,20 +65,10 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
                     <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
-
                         <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
-                            {WeaponModel ? <WeaponModel weapon={weapon} /> : null}
+                            {WeaponModel ? <WeaponModel cameraControlsRef={cameraControlsRef} weapon={weapon} /> : null}
                         </Stage>
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
-
-                        <CameraControls
-                            ref={cameraControlsRef}
-                            minDistance={2}
-                            maxDistance={7}
-                            minPolarAngle={Math.PI / 6}
-                            maxPolarAngle={Math.PI / 1.8}
-                            onControlEnd={() => handleControlEnd()}
-                        />
                         <EffectComposer>
                             <SMAA />
                             <Bloom intensity={0.2} luminanceThreshold={0.8} luminanceSmoothing={0.9} />
@@ -91,10 +80,6 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
             </div>
         </>
     );
-
-    function handleControlEnd(): void {
-        state.currentAreaSelection = 'other';
-    }
 }
 
 declare global {

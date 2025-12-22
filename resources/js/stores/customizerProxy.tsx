@@ -23,5 +23,6 @@ export const state = proxy({
         },
         {} as Record<string, Attachment>,
     ),
+    cameraControlsEnabled: true,
     currentAreaSelection: 'all' as Area,
 });

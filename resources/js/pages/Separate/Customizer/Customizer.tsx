@@ -1,5 +1,8 @@
 import { makeSelectionKey } from '@/helpers/makeSelectionKey';
 import { usePrevious } from '@/hooks/usePrevious';
+import { playLower } from '@/pages/AttAudio';
+import Count from '@/pages/Counter';
+import YouTubePlayer from '@/pages/YouTubePlayer';
 import { useCartStore } from '@/stores/bagStores';
 import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
 import { Area, Attachment, Weapon } from '@/types/types';
@@ -17,10 +20,7 @@ import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
-import { playLower } from '../AttAudio';
-import Count from '../Counter';
-import CustomizerScene from '../CustomizerScene';
-import YouTubePlayer from '../YouTubePlayer';
+import CustomizerScene from './CustomizerScene';
 
 gsap.registerPlugin(ScrambleTextPlugin);
 
