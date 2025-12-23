@@ -52,13 +52,13 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
-    const [, setActivePivot] = useState('');
 
-    const currentMeshRef = useRef<THREE.Mesh<
+    const [currentMesh, setCurrentMesh] = useState<THREE.Mesh<
         THREE.BufferGeometry<THREE.NormalBufferAttributes, THREE.BufferGeometryEventMap>,
         THREE.Material | THREE.Material[],
         THREE.Object3DEventMap
     > | null>(null);
+    const [mode, setMode] = useState<'translate' | 'rotate' | 'scale' | undefined>();
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -107,6 +107,20 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         return map;
     }, []);
 
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'q') setMode(undefined);
+            if (event.key === 'w') setMode('translate');
+            if (event.key === 'e') setMode('rotate');
+            if (event.key === 'r') setMode('scale');
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
     const snap = useSnapshot(state);
     const initAppliedRef = useRef(false);
 
@@ -148,6 +162,18 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         });
     }, [dbAttachmentsToMaterialsObject, nodes, snap.grouped, snap.selected]);
 
+    const HOVER_COLOR = '#ff0000'; // Red for hover
+    const SELECTED_COLOR = '#0000ff'; // Blue for selected
+
+    function ensureUniqueMaterial(mesh: THREE.Mesh | undefined) {
+        if (!mesh) return;
+        if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map((m: any) => m.clone());
+        } else {
+            mesh.material = (mesh.material as any).clone();
+        }
+    }
+
     return (
         <>
             <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
@@ -176,30 +202,48 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     material={n.material}
                                     visible={meshRefs.current[nodeName]?.visible ?? true}
                                     scale={n.scale}
-                                    onPointerDown={(e) => {
+                                    onDoubleClick={(e) => {
                                         e.stopPropagation();
-                                        setActivePivot(nodeName);
-                                        currentMeshRef.current = meshRefs.current[nodeName];
+                                        const previousMesh = currentMesh;
+                                        if (previousMesh) {
+                                            const prevMat = Array.isArray(previousMesh.material) ? previousMesh.material[0] : previousMesh.material;
+                                            if ((prevMat as any)?.color?.isColor && previousMesh.userData.__originalColor) {
+                                                (prevMat as any).color.set(previousMesh.userData.__originalColor);
+                                            }
+                                        }
+                                        setCurrentMesh(meshRefs.current[nodeName]);
+                                        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
+                                            ? meshRefs.current[nodeName].material[0]
+                                            : meshRefs.current[nodeName]?.material;
+                                        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
+                                            if (!meshRefs.current[nodeName].userData.__originalColor) {
+                                                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+                                            }
+                                            (newMat as any).color.set(SELECTED_COLOR);
+                                        }
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();
                                         const mesh = e.object as THREE.Mesh;
+                                        ensureUniqueMaterial(mesh);
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-                                        if (!mesh.userData.__originalColor && (mat as any)?.color?.isColor) {
+                                        if (!mesh.userData.__originalColor) {
                                             mesh.userData.__originalColor = (mat as any).color.clone();
                                         }
-                                        if ((mat as any)?.color?.isColor) {
-                                            (mat as any).color.set('#f41900'); // hover color
-                                        }
+                                        (mat as any).color.set(HOVER_COLOR);
                                         if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
                                     }}
                                     onPointerLeave={(e) => {
                                         const mesh = e.object as THREE.Mesh;
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
                                         const original: THREE.Color | undefined = mesh.userData.__originalColor;
-                                        if (original && (mat as any)?.color?.isColor) {
+
+                                        if (currentMesh === mesh) {
+                                            (mat as any).color.set(SELECTED_COLOR);
+                                        } else if (original) {
                                             (mat as any).color.copy(original);
                                         }
+
                                         if (typeof document !== 'undefined') document.body.style.cursor = 'auto';
                                     }}
                                 />
@@ -208,7 +252,14 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                     </group>
                 </group>
             </Stage>
-            <TransformControls object={currentMeshRef.current ?? undefined} mode="scale" />
+            {mode && (
+                <TransformControls
+                    object={currentMesh ?? undefined}
+                    mode={mode}
+                    onMouseDown={() => (state.cameraControlsEnabled = false)}
+                    onMouseUp={() => (state.cameraControlsEnabled = true)}
+                />
+            )}
         </>
     );
 }
