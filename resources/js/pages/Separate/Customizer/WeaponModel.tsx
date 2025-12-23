@@ -8,8 +8,8 @@ Title: PPSH-41 TACTICAL
 
 import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
-import { CameraControls, PivotControls, useGLTF } from '@react-three/drei';
-import { JSX, RefObject, useEffect, useMemo, useRef } from 'react';
+import { CameraControls, Stage, TransformControls, useGLTF } from '@react-three/drei';
+import { JSX, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 import { useSnapshot } from 'valtio';
@@ -49,9 +49,16 @@ type WorldNode = {
 };
 
 export default function Model({ cameraControlsRef, weapon, ...props }: ModelProps) {
-    const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.gltf`) as unknown as GLTFResult;
+    const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
+    const [, setActivePivot] = useState('');
+
+    const currentMeshRef = useRef<THREE.Mesh<
+        THREE.BufferGeometry<THREE.NormalBufferAttributes, THREE.BufferGeometryEventMap>,
+        THREE.Material | THREE.Material[],
+        THREE.Object3DEventMap
+    > | null>(null);
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -142,42 +149,67 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     }, [dbAttachmentsToMaterialsObject, nodes, snap.grouped, snap.selected]);
 
     return (
-        <group>
-            <CameraControls
-                enabled={snap.cameraControlsEnabled}
-                ref={cameraControlsRef}
-                minDistance={2}
-                maxDistance={7}
-                minPolarAngle={Math.PI / 6}
-                maxPolarAngle={Math.PI / 1.8}
-                onControlEnd={() => handleControlEnd()}
-            />
-            <PivotControls
-                depthTest={false}
-                onDragStart={() => (state.cameraControlsEnabled = false)}
-                onDragEnd={() => (state.cameraControlsEnabled = true)}
-            >
-                <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
-                    <group rotation={[0, 0, 0]}>
-                        {Object.entries(worldNodes).map(([nodeName, n]) => (
-                            <mesh
-                                name={nodeName}
-                                ref={(el) => (meshRefs.current[nodeName] = el)}
-                                key={n.uuid}
-                                castShadow
-                                receiveShadow
-                                position={n.position}
-                                rotation={n.rotation}
-                                geometry={n.geometry}
-                                material={n.material}
-                                visible={meshRefs.current[nodeName]?.visible ?? true}
-                                scale={n.scale}
-                            />
-                        ))}
+        <>
+            <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
+                <group>
+                    <CameraControls
+                        enabled={snap.cameraControlsEnabled}
+                        ref={cameraControlsRef}
+                        minDistance={2}
+                        maxDistance={7}
+                        minPolarAngle={Math.PI / 6}
+                        maxPolarAngle={Math.PI / 1.8}
+                        onControlEnd={() => handleControlEnd()}
+                    />
+                    <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
+                        <group rotation={[0, 0, 0]}>
+                            {Object.entries(worldNodes).map(([nodeName, n]) => (
+                                <mesh
+                                    name={nodeName}
+                                    ref={(el) => (meshRefs.current[nodeName] = el)}
+                                    key={n.uuid}
+                                    castShadow
+                                    receiveShadow
+                                    position={n.position}
+                                    rotation={n.rotation}
+                                    geometry={n.geometry}
+                                    material={n.material}
+                                    visible={meshRefs.current[nodeName]?.visible ?? true}
+                                    scale={n.scale}
+                                    onPointerDown={(e) => {
+                                        e.stopPropagation();
+                                        setActivePivot(nodeName);
+                                        currentMeshRef.current = meshRefs.current[nodeName];
+                                    }}
+                                    onPointerEnter={(e) => {
+                                        e.stopPropagation();
+                                        const mesh = e.object as THREE.Mesh;
+                                        const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+                                        if (!mesh.userData.__originalColor && (mat as any)?.color?.isColor) {
+                                            mesh.userData.__originalColor = (mat as any).color.clone();
+                                        }
+                                        if ((mat as any)?.color?.isColor) {
+                                            (mat as any).color.set('#f41900'); // hover color
+                                        }
+                                        if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
+                                    }}
+                                    onPointerLeave={(e) => {
+                                        const mesh = e.object as THREE.Mesh;
+                                        const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+                                        const original: THREE.Color | undefined = mesh.userData.__originalColor;
+                                        if (original && (mat as any)?.color?.isColor) {
+                                            (mat as any).color.copy(original);
+                                        }
+                                        if (typeof document !== 'undefined') document.body.style.cursor = 'auto';
+                                    }}
+                                />
+                            ))}
+                        </group>
                     </group>
                 </group>
-            </PivotControls>
-        </group>
+            </Stage>
+            <TransformControls object={currentMeshRef.current ?? undefined} mode="scale" />
+        </>
     );
 }
 

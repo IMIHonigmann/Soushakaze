@@ -1,7 +1,7 @@
 import WeaponModel from '@/pages/Separate/Customizer/WeaponModel';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
-import { ContactShadows, Stage } from '@react-three/drei';
+import { ContactShadows } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { memo, Suspense, useCallback, useRef, useState } from 'react';
@@ -65,9 +65,7 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
                     <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
-                        <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
-                            {WeaponModel ? <WeaponModel cameraControlsRef={cameraControlsRef} weapon={weapon} /> : null}
-                        </Stage>
+                        {WeaponModel ? <WeaponModel cameraControlsRef={cameraControlsRef} weapon={weapon} /> : null}
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
                         <EffectComposer>
                             <SMAA />
