@@ -10,16 +10,17 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
+import { ChevronRight, PlusCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
-import { FaAngleDoubleUp, FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaChevronRight } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { IconType } from 'react-icons/lib';
 import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
-import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
+import { MdAddShoppingCart, MdEdit, MdOutlineCameraswitch } from 'react-icons/md';
 import { TbBox } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
@@ -242,7 +243,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }, []);
 
     const liRefs = useRef<(HTMLLIElement | null)[]>([]);
-    const scrollDivRef = useRef<HTMLDivElement | null>(null);
+    const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
     useEffect(() => {
         const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh[1]));
@@ -254,57 +255,93 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         }
     }, [snap.currentMesh, snap.nodeNames]);
 
+    const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, boolean>>(() =>
+        Object.fromEntries(Object.keys(attachments).map((area) => [area, false])),
+    );
+    const [openedAttTabs, setOpenedAttTabs] = useState<Record<string, boolean>>(() =>
+        Object.fromEntries(Object.values(attachments).map((atts) => atts.map((att) => [att.id, false]))),
+    );
+
     return (
-        <div className="grid h-screen w-screen grid-cols-[16%_4%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
+        <div className="grid h-screen w-screen grid-cols-[17%_3%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
             <div className="row-span-full grid grid-cols-1 grid-rows-[35%_65%] *:border">
-                <div ref={scrollDivRef} className="overflow-scroll" style={{ scrollBehavior: 'revert' }}>
-                    <ul>
-                        {snap.nodeNames.map((nodeName, index) => (
-                            <li
-                                ref={(el) => {
-                                    liRefs.current[index] = el;
-                                }}
-                                tabIndex={0}
-                                className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
-                                onClick={() => {
+                <ul ref={scrollDivRef} className="overflow-scroll" style={{ scrollBehavior: 'smooth' }}>
+                    {snap.nodeNames.map((nodeName, index) => (
+                        <li
+                            ref={(el) => {
+                                liRefs.current[index] = el;
+                            }}
+                            tabIndex={0}
+                            className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
+                            onClick={() => {
+                                state.currentMesh[0] = state.currentMesh[1];
+                                state.currentMesh[1] = nodeName;
+                            }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
+                                if (e.key === 'ArrowUp' && index > 0) {
                                     state.currentMesh[0] = state.currentMesh[1];
-                                    state.currentMesh[1] = nodeName;
-                                }}
-                                onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                    if (e.key === 'ArrowUp' && index > 0) {
-                                        state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = snap.nodeNames[index - 1];
-                                        liRefs.current[index - 1]?.focus();
-                                    }
-                                    if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
-                                        state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = snap.nodeNames[index + 1];
-                                        liRefs.current[index + 1]?.focus();
-                                    }
-                                }}
-                                key={nodeName}
+                                    state.currentMesh[1] = snap.nodeNames[index - 1];
+                                    liRefs.current[index - 1]?.focus();
+                                }
+                                if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
+                                    state.currentMesh[0] = state.currentMesh[1];
+                                    state.currentMesh[1] = snap.nodeNames[index + 1];
+                                    liRefs.current[index + 1]?.focus();
+                                }
+                            }}
+                            key={nodeName}
+                        >
+                            <div
+                                className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
                             >
-                                <div
-                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
-                                >
-                                    <TbBox className="inline-block text-3xl" />
-                                    <span>{nodeName}</span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="flex flex-col gap-8 p-4">
-                    {Object.entries(snap.dbAttachmentsToMaterialsObject).map(([attName, objectNames]) => (
-                        <div>
-                            <h3 className="font-hitmarker-condensed text-4xl">{attName}</h3>
-                            <ul>
-                                {objectNames.map((objName) => (
-                                    <li>{objName}</li>
+                                <TbBox className="inline-block text-3xl" />
+                                <span>{nodeName}</span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                <div className="flex flex-col gap-8 overflow-scroll p-4">
+                    {Object.entries(attachments).map(([area, atts]) => (
+                        <div key={area}>
+                            <h3
+                                onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
+                                className="flex -skew-x-12 cursor-pointer items-center justify-between border-b-2 font-hitmarker-condensed text-3xl uppercase"
+                            >
+                                <span className={`mb-2 transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
+                                <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} transition-transform duration-300`} />
+                            </h3>
+                            <ul
+                                className={`overflow-scroll transition-all duration-300 ease-out ${openedAreaTabs[area] ? 'max-h-96' : 'max-h-0 opacity-0'}`}
+                            >
+                                {atts.map((att) => (
+                                    <li className="px-6" key={att.id}>
+                                        <h4
+                                            onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
+                                            className={`group flex -skew-x-12 cursor-pointer items-center justify-between gap-4 overflow-hidden p-2 transition-all duration-300 ease-out hover:bg-red-600`}
+                                        >
+                                            {att.name}
+                                            <span className="flex items-center gap-2 text-xl">
+                                                <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
+                                                <ChevronRight
+                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} transition-transform duration-300`}
+                                                />
+                                            </span>
+                                        </h4>
+                                        <div
+                                            className={`ml-4 overflow-scroll transition-all duration-300 ease-out ${openedAttTabs[att.id] ? 'max-h-96' : 'max-h-0 opacity-0'} `}
+                                        >
+                                            <div>bruh</div>
+                                            <div>bruh</div>
+                                            <div>bruh</div>
+                                            <PlusCircle />
+                                        </div>
+                                    </li>
                                 ))}
+                                <PlusCircle />
                             </ul>
                         </div>
                     ))}
+                    <PlusCircle />
                 </div>
             </div>
             <ul className="row-span-full flex flex-col gap-0.5">
