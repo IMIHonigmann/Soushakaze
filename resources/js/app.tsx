@@ -17,7 +17,7 @@ createInertiaApp({
         if (!page.default.layout) {
             if (name.startsWith('Profile/')) {
                 page.default.layout = (page) => <ProfileLayout>{page}</ProfileLayout>;
-            } else if (name.startsWith('Separate/')) {
+            } else if (name.startsWith('Separate/') || name.startsWith('auth/')) {
                 page.default.layout = { page };
             } else {
                 page.default.layout = (page) => <Layout>{page}</Layout>;

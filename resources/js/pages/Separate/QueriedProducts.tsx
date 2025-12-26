@@ -332,8 +332,8 @@ export default function QueriedProducts({ weapons, message }: Props) {
                                                         €{weapon.price}
                                                         <span className="absolute bottom-0.5 left-0.5 h-0.5 w-full origin-bottom-left -rotate-12 bg-current"></span>
                                                     </span>
-                                                    <div className="flex justify-end gap-4 text-6xl">
-                                                        <span className="bg-red-600">{weapon.price_modification_coefficient * 100 - 100}%</span>
+                                                    <div className="flex items-center justify-end gap-4 text-6xl">
+                                                        <span className="bg-red-600 p-1">{weapon.price_modification_coefficient * 100 - 100}%</span>
                                                         <span>€{(weapon.price * weapon.price_modification_coefficient).toFixed(2)}</span>
                                                     </div>
                                                 </>

@@ -102,8 +102,9 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
 
     return (
         <div className={className} style={{ animationDuration: '0.5s' }}>
+            {/* spotify musikleiste reinlegen */}
             <span
-                className={`pointer-events-auto w-lg rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-[size:3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
+                className={`pointer-events-auto w-1/3 rounded-b-4xl border-b-2 border-orange-500 bg-[radial-gradient(circle,#73737350_0.5px,black_1px)] bg-size-[3px_3px] transition-all ${isPlaying ? 'shadow-[0_0_20px_rgba(249,115,22,0.7)]' : ''} overflow-hidden p-4 pb-9`}
             >
                 <YouTube
                     className="hidden"
@@ -113,7 +114,7 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
                     onReady={onReady}
                     onEnd={onEnd}
                 />
-                <div className="mb-2 flex items-center text-xl [&>*]:px-2">
+                <div className="mb-2 flex items-center text-xl *:px-2">
                     <FaCompactDisc
                         key={currentIndex}
                         className={`text-5xl ${isPlaying ? 'animate-spin-720 text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.8)] ease-in-out' : 'animate-ping transition-all duration-1000'}`}

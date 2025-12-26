@@ -17,6 +17,7 @@ import { FaAngleDoubleUp, FaAngleDown, FaAngleUp } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
+import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
@@ -223,230 +224,268 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         );
     }
 
+    const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
+
     return (
-        <>
-            <MdOutlineCameraswitch
-                className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
-                onClick={() => goBackTo3D('all')}
-            />
-            <CustomizerScene weapon={weapon} cameraControlsRef={cameraControlsRef}></CustomizerScene>
-            <div className="flex justify-center">
-                <div
-                    className={`absolute bottom-10 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
-                >
-                    <ul
-                        className={`${snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
-                    >
-                        {Object.entries(snap.grouped).map(([area]) => {
-                            const a = snap.selected[area];
-                            return (
-                                <li
-                                    key={area}
-                                    style={{ transform: snap.currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
-                                    className={`z-30 flex h-40 ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
-                                >
-                                    <strong className="ml-1 w-full truncate text-sm uppercase">{area.charAt(0).toUpperCase() + area.slice(1)}</strong>
-                                    <button
-                                        onClick={() => handleClickAttachmentArea(area as Area)}
-                                        className={`mt-2 flex grow flex-col items-center rounded-sm border ${snap.currentAreaSelection !== 'all' && state.currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} ${state.currentAreaSelection === area && state.currentAreaSelection !== 'other' && state.currentAreaSelection !== 'all' ? 'shadow-[0_10px_15px_-5px_rgba(249,115,22,0.7)]' : ''} border-zinc-600 transition-all duration-150 *:w-full hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]`}
-                                    >
-                                        <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-sm bg-zinc-700">
-                                            <div key={snap.selected[area]?.id} className="animate-fade-from-below">
-                                                {snap.selected[area]?.id === 0 ? (
-                                                    <AiOutlinePlus className="text-6xl" />
-                                                ) : (
-                                                    <DynamicIcon className="scale-125">
-                                                        {a.power_modifier > 0 && <GiCornerExplosion />}
-                                                        {a.mobility_modifier > 0 && <GiFeather />}
-                                                        {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                                        {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                                        {a.magsize_modifier > 0 && <GiHeavyBullets />}
-                                                    </DynamicIcon>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex h-2/6 items-center justify-center overflow-x-hidden rounded-b-sm border-t border-zinc-600 bg-zinc-800">
-                                            <h3
-                                                key={snap.selected[area]?.id}
-                                                className={`${snap.selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} animate-fade-from-left line-clamp-2 px-1 text-xs wrap-break-word uppercase`}
-                                            >
-                                                {snap.selected[area]?.id === 0 ? 'empty' : state.selected[area]?.name}
-                                            </h3>
-                                        </div>
-                                    </button>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                    <div className="mt-auto mb-3.5 grid grid-cols-[80%_20%] transition-all">
-                        <div className="flex flex-col gap-y-2 uppercase">
-                            {statTypes.map((stat) => {
-                                const skipItems = new Set(['magsize', 'price']);
-                                if (skipItems.has(stat)) return;
-                                return (
-                                    <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
-                                        <span
-                                            className={`${contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : contextDependentStatModifier(stat) < 0 ? 'text-red-500' : ''} place-self-end font-extrabold transition-all duration-250`}
-                                        >
-                                            {weapon.type !== 'blade' ? (stat === 'power' ? 'firepower' : stat) : stat}
-                                        </span>
-                                        <div className="grid grid-cols-2 place-items-center items-center gap-2">
-                                            <div className="relative h-6 w-6">
-                                                <FaAngleUp
-                                                    className={`${contextDependentStatModifier(stat) > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
-                                                />
-                                                <FaAngleDown
-                                                    className={`${contextDependentStatModifier(stat) < 0 ? 'translate-y-0 text-red-500 opacity-100' : '-translate-y-2 opacity-0'} absolute inset-0 text-2xl transition-all duration-250`}
-                                                />
-                                            </div>
-                                            <div
-                                                className={`${contextDependentStatModifier(stat) === 0 ? 'translate-x-2 opacity-0' : ''} ${contextDependentStatModifier(stat) < 0 ? 'text-red-500' : contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : 'text-white'} -skew-x-12 text-sm font-bold transition-all`}
-                                            >
-                                                {contextDependentStatModifier(stat) >= 0
-                                                    ? `+${Math.round(contextDependentStatModifier(stat))}%`
-                                                    : `${Math.round(contextDependentStatModifier(stat))}%`}
-                                            </div>
-                                        </div>
-                                        <div className="relative flex h-3/4 w-full -skew-x-12 border">
-                                            <div
-                                                style={{
-                                                    width:
-                                                        stat === 'power'
-                                                            ? `${(weapon['power'] / (maxPower + 1)) * 100}%`
-                                                            : `${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? weapon[stat] : weapon[stat] + statModifiers[stat] - contextDependentStatModifier(stat)}%`,
-                                                }}
-                                                className="relative z-30 h-full bg-white transition-all"
-                                            >
-                                                <div
-                                                    style={{
-                                                        width: `${Math.abs(Math.max(Math.min(contextDependentStatModifier(stat) / (weapon[stat] * 0.01), 0), -100))}%`,
-                                                    }}
-                                                    className="absolute right-0 h-full border-l bg-red-500 transition-all"
-                                                />
-                                            </div>
-                                            <div
-                                                style={{ width: `${Math.min(Math.max(contextDependentStatModifier(stat), 0), 100)}%` }}
-                                                className="h-full bg-lime-400 transition-all"
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        {weapon.type !== 'blade' && (
-                            <div className="grid w-3/4 grid-cols-1 font-extrabold">
-                                <div>
-                                    <div>Mags</div>
-                                    <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
-                                </div>
-                                <div
-                                    className={`${weapon.magsize + contextDependentStatModifier('magsize') > weapon.magsize ? 'text-lime-400' : weapon.magsize + contextDependentStatModifier('magsize') < weapon.magsize ? 'text-red-500' : ''} transition-all`}
-                                >
-                                    <div>Mag Size</div>
-                                    <div className="flex">
-                                        <div className="-mt-1 text-4xl">{weapon.magsize}</div>
-                                        <div
-                                            className={`${contextDependentStatModifier('magsize') !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
-                                        >
-                                            {contextDependentStatModifier('magsize') >= 0
-                                                ? `+${contextDependentStatModifier('magsize')}`
-                                                : contextDependentStatModifier('magsize')}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    {/* empty element for grid */}
-                    <div />
-                </div>
-                <Link
-                    className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 *:px-2 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]"
-                    onClick={() =>
-                        addToBag({
-                            customizedWeaponId: makeSelectionKey(weapon.id, { ...snap.selected }),
-                            customizedPrice: totalPrice,
-                            weapon: weapon,
-                            selectedAttachments: { ...snap.selected },
-                            quantity: 1,
-                        })
-                    }
-                    href={route('cart')}
-                >
-                    <MdAddShoppingCart className="-skew-x-12 text-6xl" />
-                    <span className="ml-2 translate-x-[60vw] -skew-x-12 text-xl font-extrabold transition-transform duration-300 group-hover:translate-x-0">
-                        ADD TO CART
-                    </span>
-                </Link>
-            </div>
-            <div
-                style={{
-                    backgroundColor:
-                        snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)',
-                }}
-                className="pointer-events-none absolute top-0 right-0 z-100 h-full w-screen transition-all duration-400"
-            >
-                {/* Attachment Selection List */}
-                <div>
-                    {Object.entries(snap.grouped).map(([area, attachments]) => (
-                        <div
-                            key={area}
-                            style={{
-                                transform: `translateX(${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
-                                opacity: snap.currentAreaSelection === area ? 1 : 0,
-                                pointerEvents: snap.currentAreaSelection === area ? 'auto' : 'none',
-                                right: snap.currentAreaSelection === area ? '0' : '-30%',
-                            }}
-                            className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
-                        >
-                            <div className="m-4 flex items-center justify-between">
-                                <div className="relative">
-                                    <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">{area}</strong>
-                                    <span
-                                        className={`absolute -bottom-1 left-0 h-0.5 origin-left ${snap.currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
-                                        style={{ width: '100%' }}
-                                    />
-                                </div>
-                                <IoIosReturnLeft
-                                    onClick={() => goBackTo3D('other')}
-                                    className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
-                                />
-                            </div>
-                            <ul className="-mr-2 flex flex-col divide-y-2 *:min-w-72 *:py-4 *:pr-12 *:pl-6">
-                                <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
-                                    <CiIceCream id="factory_issue" />
-                                </AttachmentListElement>
-                                {attachments.map((a) => (
-                                    <AttachmentListElement key={a.id} area={area as Area} att={a}>
-                                        {a.power_modifier > 0 && <GiCornerExplosion />}
-                                        {a.mobility_modifier > 0 && <GiFeather />}
-                                        {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                        {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                        {a.magsize_modifier > 0 && <GiHeavyBullets />}
-                                    </AttachmentListElement>
+        <div className="grid h-screen w-screen grid-cols-[16%_4%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
+            <div className="row-span-full grid grid-cols-1 grid-rows-[35%_65%] *:border">
+                <div>Hierarchy*</div>
+                <div className="flex flex-col gap-8 p-4">
+                    {Object.entries(snap.dbAttachmentsToMaterialsObject).map(([attName, objectNames]) => (
+                        <div>
+                            <h3 className="font-hitmarker-condensed text-4xl">{attName}</h3>
+                            <ul>
+                                {objectNames.map((objName) => (
+                                    <li>{objName}</li>
                                 ))}
                             </ul>
                         </div>
                     ))}
                 </div>
-                <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
-                    <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
-                        <div className={`pointer-events-none fixed inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
-                    </div>
-                    <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
-                        S0USHAK4Z3
-                    </h1>
-                    <div className="z-10 mt-1 text-xl">Total Price (inkl. Tax): </div>
-                    <Count className="ml-1" from={previousPrice ?? totalPrice} to={totalPrice} />
-                </div>
-                <YouTubePlayer
-                    isPlaying={isPlaying}
-                    setIsPlaying={setIsPlaying}
-                    className={`pointer-events-none z-200 flex -translate-y-10/12 flex-col items-center justify-center transition-all hover:translate-0 ${isPlaying ? 'animate-beat hover:animate-none' : ''}`}
-                    videoIds={myPlaylist}
-                />
             </div>
-        </>
+            <ul className="row-span-full flex flex-col gap-0.5">
+                {[1, 2, 3, 4, 5].map((num, index) => (
+                    <li
+                        onClick={() => setClickedSidebarTab(index)}
+                        key={num}
+                        className={`flex aspect-square items-center justify-center rounded-xl border transition-colors duration-150 ${clickedSidebarTab === index ? 'bg-red-600' : 'cursor-pointer hover:bg-orange-500'}`}
+                    >
+                        <span></span>
+                    </li>
+                ))}
+            </ul>
+            <div className="relative overflow-hidden">
+                <MdOutlineCameraswitch
+                    className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
+                    onClick={() => goBackTo3D('all')}
+                />
+                <CustomizerScene weapon={weapon} cameraControlsRef={cameraControlsRef}></CustomizerScene>
+                <div className="flex justify-center">
+                    <div
+                        className={`absolute bottom-10 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}
+                    >
+                        <ul
+                            className={`${snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? '' : ''} mx-auto flex max-w-full shrink basis-48 justify-center gap-4 px-40 transition-transform`}
+                        >
+                            {Object.entries(snap.grouped).map(([area]) => {
+                                const a = snap.selected[area];
+                                return (
+                                    <li
+                                        key={area}
+                                        style={{ transform: snap.currentAreaSelection === area ? 'translateY(-1.25rem)' : '' }}
+                                        className={`z-30 flex h-40 ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'w-32' : 'w-24 min-w-24'} flex-col transition-all`}
+                                    >
+                                        <strong className="ml-1 w-full truncate text-sm uppercase">
+                                            {area.charAt(0).toUpperCase() + area.slice(1)}
+                                        </strong>
+                                        <button
+                                            onClick={() => handleClickAttachmentArea(area as Area)}
+                                            className={`mt-2 flex grow flex-col items-center rounded-sm border ${snap.currentAreaSelection !== 'all' && state.currentAreaSelection !== 'other' ? 'border-b-2 border-b-orange-400' : ''} ${state.currentAreaSelection === area && state.currentAreaSelection !== 'other' && state.currentAreaSelection !== 'all' ? 'shadow-[0_10px_15px_-5px_rgba(249,115,22,0.7)]' : ''} border-zinc-600 transition-all duration-150 *:w-full hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]`}
+                                        >
+                                            <div className="flex h-3/4 items-center justify-center overflow-hidden rounded-t-sm bg-zinc-700">
+                                                <div key={snap.selected[area]?.id} className="animate-fade-from-below">
+                                                    {snap.selected[area]?.id === 0 ? (
+                                                        <AiOutlinePlus className="text-6xl" />
+                                                    ) : (
+                                                        <DynamicIcon className="scale-125">
+                                                            {a.power_modifier > 0 && <GiCornerExplosion />}
+                                                            {a.mobility_modifier > 0 && <GiFeather />}
+                                                            {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                                            {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                                            {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                                        </DynamicIcon>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex h-2/6 items-center justify-center overflow-x-hidden rounded-b-sm border-t border-zinc-600 bg-zinc-800">
+                                                <h3
+                                                    key={snap.selected[area]?.id}
+                                                    className={`${snap.selected[area]?.id === 0 ? 'font-extrabold opacity-50' : 'opacity-100'} animate-fade-from-left line-clamp-2 px-1 text-xs wrap-break-word uppercase`}
+                                                >
+                                                    {snap.selected[area]?.id === 0 ? 'empty' : state.selected[area]?.name}
+                                                </h3>
+                                            </div>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <div className="mt-auto mb-3.5 grid grid-cols-[80%_20%] transition-all">
+                            <div className="flex flex-col gap-y-2 uppercase">
+                                {statTypes.map((stat) => {
+                                    const skipItems = new Set(['magsize', 'price']);
+                                    if (skipItems.has(stat)) return;
+                                    return (
+                                        <div key={stat} className="grid grid-cols-[15%_17.5%_47.5%] items-center gap-6">
+                                            <span
+                                                className={`${contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : contextDependentStatModifier(stat) < 0 ? 'text-red-500' : ''} place-self-end font-extrabold transition-all duration-250`}
+                                            >
+                                                {weapon.type !== 'blade' ? (stat === 'power' ? 'firepower' : stat) : stat}
+                                            </span>
+                                            <div className="grid grid-cols-2 place-items-center items-center gap-2">
+                                                <div className="relative h-6 w-6">
+                                                    <FaAngleUp
+                                                        className={`${contextDependentStatModifier(stat) > 0 ? 'translate-y-0 text-lime-400 opacity-100' : 'translate-y-2 opacity-0'} text-2xl transition-all duration-250`}
+                                                    />
+                                                    <FaAngleDown
+                                                        className={`${contextDependentStatModifier(stat) < 0 ? 'translate-y-0 text-red-500 opacity-100' : '-translate-y-2 opacity-0'} absolute inset-0 text-2xl transition-all duration-250`}
+                                                    />
+                                                </div>
+                                                <div
+                                                    className={`${contextDependentStatModifier(stat) === 0 ? 'translate-x-2 opacity-0' : ''} ${contextDependentStatModifier(stat) < 0 ? 'text-red-500' : contextDependentStatModifier(stat) > 0 ? 'text-lime-400' : 'text-white'} -skew-x-12 text-sm font-bold transition-all`}
+                                                >
+                                                    {contextDependentStatModifier(stat) >= 0
+                                                        ? `+${Math.round(contextDependentStatModifier(stat))}%`
+                                                        : `${Math.round(contextDependentStatModifier(stat))}%`}
+                                                </div>
+                                            </div>
+                                            <div className="relative flex h-3/4 w-full -skew-x-12 border">
+                                                <div
+                                                    style={{
+                                                        width:
+                                                            stat === 'power'
+                                                                ? `${(weapon['power'] / (maxPower + 1)) * 100}%`
+                                                                : `${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? weapon[stat] : weapon[stat] + statModifiers[stat] - contextDependentStatModifier(stat)}%`,
+                                                    }}
+                                                    className="relative z-30 h-full bg-white transition-all"
+                                                >
+                                                    <div
+                                                        style={{
+                                                            width: `${Math.abs(Math.max(Math.min(contextDependentStatModifier(stat) / (weapon[stat] * 0.01), 0), -100))}%`,
+                                                        }}
+                                                        className="absolute right-0 h-full border-l bg-red-500 transition-all"
+                                                    />
+                                                </div>
+                                                <div
+                                                    style={{ width: `${Math.min(Math.max(contextDependentStatModifier(stat), 0), 100)}%` }}
+                                                    className="h-full bg-lime-400 transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {weapon.type !== 'blade' && (
+                                <div className="grid w-3/4 grid-cols-1 font-extrabold">
+                                    <div>
+                                        <div>Mags</div>
+                                        <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
+                                    </div>
+                                    <div
+                                        className={`${weapon.magsize + contextDependentStatModifier('magsize') > weapon.magsize ? 'text-lime-400' : weapon.magsize + contextDependentStatModifier('magsize') < weapon.magsize ? 'text-red-500' : ''} transition-all`}
+                                    >
+                                        <div>Mag Size</div>
+                                        <div className="flex">
+                                            <div className="-mt-1 text-4xl">{weapon.magsize}</div>
+                                            <div
+                                                className={`${contextDependentStatModifier('magsize') !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
+                                            >
+                                                {contextDependentStatModifier('magsize') >= 0
+                                                    ? `+${contextDependentStatModifier('magsize')}`
+                                                    : contextDependentStatModifier('magsize')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        {/* empty element for grid */}
+                        <div />
+                    </div>
+                    <Link
+                        className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 *:px-2 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]"
+                        onClick={() =>
+                            addToBag({
+                                customizedWeaponId: makeSelectionKey(weapon.id, { ...snap.selected }),
+                                customizedPrice: totalPrice,
+                                weapon: weapon,
+                                selectedAttachments: { ...snap.selected },
+                                quantity: 1,
+                            })
+                        }
+                        href={route('cart')}
+                    >
+                        <MdAddShoppingCart className="-skew-x-12 text-6xl" />
+                        <span className="ml-2 translate-x-[60vw] -skew-x-12 text-xl font-extrabold transition-transform duration-300 group-hover:translate-x-0">
+                            ADD TO CART
+                        </span>
+                    </Link>
+                </div>
+                <div
+                    style={{
+                        backgroundColor:
+                            snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.3)',
+                    }}
+                    className="pointer-events-none absolute top-0 right-0 z-100 h-full w-full transition-all duration-400"
+                >
+                    {/* Attachment Selection List */}
+                    <div>
+                        {Object.entries(snap.grouped).map(([area, attachments]) => (
+                            <div
+                                key={area}
+                                style={{
+                                    transform: `translateX(${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
+                                    opacity: snap.currentAreaSelection === area ? 1 : 0,
+                                    pointerEvents: snap.currentAreaSelection === area ? 'auto' : 'none',
+                                    right: snap.currentAreaSelection === area ? '0' : '-30%',
+                                }}
+                                className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
+                            >
+                                <div className="m-4 flex items-center justify-between">
+                                    <div className="relative">
+                                        <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">{area}</strong>
+                                        <span
+                                            className={`absolute -bottom-1 left-0 h-0.5 origin-left ${snap.currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
+                                            style={{ width: '100%' }}
+                                        />
+                                    </div>
+                                    <IoIosReturnLeft
+                                        onClick={() => goBackTo3D('other')}
+                                        className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
+                                    />
+                                </div>
+                                <ul className="-mr-2 flex flex-col divide-y-2 *:min-w-72 *:py-4 *:pr-12 *:pl-6">
+                                    <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
+                                        <CiIceCream id="factory_issue" />
+                                    </AttachmentListElement>
+                                    {attachments.map((a) => (
+                                        <AttachmentListElement key={a.id} area={area as Area} att={a}>
+                                            {a.power_modifier > 0 && <GiCornerExplosion />}
+                                            {a.mobility_modifier > 0 && <GiFeather />}
+                                            {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                            {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                            {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                        </AttachmentListElement>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
+                        <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
+                            <div className={`pointer-events-none fixed inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
+                        </div>
+                        <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
+                            S0USHAK4Z3
+                        </h1>
+                        <div className="z-10 mt-1 text-xl">Total Price (inkl. Tax): </div>
+                        <Count className="ml-1" from={previousPrice ?? totalPrice} to={totalPrice} />
+                    </div>
+                    <YouTubePlayer
+                        isPlaying={isPlaying}
+                        setIsPlaying={setIsPlaying}
+                        className={`pointer-events-none z-200 flex -translate-y-10/12 flex-col items-center justify-center transition-all hover:translate-0 ${isPlaying ? 'animate-beat hover:animate-none' : ''}`}
+                        videoIds={myPlaylist}
+                    />
+                </div>
+            </div>
+            <div className="col-start-3 flex *:h-full *:w-12 *:border *:p-2">
+                <LuMousePointer />
+                <LuMove3D />
+                <LuRotate3D />
+                <LuScale3D />
+            </div>
+        </div>
     );
 
     function goBackTo3D(area: Area): void {

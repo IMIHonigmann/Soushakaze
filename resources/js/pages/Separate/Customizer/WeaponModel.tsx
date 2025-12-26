@@ -97,7 +97,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         }
     }, [materials]);
 
-    const dbAttachmentsToMaterialsObject = useMemo(() => {
+    state.dbAttachmentsToMaterialsObject = useMemo(() => {
         const map: Record<string, string[]> = {};
         map['Foregrip'] = ['defaultMaterial_19'];
         map['Red Dot Sight'] = ['defaultMaterial_13', 'defaultMaterial_14', 'defaultMaterial_15'];
@@ -127,7 +127,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     useEffect(() => {
         if (!snap.grouped || initAppliedRef.current || !meshRefs.current) return;
 
-        Object.values(dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
+        Object.values(state.dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
             nodeNames.forEach((nodeName) => {
                 const n = meshRefs.current[nodeName];
                 if (n && 'visible' in n) n.visible = false;
@@ -135,32 +135,32 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         });
 
         Object.values(snap.selected).forEach((selAtt) => {
-            (dbAttachmentsToMaterialsObject[selAtt.name] ?? []).forEach((nodeName) => {
+            (state.dbAttachmentsToMaterialsObject[selAtt.name] ?? []).forEach((nodeName) => {
                 const n = meshRefs.current[nodeName];
                 if (n && 'visible' in n) n.visible = true;
             });
         });
 
         initAppliedRef.current = true;
-    }, [dbAttachmentsToMaterialsObject, snap.grouped, snap.selected]);
+    }, [snap.grouped, snap.selected]);
 
     useEffect(() => {
         if (!snap.grouped || !meshRefs.current) return;
 
         (snap.grouped[state.currentAreaSelection] ?? []).forEach((att) => {
-            (dbAttachmentsToMaterialsObject[att.name] ?? []).forEach((nodeName) => {
+            (state.dbAttachmentsToMaterialsObject[att.name] ?? []).forEach((nodeName) => {
                 const n = meshRefs.current[nodeName];
                 if (n && 'visible' in n) n.visible = false;
             });
         });
 
-        const currentSelectedMaterialNames = dbAttachmentsToMaterialsObject[snap.selected[state.currentAreaSelection]?.name];
+        const currentSelectedMaterialNames = state.dbAttachmentsToMaterialsObject[snap.selected[state.currentAreaSelection]?.name];
         if (!currentSelectedMaterialNames) return;
         currentSelectedMaterialNames.forEach((nodeName) => {
             const n = meshRefs.current[nodeName];
             if (n) n.visible = true;
         });
-    }, [dbAttachmentsToMaterialsObject, nodes, snap.grouped, snap.selected]);
+    }, [nodes, snap.grouped, snap.selected]);
 
     const HOVER_COLOR = '#ff0000'; // Red for hover
     const SELECTED_COLOR = '#0000ff'; // Blue for selected

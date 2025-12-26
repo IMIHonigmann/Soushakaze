@@ -54,7 +54,7 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
 
     return (
         <>
-            <div style={{ width: '1920px', height: '960px', margin: 'auto', backgroundColor: '#151517' }}>
+            <div style={{ width: '100%', height: '100%', margin: 'auto', backgroundColor: '#151517' }}>
                 <Suspense
                     fallback={
                         <div className="flex h-full items-center justify-center">
@@ -62,7 +62,12 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
                         </div>
                     }
                 >
-                    <Canvas ref={canvasRef} shadows gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}>
+                    <Canvas
+                        ref={canvasRef}
+                        shadows
+                        style={{ top: 0, right: 0, position: 'absolute' }}
+                        gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
+                    >
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
                         {WeaponModel ? <WeaponModel cameraControlsRef={cameraControlsRef} weapon={weapon} /> : null}
