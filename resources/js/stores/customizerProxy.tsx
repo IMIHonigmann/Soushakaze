@@ -26,4 +26,5 @@ export const state = proxy({
     cameraControlsEnabled: true,
     currentAreaSelection: 'all' as Area,
     dbAttachmentsToMaterialsObject: {} as Record<string, string[]>,
+    mode: undefined as 'translate' | 'rotate' | 'scale' | undefined,
 });

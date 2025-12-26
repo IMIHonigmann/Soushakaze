@@ -17,6 +17,7 @@ import { FaAngleDoubleUp, FaAngleDown, FaAngleUp } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
+import { IconType } from 'react-icons/lib';
 import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import * as THREE from 'three';
@@ -225,6 +226,19 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }
 
     const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'q') state.mode = undefined;
+            if (event.key === 'w') state.mode = 'translate';
+            if (event.key === 'e') state.mode = 'rotate';
+            if (event.key === 'r') state.mode = 'scale';
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     return (
         <div className="grid h-screen w-screen grid-cols-[16%_4%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
@@ -479,11 +493,21 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     />
                 </div>
             </div>
-            <div className="col-start-3 flex *:h-full *:w-12 *:border *:p-2">
-                <LuMousePointer />
-                <LuMove3D />
-                <LuRotate3D />
-                <LuScale3D />
+            <div className="col-start-3 flex">
+                {(
+                    [
+                        [LuMousePointer, undefined],
+                        [LuMove3D, 'translate'],
+                        [LuRotate3D, 'rotate'],
+                        [LuScale3D, 'scale'],
+                    ] as [IconType, typeof state.mode][]
+                ).map(([IconComponent, mode]) => (
+                    <IconComponent
+                        key={mode ?? 'select'}
+                        className={`h-full w-12 origin-bottom rounded-t-full p-2 transition-all duration-150 hover:scale-125 hover:text-black ${snap.mode === mode ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                        onClick={() => (state.mode = mode as typeof state.mode)}
+                    />
+                ))}
             </div>
         </div>
     );

@@ -58,7 +58,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         THREE.Material | THREE.Material[],
         THREE.Object3DEventMap
     > | null>(null);
-    const [mode, setMode] = useState<'translate' | 'rotate' | 'scale' | undefined>();
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -105,20 +104,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         map['Laser Sight'].push('defaultMaterial');
 
         return map;
-    }, []);
-
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'q') setMode(undefined);
-            if (event.key === 'w') setMode('translate');
-            if (event.key === 'e') setMode('rotate');
-            if (event.key === 'r') setMode('scale');
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
     }, []);
 
     const snap = useSnapshot(state);
@@ -252,10 +237,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                     </group>
                 </group>
             </Stage>
-            {mode && (
+            {snap.mode && (
                 <TransformControls
                     object={currentMesh ?? undefined}
-                    mode={mode}
+                    mode={snap.mode}
                     onMouseDown={() => (state.cameraControlsEnabled = false)}
                     onMouseUp={() => (state.cameraControlsEnabled = true)}
                 />
