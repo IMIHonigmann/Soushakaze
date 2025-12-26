@@ -225,7 +225,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
                                     }}
                                     onPointerLeave={(e) => {
-                                        if (!snap.currentMesh[1]) return;
                                         const mesh = e.object as THREE.Mesh;
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
                                         const original: THREE.Color | undefined = mesh.userData.__originalColor;

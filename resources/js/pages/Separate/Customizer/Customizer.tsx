@@ -242,11 +242,22 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }, []);
 
     const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+    const scrollDivRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh[1]));
+        if (selectedIndex !== -1 && liRefs.current[selectedIndex]) {
+            liRefs.current[selectedIndex]?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [snap.currentMesh, snap.nodeNames]);
 
     return (
         <div className="grid h-screen w-screen grid-cols-[16%_4%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
             <div className="row-span-full grid grid-cols-1 grid-rows-[35%_65%] *:border">
-                <div className="overflow-scroll" style={{ scrollBehavior: 'revert' }}>
+                <div ref={scrollDivRef} className="overflow-scroll" style={{ scrollBehavior: 'revert' }}>
                     <ul>
                         {snap.nodeNames.map((nodeName, index) => (
                             <li
@@ -254,7 +265,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                     liRefs.current[index] = el;
                                 }}
                                 tabIndex={0}
-                                className={`cursor-pointer ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'hover:bg-red-600'}`}
+                                className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
                                 onClick={() => {
                                     state.currentMesh[0] = state.currentMesh[1];
                                     state.currentMesh[1] = nodeName;
@@ -274,7 +285,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 key={nodeName}
                             >
                                 <div
-                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black' : 'ml-2'}`}
+                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
                                 >
                                     <TbBox className="inline-block text-3xl" />
                                     <span>{nodeName}</span>
