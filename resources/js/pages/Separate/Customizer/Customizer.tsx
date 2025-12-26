@@ -20,6 +20,7 @@ import { IoIosReturnLeft } from 'react-icons/io';
 import { IconType } from 'react-icons/lib';
 import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
+import { TbBox } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import CustomizerScene from './CustomizerScene';
@@ -240,10 +241,48 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         };
     }, []);
 
+    const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+
     return (
         <div className="grid h-screen w-screen grid-cols-[16%_4%_80%] grid-rows-[95%_5%] bg-zinc-950 *:border">
             <div className="row-span-full grid grid-cols-1 grid-rows-[35%_65%] *:border">
-                <div>Hierarchy*</div>
+                <div className="overflow-scroll" style={{ scrollBehavior: 'revert' }}>
+                    <ul>
+                        {snap.nodeNames.map((nodeName, index) => (
+                            <li
+                                ref={(el) => {
+                                    liRefs.current[index] = el;
+                                }}
+                                tabIndex={0}
+                                className={`cursor-pointer ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'hover:bg-red-600'}`}
+                                onClick={() => {
+                                    state.currentMesh[0] = state.currentMesh[1];
+                                    state.currentMesh[1] = nodeName;
+                                }}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
+                                    if (e.key === 'ArrowUp' && index > 0) {
+                                        state.currentMesh[0] = state.currentMesh[1];
+                                        state.currentMesh[1] = snap.nodeNames[index - 1];
+                                        liRefs.current[index - 1]?.focus();
+                                    }
+                                    if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
+                                        state.currentMesh[0] = state.currentMesh[1];
+                                        state.currentMesh[1] = snap.nodeNames[index + 1];
+                                        liRefs.current[index + 1]?.focus();
+                                    }
+                                }}
+                                key={nodeName}
+                            >
+                                <div
+                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black' : 'ml-2'}`}
+                                >
+                                    <TbBox className="inline-block text-3xl" />
+                                    <span>{nodeName}</span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
                 <div className="flex flex-col gap-8 p-4">
                     {Object.entries(snap.dbAttachmentsToMaterialsObject).map(([attName, objectNames]) => (
                         <div>

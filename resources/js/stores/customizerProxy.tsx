@@ -27,4 +27,6 @@ export const state = proxy({
     currentAreaSelection: 'all' as Area,
     dbAttachmentsToMaterialsObject: {} as Record<string, string[]>,
     mode: undefined as 'translate' | 'rotate' | 'scale' | undefined,
+    currentMesh: [0, 0] as [string, string] | [number, number],
+    nodeNames: [] as string[],
 });

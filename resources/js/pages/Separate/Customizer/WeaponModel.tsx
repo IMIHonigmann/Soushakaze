@@ -9,7 +9,7 @@ Title: PPSH-41 TACTICAL
 import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
 import { CameraControls, Stage, TransformControls, useGLTF } from '@react-three/drei';
-import { JSX, RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { JSX, RefObject, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 import { useSnapshot } from 'valtio';
@@ -52,12 +52,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
-
-    const [currentMesh, setCurrentMesh] = useState<THREE.Mesh<
-        THREE.BufferGeometry<THREE.NormalBufferAttributes, THREE.BufferGeometryEventMap>,
-        THREE.Material | THREE.Material[],
-        THREE.Object3DEventMap
-    > | null>(null);
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -105,6 +99,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
 
         return map;
     }, []);
+
+    useEffect(() => {
+        state.nodeNames = Object.keys(worldNodes);
+    }, [worldNodes]);
 
     const snap = useSnapshot(state);
     const initAppliedRef = useRef(false);
@@ -159,6 +157,29 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         }
     }
 
+    useEffect(() => {
+        if (!meshRefs.current) return;
+        const previousMeshRef = meshRefs.current[snap.currentMesh[0]];
+        if (previousMeshRef) {
+            const prevMat = Array.isArray(previousMeshRef.material) ? previousMeshRef.material[0] : previousMeshRef.material;
+            if ((prevMat as any)?.color?.isColor && previousMeshRef.userData.__originalColor) {
+                (prevMat as any).color.set(previousMeshRef.userData.__originalColor);
+            }
+        }
+
+        state.currentMesh[0] = state.currentMesh[1];
+        const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
+        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
+            ? meshRefs.current[nodeName].material[0]
+            : meshRefs.current[nodeName]?.material;
+        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
+            if (!meshRefs.current[nodeName].userData.__originalColor) {
+                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+            }
+            (newMat as any).color.set(SELECTED_COLOR);
+        }
+    }, [snap.currentMesh]);
+
     return (
         <>
             <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
@@ -189,23 +210,8 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     scale={n.scale}
                                     onDoubleClick={(e) => {
                                         e.stopPropagation();
-                                        const previousMesh = currentMesh;
-                                        if (previousMesh) {
-                                            const prevMat = Array.isArray(previousMesh.material) ? previousMesh.material[0] : previousMesh.material;
-                                            if ((prevMat as any)?.color?.isColor && previousMesh.userData.__originalColor) {
-                                                (prevMat as any).color.set(previousMesh.userData.__originalColor);
-                                            }
-                                        }
-                                        setCurrentMesh(meshRefs.current[nodeName]);
-                                        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
-                                            ? meshRefs.current[nodeName].material[0]
-                                            : meshRefs.current[nodeName]?.material;
-                                        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
-                                            if (!meshRefs.current[nodeName].userData.__originalColor) {
-                                                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
-                                            }
-                                            (newMat as any).color.set(SELECTED_COLOR);
-                                        }
+                                        state.currentMesh[0] = state.currentMesh[1];
+                                        state.currentMesh[1] = e.object.name;
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();
@@ -219,11 +225,12 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
                                     }}
                                     onPointerLeave={(e) => {
+                                        if (!snap.currentMesh[1]) return;
                                         const mesh = e.object as THREE.Mesh;
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
                                         const original: THREE.Color | undefined = mesh.userData.__originalColor;
 
-                                        if (currentMesh === mesh) {
+                                        if (mesh.name === snap.currentMesh[1]) {
                                             (mat as any).color.set(SELECTED_COLOR);
                                         } else if (original) {
                                             (mat as any).color.copy(original);
@@ -239,7 +246,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
             </Stage>
             {snap.mode && (
                 <TransformControls
-                    object={currentMesh ?? undefined}
+                    object={meshRefs.current[snap.currentMesh[1]] ?? undefined}
                     mode={snap.mode}
                     onMouseDown={() => (state.cameraControlsEnabled = false)}
                     onMouseUp={() => (state.cameraControlsEnabled = true)}
