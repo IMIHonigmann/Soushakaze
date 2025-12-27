@@ -254,17 +254,17 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     );
 
     return (
-        <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3))]:p-2">
-            <div className="row-start-1 overflow-hidden border-b">
+        <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
+            <div className="row-start-1 overflow-scroll border-b">
                 {snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? (
-                    <ul ref={scrollDivRef} className="animate-fade-from-above overflow-scroll" style={{ scrollBehavior: 'smooth' }}>
+                    <ul ref={scrollDivRef} className="animate-fade-from-above" style={{ scrollBehavior: 'smooth' }}>
                         {snap.nodeNames.map((nodeName, index) => (
                             <li
                                 ref={(el) => {
                                     liRefs.current[index] = el;
                                 }}
                                 tabIndex={0}
-                                className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
+                                className={`rounded-sm ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
                                 onClick={() => {
                                     state.currentMesh[0] = state.currentMesh[1];
                                     state.currentMesh[1] = nodeName;
@@ -293,12 +293,11 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                         ))}
                     </ul>
                 ) : (
-                    <div className="animate-fade-from-below overflow-hidden *:not-first:not-last:mb-2">
+                    <div className="animate-fade-from-below *:not-first:not-last:mb-2">
                         <div className="text-3xl">
                             <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
                             <h2>Camera Transforms</h2>
                         </div>
-
                         {['Target', 'Position'].map((element, index) => {
                             function handleCamChange(
                                 e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>,
@@ -340,6 +339,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 </div>
                             );
                         })}
+                        <button className="block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert">Reset</button>
                     </div>
                 )}
             </div>
