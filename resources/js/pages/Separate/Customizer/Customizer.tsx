@@ -254,141 +254,94 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     );
 
     return (
-        <div className="grid h-screen w-screen grid-cols-[17%_3%_80%] grid-rows-[95%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border">
-            <div className="row-span-full grid grid-cols-1 grid-rows-[35%_65%] overflow-hidden">
-                <div className="overflow-hidden border-b">
-                    {snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? (
-                        <ul ref={scrollDivRef} className="animate-fade-from-above overflow-scroll" style={{ scrollBehavior: 'smooth' }}>
-                            {snap.nodeNames.map((nodeName, index) => (
-                                <li
-                                    ref={(el) => {
-                                        liRefs.current[index] = el;
-                                    }}
-                                    tabIndex={0}
-                                    className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
-                                    onClick={() => {
+        <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3))]:p-2">
+            <div className="row-start-1 overflow-hidden border-b">
+                {snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? (
+                    <ul ref={scrollDivRef} className="animate-fade-from-above overflow-scroll" style={{ scrollBehavior: 'smooth' }}>
+                        {snap.nodeNames.map((nodeName, index) => (
+                            <li
+                                ref={(el) => {
+                                    liRefs.current[index] = el;
+                                }}
+                                tabIndex={0}
+                                className={` ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
+                                onClick={() => {
+                                    state.currentMesh[0] = state.currentMesh[1];
+                                    state.currentMesh[1] = nodeName;
+                                }}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
+                                    if (e.key === 'ArrowUp' && index > 0) {
                                         state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = nodeName;
-                                    }}
-                                    onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                        if (e.key === 'ArrowUp' && index > 0) {
-                                            state.currentMesh[0] = state.currentMesh[1];
-                                            state.currentMesh[1] = snap.nodeNames[index - 1];
-                                            liRefs.current[index - 1]?.focus();
-                                        }
-                                        if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
-                                            state.currentMesh[0] = state.currentMesh[1];
-                                            state.currentMesh[1] = snap.nodeNames[index + 1];
-                                            liRefs.current[index + 1]?.focus();
-                                        }
-                                    }}
-                                    key={nodeName}
+                                        state.currentMesh[1] = snap.nodeNames[index - 1];
+                                        liRefs.current[index - 1]?.focus();
+                                    }
+                                    if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
+                                        state.currentMesh[0] = state.currentMesh[1];
+                                        state.currentMesh[1] = snap.nodeNames[index + 1];
+                                        liRefs.current[index + 1]?.focus();
+                                    }
+                                }}
+                                key={nodeName}
+                            >
+                                <div
+                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
                                 >
-                                    <div
-                                        className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
-                                    >
-                                        <TbBox className="inline-block text-3xl" />
-                                        <span>{nodeName}</span>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <div className="animate-fade-from-below overflow-hidden *:not-first:not-last:mb-2">
-                            <div className="text-3xl">
-                                <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
-                                <h2>Camera Transforms</h2>
-                            </div>
+                                    <TbBox className="inline-block text-3xl" />
+                                    <span>{nodeName}</span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="animate-fade-from-below overflow-hidden *:not-first:not-last:mb-2">
+                        <div className="text-3xl">
+                            <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
+                            <h2>Camera Transforms</h2>
+                        </div>
 
-                            {['Target', 'Position'].map((element, index) => {
-                                function handleCamChange(
-                                    e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>,
-                                    axis: 'x' | 'y' | 'z',
-                                ) {
-                                    if (!state.CAMERA_POSITIONS[snap.currentAreaSelection]) {
-                                        state.CAMERA_POSITIONS[snap.currentAreaSelection] = [vec3(0, 0, 0), vec3(0, 0, 0)];
-                                    }
-                                    const camPos = state.CAMERA_POSITIONS[snap.currentAreaSelection]!;
-                                    if (camPos[index]) {
-                                        camPos[index][axis] = Number(e.currentTarget.value) || 0;
-                                        setCameraControls(camPos[0], camPos[1]);
-                                    }
+                        {['Target', 'Position'].map((element, index) => {
+                            function handleCamChange(
+                                e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>,
+                                axis: 'x' | 'y' | 'z',
+                            ) {
+                                if (!state.CAMERA_POSITIONS[snap.currentAreaSelection]) {
+                                    state.CAMERA_POSITIONS[snap.currentAreaSelection] = [vec3(0, 0, 0), vec3(0, 0, 0)];
                                 }
+                                const camPos = state.CAMERA_POSITIONS[snap.currentAreaSelection]!;
+                                if (camPos[index]) {
+                                    camPos[index][axis] = Number(e.currentTarget.value) || 0;
+                                    setCameraControls(camPos[0], camPos[1]);
+                                }
+                            }
 
-                                return (
-                                    <div className="mx-2 grid grid-cols-[30%_70%] justify-end" key={element}>
-                                        <h3>{element}:</h3>
-                                        <span className="grid grid-cols-3 gap-4 *:border">
-                                            {(['x', 'y', 'z'] as const).map((axis) => (
-                                                <>
-                                                    <input
-                                                        key={`${snap.currentAreaSelection}-${element}-X`}
-                                                        placeholder="0"
-                                                        type="number"
-                                                        style={{ MozAppearance: 'textfield' }}
-                                                        onSelect={(e) => e.currentTarget.select()}
-                                                        defaultValue={
-                                                            snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''
-                                                        }
-                                                        onBlur={(e) => {
-                                                            handleCamChange(e, axis);
-                                                        }}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') handleCamChange(e, axis);
-                                                        }}
-                                                    />
-                                                </>
-                                            ))}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-                <div className="flex flex-col gap-8 overflow-scroll p-4">
-                    {Object.entries(attachments).map(([area, atts]) => (
-                        <div key={area}>
-                            <h3
-                                onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
-                                className="flex -skew-x-12 cursor-pointer items-center justify-between border-b-2 font-hitmarker-condensed text-3xl uppercase"
-                            >
-                                <span className={`mb-2 transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
-                                <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} transition-transform duration-300`} />
-                            </h3>
-                            <ul
-                                className={`overflow-scroll transition-all duration-300 ease-out ${openedAreaTabs[area] ? 'max-h-96' : 'max-h-0 opacity-0'}`}
-                            >
-                                {atts.map((att) => (
-                                    <li className="px-6" key={att.id}>
-                                        <h4
-                                            onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
-                                            className={`group flex -skew-x-12 cursor-pointer items-center justify-between gap-4 overflow-hidden p-2 transition-all duration-300 ease-out hover:bg-red-600`}
-                                        >
-                                            {att.name}
-                                            <span className="flex items-center gap-2 text-xl">
-                                                <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
-                                                <ChevronRight
-                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} transition-transform duration-300`}
+                            return (
+                                <div className="mx-2 grid grid-cols-[30%_70%] justify-end" key={element}>
+                                    <h3>{element}:</h3>
+                                    <span className="grid grid-cols-3 gap-4 *:border">
+                                        {(['x', 'y', 'z'] as const).map((axis) => (
+                                            <>
+                                                <input
+                                                    key={`${snap.currentAreaSelection}-${element}-X`}
+                                                    placeholder="0"
+                                                    type="number"
+                                                    style={{ MozAppearance: 'textfield' }}
+                                                    onSelect={(e) => e.currentTarget.select()}
+                                                    defaultValue={snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''}
+                                                    onBlur={(e) => {
+                                                        handleCamChange(e, axis);
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') handleCamChange(e, axis);
+                                                    }}
                                                 />
-                                            </span>
-                                        </h4>
-                                        <div
-                                            className={`ml-4 overflow-scroll transition-all duration-300 ease-out ${openedAttTabs[att.id] ? 'max-h-96' : 'max-h-0 opacity-0'} `}
-                                        >
-                                            <div>bruh</div>
-                                            <div>bruh</div>
-                                            <div>bruh</div>
-                                            <PlusCircle />
-                                        </div>
-                                    </li>
-                                ))}
-                                <PlusCircle />
-                            </ul>
-                        </div>
-                    ))}
-                    <PlusCircle />
-                </div>
+                                            </>
+                                        ))}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
             <ul className="row-span-full flex flex-col gap-1 p-1">
                 {[1, 2, 3, 4, 5].map((num, index) => (
@@ -401,7 +354,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     </li>
                 ))}
             </ul>
-            <div className="relative overflow-hidden">
+            <div className="relative row-span-2 overflow-hidden">
                 <MdOutlineCameraswitch
                     className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                     onClick={() => goBackTo3D('all')}
@@ -625,6 +578,49 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                         videoIds={myPlaylist}
                     />
                 </div>
+            </div>
+            <div className="row-span-2 flex flex-col gap-8 overflow-scroll p-4">
+                {Object.entries(attachments).map(([area, atts]) => (
+                    <div key={area}>
+                        <h3
+                            onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
+                            className="flex -skew-x-12 cursor-pointer items-center justify-between border-b-2 font-hitmarker-condensed text-3xl uppercase"
+                        >
+                            <span className={`mb-2 transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
+                            <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} transition-transform duration-300`} />
+                        </h3>
+                        <ul
+                            className={`overflow-scroll transition-all duration-300 ease-out ${openedAreaTabs[area] ? 'max-h-96' : 'max-h-0 opacity-0'}`}
+                        >
+                            {atts.map((att) => (
+                                <li className="px-6" key={att.id}>
+                                    <h4
+                                        onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
+                                        className={`group flex -skew-x-12 cursor-pointer items-center justify-between gap-4 overflow-hidden p-2 transition-all duration-300 ease-out hover:bg-red-600`}
+                                    >
+                                        {att.name}
+                                        <span className="flex items-center gap-2 text-xl">
+                                            <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
+                                            <ChevronRight
+                                                className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} transition-transform duration-300`}
+                                            />
+                                        </span>
+                                    </h4>
+                                    <div
+                                        className={`ml-4 overflow-scroll transition-all duration-300 ease-out ${openedAttTabs[att.id] ? 'max-h-96' : 'max-h-0 opacity-0'} `}
+                                    >
+                                        <div>bruh</div>
+                                        <div>bruh</div>
+                                        <div>bruh</div>
+                                        <PlusCircle />
+                                    </div>
+                                </li>
+                            ))}
+                            <PlusCircle />
+                        </ul>
+                    </div>
+                ))}
+                <PlusCircle />
             </div>
             <div className="col-start-3 flex">
                 {(
