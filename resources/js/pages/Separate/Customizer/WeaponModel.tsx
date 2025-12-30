@@ -283,7 +283,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
                                         const original: THREE.Color | undefined = mesh.userData.__originalColor;
 
-                                        if (mesh.name === snap.currentMesh[1]) {
+                                        if (snap.currentMesh[2].includes(mesh.name)) {
                                             (mat as any).color.set(SELECTED_COLOR);
                                         } else if (original) {
                                             (mat as any).color.copy(original);
