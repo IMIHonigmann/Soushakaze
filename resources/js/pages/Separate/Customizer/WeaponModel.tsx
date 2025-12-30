@@ -52,6 +52,8 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
+    const sceneGroupRef = useRef<THREE.Group>(null);
+    const selectionGroupRef = useRef<THREE.Group>(null);
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -157,28 +159,70 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         }
     }
 
-    useEffect(() => {
-        if (!meshRefs.current) return;
-        const previousMeshRef = meshRefs.current[snap.currentMesh[0]];
-        if (previousMeshRef) {
-            const prevMat = Array.isArray(previousMeshRef.material) ? previousMeshRef.material[0] : previousMeshRef.material;
-            if ((prevMat as any)?.color?.isColor && previousMeshRef.userData.__originalColor) {
-                (prevMat as any).color.set(previousMeshRef.userData.__originalColor);
-            }
-        }
+    function addToSelection() {
+        if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
 
-        state.currentMesh[0] = state.currentMesh[1];
         const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
+        if (!nodeName) return;
         const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
             ? meshRefs.current[nodeName].material[0]
             : meshRefs.current[nodeName]?.material;
+
         if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
             if (!meshRefs.current[nodeName].userData.__originalColor) {
                 meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
             }
             (newMat as any).color.set(SELECTED_COLOR);
         }
-    }, [snap.currentMesh]);
+
+        if (meshRefs.current[nodeName]) {
+            selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+        }
+
+        console.log('SHIFT CLICKED!!!');
+    }
+
+    function changeSelection() {
+        if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
+
+        const previousSelection = snap.currentMesh[0];
+        previousSelection.map((nodeName) => {
+            const previousMeshRef = meshRefs.current[nodeName];
+            if (previousMeshRef) {
+                const prevMat = Array.isArray(previousMeshRef.material) ? previousMeshRef.material[0] : previousMeshRef.material;
+                if ((prevMat as any)?.color?.isColor && previousMeshRef.userData.__originalColor) {
+                    (prevMat as any).color.set(previousMeshRef.userData.__originalColor);
+                }
+                sceneGroupRef.current!.attach(previousMeshRef);
+            }
+        });
+
+        state.currentMesh[0] = state.currentMesh[2];
+        const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
+        if (!nodeName) return;
+        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
+            ? meshRefs.current[nodeName].material[0]
+            : meshRefs.current[nodeName]?.material;
+
+        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
+            if (!meshRefs.current[nodeName].userData.__originalColor) {
+                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+            }
+            (newMat as any).color.set(SELECTED_COLOR);
+        }
+
+        if (meshRefs.current[nodeName]) {
+            selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+        }
+    }
+
+    useEffect(() => {
+        if (snap.action) {
+            if (snap.action === 'CHANGESELECTION') changeSelection();
+            if (snap.action === 'ADDTOSELECTION') addToSelection();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [snap.lastUpdateId]);
 
     return (
         <>
@@ -194,7 +238,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                         onControlEnd={() => handleControlEnd()}
                     />
                     <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
-                        <group rotation={[0, 0, 0]}>
+                        <group rotation={[0, 0, 0]} ref={sceneGroupRef}>
                             {Object.entries(worldNodes).map(([nodeName, n]) => (
                                 <mesh
                                     name={nodeName}
@@ -210,8 +254,18 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     scale={n.scale}
                                     onDoubleClick={(e) => {
                                         e.stopPropagation();
-                                        state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = e.object.name;
+                                        if (e.shiftKey) {
+                                            state.currentMesh[0] = [...state.currentMesh[2]];
+                                            state.currentMesh[1] = e.object.name;
+                                            state.currentMesh[2].push(e.object.name);
+                                            state.action = 'ADDTOSELECTION';
+                                        } else {
+                                            state.currentMesh[0] = [...state.currentMesh[2]];
+                                            state.currentMesh[1] = e.object.name;
+                                            state.currentMesh[2] = [e.object.name];
+                                            state.action = 'CHANGESELECTION';
+                                        }
+                                        state.lastUpdateId++;
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();
@@ -239,13 +293,14 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     }}
                                 />
                             ))}
+                            <group ref={selectionGroupRef}></group>
                         </group>
                     </group>
                 </group>
             </Stage>
             {snap.mode && (
                 <TransformControls
-                    object={meshRefs.current[snap.currentMesh[1]] ?? undefined}
+                    object={selectionGroupRef.current ?? undefined}
                     mode={snap.mode}
                     onMouseDown={() => (state.cameraControlsEnabled = false)}
                     onMouseUp={() => (state.cameraControlsEnabled = true)}

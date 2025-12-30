@@ -256,8 +256,12 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
-                {snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? (
-                    <ul ref={scrollDivRef} className="animate-fade-from-above" style={{ scrollBehavior: 'smooth' }}>
+                {false && (
+                    <ul
+                        ref={scrollDivRef}
+                        className={`animate-fade-from-above ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
+                        style={{ scrollBehavior: 'smooth' }}
+                    >
                         {snap.nodeNames.map((nodeName, index) => (
                             <li
                                 ref={(el) => {
@@ -266,8 +270,9 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 tabIndex={0}
                                 className={`rounded-sm ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
                                 onClick={() => {
-                                    state.currentMesh[0] = state.currentMesh[1];
+                                    state.currentMesh[0] = state.currentMesh[2];
                                     state.currentMesh[1] = nodeName;
+                                    state.currentMesh[2]?.push(nodeName);
                                 }}
                                 onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
                                     if (e.key === 'ArrowUp' && index > 0) {
@@ -292,56 +297,57 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <div className="animate-fade-from-below *:not-first:not-last:mb-2">
-                        <div className="text-3xl">
-                            <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
-                            <h2>Camera Transforms</h2>
-                        </div>
-                        {['Target', 'Position'].map((element, index) => {
-                            function handleCamChange(
-                                e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>,
-                                axis: 'x' | 'y' | 'z',
-                            ) {
-                                if (!state.CAMERA_POSITIONS[snap.currentAreaSelection]) {
-                                    state.CAMERA_POSITIONS[snap.currentAreaSelection] = [vec3(0, 0, 0), vec3(0, 0, 0)];
-                                }
-                                const camPos = state.CAMERA_POSITIONS[snap.currentAreaSelection]!;
-                                if (camPos[index]) {
-                                    camPos[index][axis] = Number(e.currentTarget.value) || 0;
-                                    setCameraControls(camPos[0], camPos[1]);
-                                }
-                            }
-
-                            return (
-                                <div className="mx-2 grid grid-cols-[30%_70%] justify-end" key={element}>
-                                    <h3>{element}:</h3>
-                                    <span className="grid grid-cols-3 gap-4 *:border">
-                                        {(['x', 'y', 'z'] as const).map((axis) => (
-                                            <>
-                                                <input
-                                                    key={`${snap.currentAreaSelection}-${element}-X`}
-                                                    placeholder="0"
-                                                    type="number"
-                                                    style={{ MozAppearance: 'textfield' }}
-                                                    onSelect={(e) => e.currentTarget.select()}
-                                                    defaultValue={snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''}
-                                                    onBlur={(e) => {
-                                                        handleCamChange(e, axis);
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') handleCamChange(e, axis);
-                                                    }}
-                                                />
-                                            </>
-                                        ))}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                        <button className="block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert">Reset</button>
-                    </div>
                 )}
+                <div
+                    className={`animate-fade-from-below *:not-first:not-last:mb-2 ${!(snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all') ? 'block' : 'hidden'}`}
+                >
+                    <div className="text-3xl">
+                        <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
+                        <h2>Camera Transforms</h2>
+                    </div>
+                    {['Target', 'Position'].map((element, index) => {
+                        function handleCamChange(
+                            e: React.FocusEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>,
+                            axis: 'x' | 'y' | 'z',
+                        ) {
+                            if (!state.CAMERA_POSITIONS[snap.currentAreaSelection]) {
+                                state.CAMERA_POSITIONS[snap.currentAreaSelection] = [vec3(0, 0, 0), vec3(0, 0, 0)];
+                            }
+                            const camPos = state.CAMERA_POSITIONS[snap.currentAreaSelection]!;
+                            if (camPos[index]) {
+                                camPos[index][axis] = Number(e.currentTarget.value) || 0;
+                                setCameraControls(camPos[0], camPos[1]);
+                            }
+                        }
+
+                        return (
+                            <div className="mx-2 grid grid-cols-[30%_70%] justify-end" key={element}>
+                                <h3>{element}:</h3>
+                                <span className="grid grid-cols-3 gap-4 *:border">
+                                    {(['x', 'y', 'z'] as const).map((axis) => (
+                                        <>
+                                            <input
+                                                key={`${snap.currentAreaSelection}-${element}-X`}
+                                                placeholder="0"
+                                                type="number"
+                                                style={{ MozAppearance: 'textfield' }}
+                                                onSelect={(e) => e.currentTarget.select()}
+                                                defaultValue={snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''}
+                                                onBlur={(e) => {
+                                                    handleCamChange(e, axis);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleCamChange(e, axis);
+                                                }}
+                                            />
+                                        </>
+                                    ))}
+                                </span>
+                            </div>
+                        );
+                    })}
+                    <button className="block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert">Reset</button>
+                </div>
             </div>
             <ul className="row-span-full flex flex-col gap-1 p-1">
                 {[1, 2, 3, 4, 5].map((num, index) => (
@@ -633,7 +639,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 ).map(([IconComponent, mode]) => (
                     <IconComponent
                         key={mode ?? 'select'}
-                        className={`h-full w-12 origin-bottom rounded-t-full p-2 transition-all duration-150 hover:scale-125 hover:text-black ${snap.mode === mode ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                        className={`h-full w-12 origin-bottom rounded-t-full p-2 transition-transform duration-150 hover:translate-y-0.5 hover:scale-125 hover:text-black ${snap.mode === mode ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
                         onClick={() => (state.mode = mode as typeof state.mode)}
                     />
                 ))}
