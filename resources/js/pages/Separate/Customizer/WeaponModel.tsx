@@ -202,31 +202,30 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
 
             if (meshRefs.current[nodeName] && selectionGroupRef.current) {
                 selectionGroupRef.current.attach(meshRefs.current[nodeName]);
-                const box = new THREE.Box3();
-                box.makeEmpty();
-
-                snap.currentMesh.existingSelection.forEach((name) => {
-                    const mesh = meshRefs.current[name];
-                    if (mesh) box.expandByObject(mesh);
-                });
-
-                const center = new THREE.Vector3();
-                box.getCenter(center);
-
-                snap.currentMesh.existingSelection.map((nn) => {
-                    const mesh = meshRefs.current[nn];
-                    if (mesh) sceneGroupRef.current!.attach(mesh);
-                });
-
-                selectionGroupRef.current.parent?.worldToLocal(center);
-                selectionGroupRef.current.position.copy(center);
-                selectionGroupRef.current.updateMatrixWorld(true);
-
-                snap.currentMesh.existingSelection.forEach((name) => {
-                    const mesh = meshRefs.current[name];
-                    if (mesh) selectionGroupRef.current!.attach(mesh);
-                });
             }
+        });
+
+        const box = new THREE.Box3();
+        box.makeEmpty();
+
+        snap.currentMesh.existingSelection.forEach((name) => {
+            const mesh = meshRefs.current[name];
+            if (mesh) {
+                box.expandByObject(mesh);
+                sceneGroupRef.current!.attach(mesh);
+            }
+        });
+
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+
+        selectionGroupRef.current!.parent?.worldToLocal(center);
+        selectionGroupRef.current!.position.copy(center);
+        selectionGroupRef.current!.updateMatrixWorld(true);
+
+        snap.currentMesh.existingSelection.forEach((name) => {
+            const mesh = meshRefs.current[name];
+            if (mesh) selectionGroupRef.current!.attach(mesh);
         });
     }
 
@@ -305,10 +304,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     }}
                                 />
                             ))}
-                            <group ref={selectionGroupRef}></group>
                         </group>
                     </group>
                 </group>
+                <group ref={selectionGroupRef}></group>
             </Stage>
             {snap.mode && (
                 <TransformControls
