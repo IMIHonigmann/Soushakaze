@@ -238,7 +238,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
     useEffect(() => {
-        const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh[1]));
+        const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh.lastSelection));
         if (selectedIndex !== -1 && liRefs.current[selectedIndex]) {
             liRefs.current[selectedIndex]?.scrollIntoView({
                 behavior: 'smooth',
@@ -257,48 +257,53 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
-                {false && (
-                    <ul
-                        ref={scrollDivRef}
-                        className={`animate-fade-from-above ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
-                        style={{ scrollBehavior: 'smooth' }}
-                    >
-                        {snap.nodeNames.map((nodeName, index) => (
-                            <li
-                                ref={(el) => {
-                                    liRefs.current[index] = el;
-                                }}
-                                tabIndex={0}
-                                className={`rounded-sm ${snap.currentMesh[1] === nodeName ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
-                                onClick={() => {
-                                    state.currentMesh[0] = state.currentMesh[2];
-                                    state.currentMesh[1] = nodeName;
-                                    state.currentMesh[2]?.push(nodeName);
-                                }}
-                                onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                    if (e.key === 'ArrowUp' && index > 0) {
-                                        state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = snap.nodeNames[index - 1];
-                                        liRefs.current[index - 1]?.focus();
-                                    }
-                                    if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
-                                        state.currentMesh[0] = state.currentMesh[1];
-                                        state.currentMesh[1] = snap.nodeNames[index + 1];
-                                        liRefs.current[index + 1]?.focus();
-                                    }
-                                }}
-                                key={nodeName}
+                <ul
+                    ref={scrollDivRef}
+                    className={`animate-fade-from-above ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
+                    style={{ scrollBehavior: 'smooth' }}
+                >
+                    {snap.nodeNames.map((nodeName, index) => (
+                        <li
+                            ref={(el) => {
+                                liRefs.current[index] = el;
+                            }}
+                            tabIndex={0}
+                            className={`rounded-sm ${snap.currentMesh.lastSelection.includes(nodeName) ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
+                            onClick={() => {
+                                state.action = 'CHANGESELECTION';
+                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                state.currentMesh.lastSelection = [nodeName];
+                                state.currentMesh.existingSelection = [nodeName];
+                                state.lastUpdateId++;
+                            }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
+                                state.action = 'CHANGESELECTION';
+                                if (e.key === 'ArrowUp' && index > 0) {
+                                    state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                    state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
+                                    state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
+                                    liRefs.current[index - 1]?.focus();
+                                }
+                                if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
+                                    state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                    state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
+                                    state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
+                                    liRefs.current[index + 1]?.focus();
+                                }
+                                state.lastUpdateId++;
+                            }}
+                            key={nodeName}
+                        >
+                            <div
+                                className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh.lastSelection.includes(nodeName) ? 'ml-4 text-black select-none' : 'ml-2'}`}
                             >
-                                <div
-                                    className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh[1] === nodeName ? 'ml-4 text-black select-none' : 'ml-2'}`}
-                                >
-                                    <TbBox className="inline-block text-3xl" />
-                                    <span>{nodeName}</span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                                <TbBox className="inline-block text-3xl" />
+                                <span>{nodeName}</span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+
                 <div
                     className={`animate-fade-from-below *:not-first:not-last:mb-2 ${!(snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all') ? 'block' : 'hidden'}`}
                 >

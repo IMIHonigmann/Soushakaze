@@ -234,6 +234,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
             if (snap.action === 'CHANGESELECTION') changeSelection();
             if (snap.action === 'ADDTOSELECTION') addToSelection();
         }
+        state.action = null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastUpdateId]);
 
