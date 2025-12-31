@@ -162,51 +162,52 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     function addToSelection() {
         if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
 
-        const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
-        if (!nodeName) return;
-        const node = meshRefs.current[nodeName];
-        const newMat = Array.isArray(node?.material) ? node.material[0] : node?.material;
+        const nodeNames = snap.currentMesh.lastSelection as typeof state.currentMesh.lastSelection;
+        nodeNames.map((nodeName) => {
+            if (!nodeName) return;
+            const node = meshRefs.current[nodeName];
+            const newMat = Array.isArray(node?.material) ? node.material[0] : node?.material;
 
-        if ((newMat as any)?.color?.isColor && node) {
-            if (!node.userData.__originalColor) {
-                node.userData.__originalColor = (newMat as any).color.clone();
+            if ((newMat as any)?.color?.isColor && node) {
+                if (!node.userData.__originalColor) {
+                    node.userData.__originalColor = (newMat as any).color.clone();
+                }
+                (newMat as any).color.set(SELECTED_COLOR);
             }
-            (newMat as any).color.set(SELECTED_COLOR);
-        }
+            if (node && selectionGroupRef.current) {
+                selectionGroupRef.current.attach(node);
+                const box = new THREE.Box3();
+                box.makeEmpty();
 
-        if (node && selectionGroupRef.current) {
-            selectionGroupRef.current.attach(node);
-            const box = new THREE.Box3();
-            box.makeEmpty();
+                snap.currentMesh.existingSelection.forEach((name) => {
+                    const mesh = meshRefs.current[name];
+                    if (mesh) box.expandByObject(mesh);
+                });
+                const center = new THREE.Vector3();
+                box.getCenter(center);
 
-            snap.currentMesh[2].forEach((name) => {
-                const mesh = meshRefs.current[name];
-                if (mesh) box.expandByObject(mesh);
-            });
-            const center = new THREE.Vector3();
-            box.getCenter(center);
+                snap.currentMesh.existingSelection.map((nn) => {
+                    const mesh = meshRefs.current[nn];
+                    if (mesh) sceneGroupRef.current!.attach(mesh);
+                });
 
-            snap.currentMesh[2].map((nn) => {
-                sceneGroupRef.current!.attach(meshRefs.current[nn]);
-            });
+                selectionGroupRef.current.parent?.worldToLocal(center);
+                selectionGroupRef.current.position.copy(center);
+                selectionGroupRef.current.updateMatrixWorld(true);
 
-            selectionGroupRef.current.parent?.worldToLocal(center);
-            selectionGroupRef.current.position.copy(center);
-            selectionGroupRef.current.updateMatrixWorld(true);
-
-            snap.currentMesh[2].forEach((name) => {
-                const mesh = meshRefs.current[name];
-                if (mesh) selectionGroupRef.current.attach(mesh);
-            });
-        }
-
+                snap.currentMesh.existingSelection.forEach((name) => {
+                    const mesh = meshRefs.current[name];
+                    if (mesh) selectionGroupRef.current!.attach(mesh);
+                });
+            }
+        });
         console.log('SHIFT CLICKED!!!');
     }
 
     function changeSelection() {
         if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
 
-        const previousSelection = snap.currentMesh[0];
+        const previousSelection = snap.currentMesh.previousSelection;
         previousSelection.map((nodeName) => {
             const previousMeshRef = meshRefs.current[nodeName];
             if (previousMeshRef) {
@@ -218,46 +219,49 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
             }
         });
 
-        state.currentMesh[0] = state.currentMesh[2];
-        const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
-        if (!nodeName) return;
-        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
-            ? meshRefs.current[nodeName].material[0]
-            : meshRefs.current[nodeName]?.material;
+        state.currentMesh.previousSelection = state.currentMesh.lastSelection;
+        const nodeNames = snap.currentMesh.lastSelection as typeof state.currentMesh.lastSelection;
+        nodeNames.map((nodeName) => {
+            if (!nodeName) return;
+            const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
+                ? meshRefs.current[nodeName].material[0]
+                : meshRefs.current[nodeName]?.material;
 
-        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
-            if (!meshRefs.current[nodeName].userData.__originalColor) {
-                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+            if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
+                if (!meshRefs.current[nodeName].userData.__originalColor) {
+                    meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+                }
+                (newMat as any).color.set(SELECTED_COLOR);
             }
-            (newMat as any).color.set(SELECTED_COLOR);
-        }
 
-        if (meshRefs.current[nodeName] && selectionGroupRef.current) {
-            selectionGroupRef.current.attach(meshRefs.current[nodeName]);
-            const box = new THREE.Box3();
-            box.makeEmpty();
+            if (meshRefs.current[nodeName] && selectionGroupRef.current) {
+                selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+                const box = new THREE.Box3();
+                box.makeEmpty();
 
-            snap.currentMesh[2].forEach((name) => {
-                const mesh = meshRefs.current[name];
-                if (mesh) box.expandByObject(mesh);
-            });
+                snap.currentMesh.existingSelection.forEach((name) => {
+                    const mesh = meshRefs.current[name];
+                    if (mesh) box.expandByObject(mesh);
+                });
 
-            const center = new THREE.Vector3();
-            box.getCenter(center);
+                const center = new THREE.Vector3();
+                box.getCenter(center);
 
-            snap.currentMesh[2].map((nn) => {
-                sceneGroupRef.current!.attach(meshRefs.current[nn]);
-            });
+                snap.currentMesh.existingSelection.map((nn) => {
+                    const mesh = meshRefs.current[nn];
+                    if (mesh) sceneGroupRef.current!.attach(mesh);
+                });
 
-            selectionGroupRef.current.parent?.worldToLocal(center);
-            selectionGroupRef.current.position.copy(center);
-            selectionGroupRef.current.updateMatrixWorld(true);
+                selectionGroupRef.current.parent?.worldToLocal(center);
+                selectionGroupRef.current.position.copy(center);
+                selectionGroupRef.current.updateMatrixWorld(true);
 
-            snap.currentMesh[2].forEach((name) => {
-                const mesh = meshRefs.current[name];
-                if (mesh) selectionGroupRef.current.attach(mesh);
-            });
-        }
+                snap.currentMesh.existingSelection.forEach((name) => {
+                    const mesh = meshRefs.current[name];
+                    if (mesh) selectionGroupRef.current!.attach(mesh);
+                });
+            }
+        });
     }
 
     useEffect(() => {
@@ -298,17 +302,15 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                     scale={n.scale}
                                     onDoubleClick={(e) => {
                                         e.stopPropagation();
+                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                         if (e.shiftKey) {
-                                            state.currentMesh[0] = [...state.currentMesh[2]];
-                                            state.currentMesh[1] = e.object.name;
-                                            state.currentMesh[2].push(e.object.name);
+                                            state.currentMesh.existingSelection.push(e.object.name);
                                             state.action = 'ADDTOSELECTION';
                                         } else {
-                                            state.currentMesh[0] = [...state.currentMesh[2]];
-                                            state.currentMesh[1] = e.object.name;
-                                            state.currentMesh[2] = [e.object.name];
+                                            state.currentMesh.existingSelection = [e.object.name];
                                             state.action = 'CHANGESELECTION';
                                         }
+                                        state.currentMesh.lastSelection = [e.object.name];
                                         state.lastUpdateId++;
                                     }}
                                     onPointerEnter={(e) => {
@@ -327,7 +329,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
                                         const original: THREE.Color | undefined = mesh.userData.__originalColor;
 
-                                        if (snap.currentMesh[2].includes(mesh.name)) {
+                                        if (snap.currentMesh.existingSelection.includes(mesh.name)) {
                                             (mat as any).color.set(SELECTED_COLOR);
                                         } else if (original) {
                                             (mat as any).color.copy(original);

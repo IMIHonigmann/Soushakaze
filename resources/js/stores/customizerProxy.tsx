@@ -30,7 +30,11 @@ export const state = proxy({
     currentAreaSelection: 'all' as Area,
     dbAttachmentsToMaterialsObject: {} as Record<string, string[]>,
     mode: undefined as 'translate' | 'rotate' | 'scale' | undefined,
-    currentMesh: [[], null, []] as [previousSelection: string[], lastSelected: string | null, currentSelection: string[]],
+    currentMesh: {
+        previousSelection: [] as string[],
+        existingSelection: [] as string[],
+        lastSelection: [] as string[],
+    },
     nodeNames: [] as string[],
     CAMERA_POSITIONS: {
         stock: [vec3(0, 0, 0), vec3(-5, 0, 3)],
