@@ -13,8 +13,9 @@ import { ScrambleTextPlugin } from 'gsap/all';
 import { ChevronRight, PlusCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
+import { BsBoundingBox } from 'react-icons/bs';
 import { CiIceCream } from 'react-icons/ci';
-import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaChevronRight } from 'react-icons/fa';
+import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaChevronRight, FaChevronUp } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
@@ -628,21 +629,29 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 ))}
                 <PlusCircle />
             </div>
-            <div className="col-start-3 flex">
-                {(
-                    [
-                        [LuMousePointer, undefined],
-                        [LuMove3D, 'translate'],
-                        [LuRotate3D, 'rotate'],
-                        [LuScale3D, 'scale'],
-                    ] as [IconType, typeof state.mode][]
-                ).map(([IconComponent, mode]) => (
-                    <IconComponent
-                        key={mode ?? 'select'}
-                        className={`h-full w-12 origin-bottom rounded-t-full p-2 transition-transform duration-150 hover:translate-y-0.5 hover:scale-125 hover:text-black ${snap.mode === mode ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
-                        onClick={() => (state.mode = mode as typeof state.mode)}
-                    />
-                ))}
+            <div className="col-start-3 flex items-center justify-between">
+                <span className="flex">
+                    {(
+                        [
+                            [LuMousePointer, undefined],
+                            [LuMove3D, 'translate'],
+                            [LuRotate3D, 'rotate'],
+                            [LuScale3D, 'scale'],
+                        ] as [IconType, typeof state.mode][]
+                    ).map(([IconComponent, mode]) => (
+                        <IconComponent
+                            key={mode ?? 'select'}
+                            className={`h-full w-12 origin-bottom rounded-xl p-2 transition-transform duration-150 hover:text-black ${snap.mode === mode ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                            onClick={() => (state.mode = mode as typeof state.mode)}
+                        />
+                    ))}
+                </span>
+                <span className="m-4 flex items-center gap-2 rounded-xl border p-2">
+                    <BsBoundingBox />
+                    Bounding Box Center
+                    <FaChevronUp />
+                </span>
+                <span>Apply</span>
             </div>
         </div>
     );

@@ -164,19 +164,40 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
 
         const nodeName = snap.currentMesh[1] as (typeof state.currentMesh)[1];
         if (!nodeName) return;
-        const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
-            ? meshRefs.current[nodeName].material[0]
-            : meshRefs.current[nodeName]?.material;
+        const node = meshRefs.current[nodeName];
+        const newMat = Array.isArray(node?.material) ? node.material[0] : node?.material;
 
-        if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
-            if (!meshRefs.current[nodeName].userData.__originalColor) {
-                meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+        if ((newMat as any)?.color?.isColor && node) {
+            if (!node.userData.__originalColor) {
+                node.userData.__originalColor = (newMat as any).color.clone();
             }
             (newMat as any).color.set(SELECTED_COLOR);
         }
 
-        if (meshRefs.current[nodeName]) {
-            selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+        if (node && selectionGroupRef.current) {
+            selectionGroupRef.current.attach(node);
+            const box = new THREE.Box3();
+            box.makeEmpty();
+
+            snap.currentMesh[2].forEach((name) => {
+                const mesh = meshRefs.current[name];
+                if (mesh) box.expandByObject(mesh);
+            });
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+
+            snap.currentMesh[2].map((nn) => {
+                sceneGroupRef.current!.attach(meshRefs.current[nn]);
+            });
+
+            selectionGroupRef.current.parent?.worldToLocal(center);
+            selectionGroupRef.current.position.copy(center);
+            selectionGroupRef.current.updateMatrixWorld(true);
+
+            snap.currentMesh[2].forEach((name) => {
+                const mesh = meshRefs.current[name];
+                if (mesh) selectionGroupRef.current.attach(mesh);
+            });
         }
 
         console.log('SHIFT CLICKED!!!');
@@ -211,8 +232,31 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
             (newMat as any).color.set(SELECTED_COLOR);
         }
 
-        if (meshRefs.current[nodeName]) {
+        if (meshRefs.current[nodeName] && selectionGroupRef.current) {
             selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+            const box = new THREE.Box3();
+            box.makeEmpty();
+
+            snap.currentMesh[2].forEach((name) => {
+                const mesh = meshRefs.current[name];
+                if (mesh) box.expandByObject(mesh);
+            });
+
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+
+            snap.currentMesh[2].map((nn) => {
+                sceneGroupRef.current!.attach(meshRefs.current[nn]);
+            });
+
+            selectionGroupRef.current.parent?.worldToLocal(center);
+            selectionGroupRef.current.position.copy(center);
+            selectionGroupRef.current.updateMatrixWorld(true);
+
+            snap.currentMesh[2].forEach((name) => {
+                const mesh = meshRefs.current[name];
+                if (mesh) selectionGroupRef.current.attach(mesh);
+            });
         }
     }
 

@@ -4,7 +4,7 @@ import { router } from '@inertiajs/react';
 import { ContactShadows } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
-import React, { memo, Suspense, useCallback, useRef, useState } from 'react';
+import React, { memo, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 
 interface Props {
     cameraControlsRef: React.RefObject<any>;
@@ -14,7 +14,7 @@ interface Props {
 function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {
     const { gl, scene, camera } = useThree();
 
-    React.useEffect(() => {
+    useEffect(() => {
         window.takeScreenshot = () => {
             gl.render(scene, camera);
             const dataURL = gl.domElement.toDataURL('image/png');
