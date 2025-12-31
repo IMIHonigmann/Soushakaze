@@ -162,45 +162,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     function addToSelection() {
         if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
 
-        const nodeNames = snap.currentMesh.lastSelection as typeof state.currentMesh.lastSelection;
-        nodeNames.map((nodeName) => {
-            if (!nodeName) return;
-            const node = meshRefs.current[nodeName];
-            const newMat = Array.isArray(node?.material) ? node.material[0] : node?.material;
-
-            if ((newMat as any)?.color?.isColor && node) {
-                if (!node.userData.__originalColor) {
-                    node.userData.__originalColor = (newMat as any).color.clone();
-                }
-                (newMat as any).color.set(SELECTED_COLOR);
-            }
-            if (node && selectionGroupRef.current) {
-                selectionGroupRef.current.attach(node);
-                const box = new THREE.Box3();
-                box.makeEmpty();
-
-                snap.currentMesh.existingSelection.forEach((name) => {
-                    const mesh = meshRefs.current[name];
-                    if (mesh) box.expandByObject(mesh);
-                });
-                const center = new THREE.Vector3();
-                box.getCenter(center);
-
-                snap.currentMesh.existingSelection.map((nn) => {
-                    const mesh = meshRefs.current[nn];
-                    if (mesh) sceneGroupRef.current!.attach(mesh);
-                });
-
-                selectionGroupRef.current.parent?.worldToLocal(center);
-                selectionGroupRef.current.position.copy(center);
-                selectionGroupRef.current.updateMatrixWorld(true);
-
-                snap.currentMesh.existingSelection.forEach((name) => {
-                    const mesh = meshRefs.current[name];
-                    if (mesh) selectionGroupRef.current!.attach(mesh);
-                });
-            }
-        });
+        selectionProcedure();
         console.log('SHIFT CLICKED!!!');
     }
 
@@ -220,6 +182,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         });
 
         state.currentMesh.previousSelection = state.currentMesh.lastSelection;
+        selectionProcedure();
+    }
+
+    function selectionProcedure() {
         const nodeNames = snap.currentMesh.lastSelection as typeof state.currentMesh.lastSelection;
         nodeNames.map((nodeName) => {
             if (!nodeName) return;
