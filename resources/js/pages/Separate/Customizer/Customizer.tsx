@@ -234,20 +234,20 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         };
     }, []);
 
-    const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+    const liRefs = useRef<Record<string, HTMLLIElement | null>>({});
     const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
-    const curIndexRef = useRef(0);
 
     useEffect(() => {
-        const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh.lastSelection));
-        if (selectedIndex !== -1 && liRefs.current[selectedIndex]) {
+        const selectedElement = Object.values(liRefs.current).find((element) => element?.dataset.index === String(snap.currentMesh.lastSelection));
+        const selectedIndex = selectedElement?.dataset.index;
+        if (selectedIndex && liRefs.current[selectedIndex]) {
             liRefs.current[selectedIndex].scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
             });
         }
-        if (snap.currentMesh.lastSelection.length === 1) setActiveClickedLi(liRefs.current[selectedIndex]);
+        if (snap.currentMesh.lastSelection.length === 1 && selectedElement) setActiveClickedLi(selectedElement);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastListSearchId, snap.nodeNames]);
 
@@ -257,6 +257,10 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     const [openedAttTabs, setOpenedAttTabs] = useState<Record<string, boolean>>(() =>
         Object.fromEntries(Object.values(attachments).map((atts) => atts.map((att) => [att.id, false]))),
     );
+
+    useEffect(() => {
+        console.log('active', activeClickedLi);
+    }, [activeClickedLi]);
 
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
@@ -553,126 +557,133 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 className={`animate-fade-from-above row-span-2 flex flex-col overflow-scroll p-4 ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
                 style={{ scrollBehavior: 'smooth' }}
             >
-                {Object.entries(attachments).map(([area, atts]) => (
-                    <li key={area}>
-                        <h3
-                            onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
-                            className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
-                        >
-                            <span className="flex items-center gap-2">
-                                <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} text-lg transition-transform duration-300`} />
-                                <TbCamera />
-                            </span>
-                            <span className={`transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
-                        </h3>
-                        <ul className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area] ? '' : 'h-0 opacity-0'}`}>
-                            {atts.map((att) => (
-                                <li key={att.id}>
-                                    <h4
-                                        onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
-                                        className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
-                                    >
-                                        <span className="flex items-center gap-2">
-                                            <FaChevronRight
-                                                className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
-                                            />
-                                            <GiDesertEagle className="text-2xl" />
-                                            <span className="text-xl">{att.name}</span>
-                                        </span>
-                                        <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
-                                    </h4>
-                                    <ul
-                                        className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id] ? '' : 'h-0 opacity-0'} `}
-                                    >
-                                        {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName) => {
-                                            const index = curIndexRef.current++;
-                                            return (
-                                                <li
-                                                    data-index={index}
-                                                    data-nodename={nodeName}
-                                                    ref={(el) => {
-                                                        liRefs.current[index] = el;
-                                                    }}
-                                                    tabIndex={0}
-                                                    className={`rounded-sm select-none ${Number(activeClickedLi?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
-                                                    onClick={(e) => {
-                                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                                        if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
-                                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                                        state.currentMesh.existingSelection = [];
-                                                        state.currentMesh.lastSelection = [];
-
-                                                        if (e.shiftKey) {
+                {(() => {
+                    return Object.entries(attachments).map(([area, atts], areaIndex) => (
+                        <li key={area}>
+                            <h3
+                                onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
+                                className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <FaChevronRight
+                                        className={`${openedAreaTabs[area] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                    />
+                                    <TbCamera />
+                                </span>
+                                <span className={`transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
+                            </h3>
+                            <ul
+                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area] ? '' : 'h-0 opacity-0'}`}
+                            >
+                                {atts.map((att, attIndex) => (
+                                    <li key={att.id}>
+                                        <h4
+                                            onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
+                                            className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
+                                        >
+                                            <span className="flex items-center gap-2">
+                                                <FaChevronRight
+                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                                />
+                                                <GiDesertEagle className="text-2xl" />
+                                                <span className="text-xl">{att.name}</span>
+                                            </span>
+                                            <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
+                                        </h4>
+                                        <ul
+                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id] ? '' : 'h-0 opacity-0'} `}
+                                        >
+                                            {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName, modelIndex) => {
+                                                const index = `${areaIndex}-${attIndex}-${modelIndex}`;
+                                                return (
+                                                    <li
+                                                        data-index={index}
+                                                        data-nodename={nodeName}
+                                                        ref={(el) => {
+                                                            liRefs.current[index] = el;
+                                                        }}
+                                                        tabIndex={0}
+                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                                                        onClick={(e) => {
+                                                            state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                                            if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
+                                                            state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                                            state.currentMesh.existingSelection = [];
+                                                            state.currentMesh.lastSelection = [];
                                                             state.action = 'CHANGESELECTION';
-                                                            const clickedIndex = Number(e.currentTarget.dataset.index);
-                                                            const activeIndex = Number(activeClickedLi?.dataset.index);
-                                                            for (
-                                                                let i = Math.min(activeIndex, clickedIndex);
-                                                                i <= Math.max(activeIndex, clickedIndex);
-                                                                i++
-                                                            ) {
-                                                                const nodeName = liRefs.current[i]?.dataset.nodename;
-                                                                if (nodeName) {
-                                                                    state.currentMesh.existingSelection.push(nodeName);
-                                                                    state.currentMesh.lastSelection.push(nodeName);
+
+                                                            if (e.shiftKey) {
+                                                                const clickedIndex = e.currentTarget.dataset.index;
+                                                                const thirdClickedNumber = Number(clickedIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3]);
+                                                                const activeIndex = activeClickedLi?.dataset.index;
+                                                                const thirdNumber = Number(activeIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3]);
+                                                                for (
+                                                                    let i = Math.min(thirdNumber, thirdClickedNumber);
+                                                                    i <= Math.max(thirdNumber, thirdClickedNumber);
+                                                                    i++
+                                                                ) {
+                                                                    const nodeName =
+                                                                        liRefs.current[`${areaIndex}-${attIndex}-${i}`]?.dataset.nodename;
+                                                                    console.log('found?', nodeName);
+                                                                    if (nodeName) {
+                                                                        state.currentMesh.existingSelection.push(nodeName);
+                                                                        state.currentMesh.lastSelection.push(nodeName);
+                                                                    }
                                                                 }
+                                                            } else {
+                                                                state.currentMesh.existingSelection = [nodeName];
+                                                                state.currentMesh.lastSelection = [nodeName];
+                                                                setActiveClickedLi(e.currentTarget);
                                                             }
 
-                                                            console.log('prev', state.currentMesh.previousSelection);
-                                                            console.log('existing', state.currentMesh.existingSelection);
-                                                        } else {
+                                                            state.lastUpdateId++;
+                                                        }}
+                                                        onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
                                                             state.action = 'CHANGESELECTION';
-                                                            state.currentMesh.existingSelection = [nodeName];
-                                                            state.currentMesh.lastSelection = [nodeName];
-                                                            setActiveClickedLi(e.currentTarget);
-                                                        }
-                                                        state.lastUpdateId++;
-                                                    }}
-                                                    onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                                        state.action = 'CHANGESELECTION';
-                                                        if (e.key === 'ArrowUp' && index > 0) {
-                                                            state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                                            state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
-                                                            state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
-                                                            liRefs.current[index - 1]?.focus();
-                                                        }
-                                                        if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
-                                                            state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                                            state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
-                                                            state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
-                                                            liRefs.current[index + 1]?.focus();
-                                                        }
-                                                        state.lastUpdateId++;
-                                                    }}
-                                                    key={nodeName}
-                                                >
-                                                    <div
-                                                        className={`flex items-center gap-2 p-1 transition-all ${
-                                                            Number(activeClickedLi?.dataset.index) === index
-                                                                ? 'ml-8 select-none'
-                                                                : snap.currentMesh.lastSelection.includes(nodeName)
-                                                                  ? 'ml-4 select-none'
-                                                                  : 'ml-2'
-                                                        }`}
+                                                            if (e.key === 'ArrowUp') {
+                                                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                                                // state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
+                                                                // state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
+                                                                // liRefs.current[index - 1]?.focus();
+                                                            }
+                                                            if (e.key === 'ArrowDown') {
+                                                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                                                // state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
+                                                                // state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
+                                                                // liRefs.current[index + 1]?.focus();
+                                                            }
+                                                            state.lastUpdateId++;
+                                                        }}
+                                                        key={nodeName}
                                                     >
-                                                        <TbBox className="inline-block text-3xl" />
-                                                        <span>{nodeName}</span>
-                                                    </div>
-                                                </li>
-                                            );
-                                        })}
-                                        <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
-                                            <PlusCircle /> <span>Add New Model</span>
-                                        </li>
-                                    </ul>
+                                                        <div
+                                                            className={`flex items-center gap-2 p-1 transition-all ${
+                                                                activeClickedLi?.dataset.nodename === nodeName
+                                                                    ? 'ml-8 select-none'
+                                                                    : snap.currentMesh.lastSelection.includes(nodeName)
+                                                                      ? 'ml-4 select-none'
+                                                                      : 'ml-2'
+                                                            }`}
+                                                        >
+                                                            <TbBox className="inline-block text-3xl" />
+                                                            <span>{nodeName}</span>
+                                                        </div>
+                                                    </li>
+                                                );
+                                            })}
+                                            <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
+                                                <PlusCircle /> <span>Add New Model</span>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                ))}
+                                <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
+                                    <PlusCircle /> <span>Add New Attachment</span>
                                 </li>
-                            ))}
-                            <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
-                                <PlusCircle /> <span>Add New Attachment</span>
-                            </li>
-                        </ul>
-                    </li>
-                ))}
+                            </ul>
+                        </li>
+                    ));
+                })()}
                 <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert">
                     <PlusCircle /> <span>Add New Area</span>
                 </li>

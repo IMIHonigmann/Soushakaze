@@ -96,7 +96,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         const map: Record<string, string[]> = {};
         map['Foregrip'] = ['defaultMaterial_19'];
         map['Red Dot Sight'] = ['defaultMaterial_13', 'defaultMaterial_14', 'defaultMaterial_15'];
-        map['Laser Sight'] = Array.from({ length: 10 }, (_, i) => `defaultMaterial_${i + 1}`);
+        map['Laser Sight'] = Array.from({ length: 10 }, (_, i) => `defaultMaterial00${i + 1}`);
         map['Laser Sight'].push('defaultMaterial');
 
         return map;
