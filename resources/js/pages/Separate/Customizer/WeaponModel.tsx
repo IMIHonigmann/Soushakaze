@@ -159,16 +159,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         }
     }
 
-    function addToSelection() {
-        if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
-
-        selectionProcedure();
-        console.log('SHIFT CLICKED!!!');
-    }
-
-    function changeSelection() {
-        if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
-
+    function removeOldSelection() {
         const previousSelection = snap.currentMesh.previousSelection;
         previousSelection.map((nodeName) => {
             const previousMeshRef = meshRefs.current[nodeName];
@@ -182,11 +173,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         });
 
         state.currentMesh.previousSelection = state.currentMesh.lastSelection;
-        selectionProcedure();
     }
 
-    function selectionProcedure() {
-        const nodeNames = snap.currentMesh.lastSelection as typeof state.currentMesh.lastSelection;
+    function addNewCollection() {
+        const nodeNames = snap.currentMesh.existingSelection as typeof state.currentMesh.existingSelection;
         nodeNames.map((nodeName) => {
             if (!nodeName) return;
             const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
@@ -230,9 +220,19 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     }
 
     useEffect(() => {
+        if (!meshRefs.current || !sceneGroupRef.current || !selectionGroupRef.current) return;
         if (snap.action) {
-            if (snap.action === 'CHANGESELECTION') changeSelection();
-            if (snap.action === 'ADDTOSELECTION') addToSelection();
+            if (snap.action === 'CHANGESELECTION') {
+                removeOldSelection();
+                addNewCollection();
+            }
+            if (snap.action === 'ADDSINGLE') {
+                addNewCollection();
+            }
+            if (snap.action === 'ADDMULTIPLE') {
+                removeOldSelection();
+                addNewCollection();
+            }
         }
         state.action = null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,13 +271,14 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                         if (e.shiftKey) {
                                             state.currentMesh.existingSelection.push(e.object.name);
-                                            state.action = 'ADDTOSELECTION';
+                                            state.action = 'ADDSINGLE';
                                         } else {
                                             state.currentMesh.existingSelection = [e.object.name];
                                             state.action = 'CHANGESELECTION';
                                         }
                                         state.currentMesh.lastSelection = [e.object.name];
                                         state.lastUpdateId++;
+                                        state.lastListSearchId++;
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();

@@ -21,7 +21,6 @@ export const createBagStore = (bagName: string) =>
         bag: (() => {
             const stored = localStorage.getItem(bagName);
             const parsedBag: BagItem[] = stored ? JSON.parse(stored) : [];
-            console.log(parsedBag);
             return parsedBag;
         })(),
         setBag: (newBag: BagItem[]) =>

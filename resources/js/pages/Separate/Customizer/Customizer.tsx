@@ -235,6 +235,8 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }, []);
 
     const liRefs = useRef<(HTMLLIElement | null)[]>([]);
+    const lastSingleClickedLiRef = useRef<HTMLLIElement | null>(null);
+    const lastClickedLiRef = useRef<HTMLLIElement | null>(null);
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
     useEffect(() => {
@@ -245,7 +247,8 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 block: 'center',
             });
         }
-    }, [snap.currentMesh, snap.nodeNames]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [snap.lastListSearchId, snap.nodeNames]);
 
     const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, boolean>>(() =>
         Object.fromEntries(Object.keys(attachments).map((area) => [area, false])),
@@ -264,16 +267,36 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                 >
                     {snap.nodeNames.map((nodeName, index) => (
                         <li
+                            data-index={index}
+                            data-nodename={nodeName}
                             ref={(el) => {
                                 liRefs.current[index] = el;
                             }}
                             tabIndex={0}
-                            className={`rounded-sm ${snap.currentMesh.lastSelection.includes(nodeName) ? 'bg-orange-500' : 'cursor-pointer hover:bg-red-600'}`}
-                            onClick={() => {
-                                state.action = 'CHANGESELECTION';
-                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                state.currentMesh.lastSelection = [nodeName];
-                                state.currentMesh.existingSelection = [nodeName];
+                            className={`rounded-sm select-none ${Number(lastSingleClickedLiRef.current?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                            onClick={(e) => {
+                                state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                if (!lastSingleClickedLiRef.current) lastSingleClickedLiRef.current = e.currentTarget;
+                                if (!lastClickedLiRef.current) lastClickedLiRef.current = e.currentTarget;
+
+                                if (e.shiftKey) {
+                                    state.action = 'ADDMULTIPLE';
+                                    const clickedIndex = Number(e.currentTarget.dataset.index);
+                                    const lastIndex = Number(lastSingleClickedLiRef.current.dataset.index);
+                                    state.currentMesh.previousSelection = snap.currentMesh.existingSelection as string[];
+                                    state.currentMesh.existingSelection = [];
+                                    state.currentMesh.lastSelection = [];
+                                    for (let i = Math.min(lastIndex, clickedIndex); i <= Math.max(lastIndex, clickedIndex); i++) {
+                                        state.currentMesh.existingSelection.push(snap.nodeNames[i]);
+                                    }
+                                    state.currentMesh.lastSelection = [snap.nodeNames[clickedIndex]];
+                                } else {
+                                    lastSingleClickedLiRef.current = e.currentTarget;
+                                    state.action = 'CHANGESELECTION';
+                                    state.currentMesh.existingSelection = [nodeName];
+                                    state.currentMesh.lastSelection = [nodeName];
+                                }
+                                lastClickedLiRef.current = e.currentTarget;
                                 state.lastUpdateId++;
                             }}
                             onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
@@ -295,7 +318,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                             key={nodeName}
                         >
                             <div
-                                className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh.lastSelection.includes(nodeName) ? 'ml-4 text-black select-none' : 'ml-2'}`}
+                                className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh.lastSelection.includes(nodeName) ? 'ml-4 select-none' : 'ml-2'}`}
                             >
                                 <TbBox className="inline-block text-3xl" />
                                 <span>{nodeName}</span>
