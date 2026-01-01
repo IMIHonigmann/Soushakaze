@@ -179,21 +179,27 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         const nodeNames = snap.currentMesh.existingSelection as typeof state.currentMesh.existingSelection;
         nodeNames.map((nodeName) => {
             if (!nodeName) return;
-            const newMat = Array.isArray(meshRefs.current[nodeName]?.material)
-                ? meshRefs.current[nodeName].material[0]
-                : meshRefs.current[nodeName]?.material;
+            const mesh = meshRefs.current[nodeName]!;
+            ensureUniqueMaterial(mesh);
+            const newMat = Array.isArray(mesh?.material) ? mesh.material[0] : mesh?.material;
 
-            if ((newMat as any)?.color?.isColor && meshRefs.current[nodeName]) {
-                if (!meshRefs.current[nodeName].userData.__originalColor) {
-                    meshRefs.current[nodeName].userData.__originalColor = (newMat as any).color.clone();
+            if ((newMat as any)?.color?.isColor && mesh) {
+                if (!mesh.userData.__originalColor) {
+                    mesh.userData.__originalColor = (newMat as any).color.clone();
                 }
                 (newMat as any).color.set(SELECTED_COLOR);
             }
 
-            if (meshRefs.current[nodeName] && selectionGroupRef.current) {
-                selectionGroupRef.current.attach(meshRefs.current[nodeName]);
+            if (mesh && selectionGroupRef.current) {
+                selectionGroupRef.current.attach(mesh);
             }
         });
+        const objects = snap.currentMesh.existingSelection.map((nodeName) => worldNodes[nodeName]);
+        console.log(
+            'CURRENT MESHES THAT WERE ADDED',
+            objects.filter((node) => node.material?.name === 'perst'),
+        );
+        console.log(worldNodes['defaultMaterial008'].material);
 
         const box = new THREE.Box3();
         box.makeEmpty();

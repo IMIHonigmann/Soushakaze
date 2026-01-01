@@ -278,18 +278,24 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                 if (!lastSingleClickedLiRef.current) lastSingleClickedLiRef.current = e.currentTarget;
                                 if (!lastClickedLiRef.current) lastClickedLiRef.current = e.currentTarget;
+                                state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                state.currentMesh.existingSelection = [];
+                                state.currentMesh.lastSelection = [];
 
                                 if (e.shiftKey) {
                                     state.action = 'ADDMULTIPLE';
                                     const clickedIndex = Number(e.currentTarget.dataset.index);
                                     const lastIndex = Number(lastSingleClickedLiRef.current.dataset.index);
-                                    state.currentMesh.previousSelection = snap.currentMesh.existingSelection as string[];
-                                    state.currentMesh.existingSelection = [];
-                                    state.currentMesh.lastSelection = [];
                                     for (let i = Math.min(lastIndex, clickedIndex); i <= Math.max(lastIndex, clickedIndex); i++) {
-                                        state.currentMesh.existingSelection.push(snap.nodeNames[i]);
+                                        const nodeName = liRefs.current[i]?.dataset.nodename;
+                                        if (nodeName) {
+                                            state.currentMesh.existingSelection.push(nodeName);
+                                            state.currentMesh.lastSelection.push(nodeName);
+                                        }
                                     }
-                                    state.currentMesh.lastSelection = [snap.nodeNames[clickedIndex]];
+
+                                    console.log('prev', state.currentMesh.previousSelection);
+                                    console.log('existing', state.currentMesh.existingSelection);
                                 } else {
                                     lastSingleClickedLiRef.current = e.currentTarget;
                                     state.action = 'CHANGESELECTION';
