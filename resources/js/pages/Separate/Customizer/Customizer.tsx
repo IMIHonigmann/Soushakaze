@@ -578,12 +578,20 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 {atts.map((att, attIndex) => (
                                     <li key={att.id}>
                                         <h4
-                                            onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
+                                            onClick={() => {
+                                                state.action = 'CHANGESELECTION';
+                                                state.currentMesh.previousSelection = [...snap.currentMesh.existingSelection];
+                                                state.currentMesh.existingSelection = [...snap.dbAttachmentsToMaterialsObject[att.name]];
+                                                state.currentMesh.lastSelection = [...snap.dbAttachmentsToMaterialsObject[att.name]];
+                                                console.log('fiofdafdsasafd', state.currentMesh.lastSelection);
+                                                state.lastUpdateId++;
+                                            }}
                                             className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
                                         >
                                             <span className="flex items-center gap-2">
                                                 <FaChevronRight
-                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                                    onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
+                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
                                                 />
                                                 <GiDesertEagle className="text-2xl" />
                                                 <span className="text-xl">{att.name}</span>
