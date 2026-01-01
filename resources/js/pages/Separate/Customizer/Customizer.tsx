@@ -235,18 +235,18 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }, []);
 
     const liRefs = useRef<(HTMLLIElement | null)[]>([]);
-    const lastSingleClickedLiRef = useRef<HTMLLIElement | null>(null);
-    const lastClickedLiRef = useRef<HTMLLIElement | null>(null);
+    const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
     useEffect(() => {
         const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh.lastSelection));
         if (selectedIndex !== -1 && liRefs.current[selectedIndex]) {
-            liRefs.current[selectedIndex]?.scrollIntoView({
+            liRefs.current[selectedIndex].scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
             });
         }
+        if (snap.currentMesh.lastSelection.length === 1) setActiveClickedLi(liRefs.current[selectedIndex]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastListSearchId, snap.nodeNames]);
 
@@ -273,11 +273,10 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 liRefs.current[index] = el;
                             }}
                             tabIndex={0}
-                            className={`rounded-sm select-none ${Number(lastSingleClickedLiRef.current?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                            className={`rounded-sm select-none ${Number(activeClickedLi?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
                             onClick={(e) => {
                                 state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                if (!lastSingleClickedLiRef.current) lastSingleClickedLiRef.current = e.currentTarget;
-                                if (!lastClickedLiRef.current) lastClickedLiRef.current = e.currentTarget;
+                                if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
                                 state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                 state.currentMesh.existingSelection = [];
                                 state.currentMesh.lastSelection = [];
@@ -285,8 +284,8 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 if (e.shiftKey) {
                                     state.action = 'CHANGESELECTION';
                                     const clickedIndex = Number(e.currentTarget.dataset.index);
-                                    const lastIndex = Number(lastSingleClickedLiRef.current.dataset.index);
-                                    for (let i = Math.min(lastIndex, clickedIndex); i <= Math.max(lastIndex, clickedIndex); i++) {
+                                    const activeIndex = Number(activeClickedLi?.dataset.index);
+                                    for (let i = Math.min(activeIndex, clickedIndex); i <= Math.max(activeIndex, clickedIndex); i++) {
                                         const nodeName = liRefs.current[i]?.dataset.nodename;
                                         if (nodeName) {
                                             state.currentMesh.existingSelection.push(nodeName);
@@ -297,12 +296,11 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                     console.log('prev', state.currentMesh.previousSelection);
                                     console.log('existing', state.currentMesh.existingSelection);
                                 } else {
-                                    lastSingleClickedLiRef.current = e.currentTarget;
                                     state.action = 'CHANGESELECTION';
                                     state.currentMesh.existingSelection = [nodeName];
                                     state.currentMesh.lastSelection = [nodeName];
+                                    setActiveClickedLi(e.currentTarget);
                                 }
-                                lastClickedLiRef.current = e.currentTarget;
                                 state.lastUpdateId++;
                             }}
                             onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
@@ -324,7 +322,13 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                             key={nodeName}
                         >
                             <div
-                                className={`flex items-center gap-2 p-1 transition-all ${snap.currentMesh.lastSelection.includes(nodeName) ? 'ml-4 select-none' : 'ml-2'}`}
+                                className={`flex items-center gap-2 p-1 transition-all ${
+                                    Number(activeClickedLi?.dataset.index) === index
+                                        ? 'ml-8 select-none'
+                                        : snap.currentMesh.lastSelection.includes(nodeName)
+                                          ? 'ml-4 select-none'
+                                          : 'ml-2'
+                                }`}
                             >
                                 <TbBox className="inline-block text-3xl" />
                                 <span>{nodeName}</span>

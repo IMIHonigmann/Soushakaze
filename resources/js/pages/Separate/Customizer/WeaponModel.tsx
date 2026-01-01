@@ -277,10 +277,10 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                                         } else {
                                             state.currentMesh.existingSelection = [e.object.name];
                                             state.action = 'CHANGESELECTION';
+                                            state.lastListSearchId++;
                                         }
                                         state.currentMesh.lastSelection = [e.object.name];
                                         state.lastUpdateId++;
-                                        state.lastListSearchId++;
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();
