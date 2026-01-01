@@ -194,12 +194,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
                 selectionGroupRef.current.attach(mesh);
             }
         });
-        const objects = snap.currentMesh.existingSelection.map((nodeName) => worldNodes[nodeName]);
-        console.log(
-            'CURRENT MESHES THAT WERE ADDED',
-            objects.filter((node) => node.material?.name === 'perst'),
-        );
-        console.log(worldNodes['defaultMaterial008'].material);
 
         const box = new THREE.Box3();
         box.makeEmpty();

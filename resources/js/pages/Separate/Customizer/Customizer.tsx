@@ -10,19 +10,19 @@ import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
-import { ChevronRight, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BsBoundingBox } from 'react-icons/bs';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDoubleUp, FaAngleDown, FaAngleUp, FaChevronRight, FaChevronUp } from 'react-icons/fa';
 import { FaBoltLightning } from 'react-icons/fa6';
-import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
+import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiDesertEagle, GiFeather, GiHeavyBullets, GiStarFormation } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { IconType } from 'react-icons/lib';
 import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
 import { MdAddShoppingCart, MdEdit, MdOutlineCameraswitch } from 'react-icons/md';
-import { TbBox } from 'react-icons/tb';
+import { TbBox, TbCamera } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import CustomizerScene from './CustomizerScene';
@@ -237,6 +237,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     const liRefs = useRef<(HTMLLIElement | null)[]>([]);
     const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
+    const curIndexRef = useRef(0);
 
     useEffect(() => {
         const selectedIndex = snap.nodeNames.indexOf(String(snap.currentMesh.lastSelection));
@@ -251,7 +252,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     }, [snap.lastListSearchId, snap.nodeNames]);
 
     const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, boolean>>(() =>
-        Object.fromEntries(Object.keys(attachments).map((area) => [area, false])),
+        Object.fromEntries(Object.keys(attachments).map((area) => [area, true])),
     );
     const [openedAttTabs, setOpenedAttTabs] = useState<Record<string, boolean>>(() =>
         Object.fromEntries(Object.values(attachments).map((atts) => atts.map((att) => [att.id, false]))),
@@ -260,83 +261,6 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
-                <ul
-                    ref={scrollDivRef}
-                    className={`animate-fade-from-above ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
-                    style={{ scrollBehavior: 'smooth' }}
-                >
-                    {snap.nodeNames.map((nodeName, index) => (
-                        <li
-                            data-index={index}
-                            data-nodename={nodeName}
-                            ref={(el) => {
-                                liRefs.current[index] = el;
-                            }}
-                            tabIndex={0}
-                            className={`rounded-sm select-none ${Number(activeClickedLi?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
-                            onClick={(e) => {
-                                state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
-                                state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                state.currentMesh.existingSelection = [];
-                                state.currentMesh.lastSelection = [];
-
-                                if (e.shiftKey) {
-                                    state.action = 'CHANGESELECTION';
-                                    const clickedIndex = Number(e.currentTarget.dataset.index);
-                                    const activeIndex = Number(activeClickedLi?.dataset.index);
-                                    for (let i = Math.min(activeIndex, clickedIndex); i <= Math.max(activeIndex, clickedIndex); i++) {
-                                        const nodeName = liRefs.current[i]?.dataset.nodename;
-                                        if (nodeName) {
-                                            state.currentMesh.existingSelection.push(nodeName);
-                                            state.currentMesh.lastSelection.push(nodeName);
-                                        }
-                                    }
-
-                                    console.log('prev', state.currentMesh.previousSelection);
-                                    console.log('existing', state.currentMesh.existingSelection);
-                                } else {
-                                    state.action = 'CHANGESELECTION';
-                                    state.currentMesh.existingSelection = [nodeName];
-                                    state.currentMesh.lastSelection = [nodeName];
-                                    setActiveClickedLi(e.currentTarget);
-                                }
-                                state.lastUpdateId++;
-                            }}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                state.action = 'CHANGESELECTION';
-                                if (e.key === 'ArrowUp' && index > 0) {
-                                    state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                    state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
-                                    state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
-                                    liRefs.current[index - 1]?.focus();
-                                }
-                                if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
-                                    state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                    state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
-                                    state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
-                                    liRefs.current[index + 1]?.focus();
-                                }
-                                state.lastUpdateId++;
-                            }}
-                            key={nodeName}
-                        >
-                            <div
-                                className={`flex items-center gap-2 p-1 transition-all ${
-                                    Number(activeClickedLi?.dataset.index) === index
-                                        ? 'ml-8 select-none'
-                                        : snap.currentMesh.lastSelection.includes(nodeName)
-                                          ? 'ml-4 select-none'
-                                          : 'ml-2'
-                                }`}
-                            >
-                                <TbBox className="inline-block text-3xl" />
-                                <span>{nodeName}</span>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-
                 <div
                     className={`animate-fade-from-below *:not-first:not-last:mb-2 ${!(snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all') ? 'block' : 'hidden'}`}
                 >
@@ -624,49 +548,136 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     />
                 </div>
             </div>
-            <div className="row-span-2 flex flex-col gap-8 overflow-scroll p-4">
+            <ul
+                ref={scrollDivRef}
+                className={`animate-fade-from-above row-span-2 flex flex-col overflow-scroll p-4 ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
+                style={{ scrollBehavior: 'smooth' }}
+            >
                 {Object.entries(attachments).map(([area, atts]) => (
-                    <div key={area}>
+                    <li key={area}>
                         <h3
                             onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
-                            className="flex -skew-x-12 cursor-pointer items-center justify-between border-b-2 font-hitmarker-condensed text-3xl uppercase"
+                            className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
                         >
-                            <span className={`mb-2 transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
-                            <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} transition-transform duration-300`} />
+                            <span className="flex items-center gap-2">
+                                <FaChevronRight className={`${openedAreaTabs[area] ? 'rotate-90' : ''} text-lg transition-transform duration-300`} />
+                                <TbCamera />
+                            </span>
+                            <span className={`transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
                         </h3>
-                        <ul
-                            className={`overflow-scroll transition-all duration-300 ease-out ${openedAreaTabs[area] ? 'max-h-96' : 'max-h-0 opacity-0'}`}
-                        >
+                        <ul className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area] ? '' : 'h-0 opacity-0'}`}>
                             {atts.map((att) => (
-                                <li className="px-6" key={att.id}>
+                                <li key={att.id}>
                                     <h4
                                         onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
-                                        className={`group flex -skew-x-12 cursor-pointer items-center justify-between gap-4 overflow-hidden p-2 transition-all duration-300 ease-out hover:bg-red-600`}
+                                        className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
                                     >
-                                        {att.name}
-                                        <span className="flex items-center gap-2 text-xl">
-                                            <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
-                                            <ChevronRight
-                                                className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} transition-transform duration-300`}
+                                        <span className="flex items-center gap-2">
+                                            <FaChevronRight
+                                                className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
                                             />
+                                            <GiDesertEagle className="text-2xl" />
+                                            <span className="text-xl">{att.name}</span>
                                         </span>
+                                        <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
                                     </h4>
-                                    <div
-                                        className={`ml-4 overflow-scroll transition-all duration-300 ease-out ${openedAttTabs[att.id] ? 'max-h-96' : 'max-h-0 opacity-0'} `}
+                                    <ul
+                                        className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id] ? '' : 'h-0 opacity-0'} `}
                                     >
-                                        <div>bruh</div>
-                                        <div>bruh</div>
-                                        <div>bruh</div>
-                                        <PlusCircle />
-                                    </div>
+                                        {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName) => {
+                                            const index = curIndexRef.current++;
+                                            return (
+                                                <li
+                                                    data-index={index}
+                                                    data-nodename={nodeName}
+                                                    ref={(el) => {
+                                                        liRefs.current[index] = el;
+                                                    }}
+                                                    tabIndex={0}
+                                                    className={`rounded-sm select-none ${Number(activeClickedLi?.dataset.index) === index ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                                                    onClick={(e) => {
+                                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                                        if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
+                                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
+                                                        state.currentMesh.existingSelection = [];
+                                                        state.currentMesh.lastSelection = [];
+
+                                                        if (e.shiftKey) {
+                                                            state.action = 'CHANGESELECTION';
+                                                            const clickedIndex = Number(e.currentTarget.dataset.index);
+                                                            const activeIndex = Number(activeClickedLi?.dataset.index);
+                                                            for (
+                                                                let i = Math.min(activeIndex, clickedIndex);
+                                                                i <= Math.max(activeIndex, clickedIndex);
+                                                                i++
+                                                            ) {
+                                                                const nodeName = liRefs.current[i]?.dataset.nodename;
+                                                                if (nodeName) {
+                                                                    state.currentMesh.existingSelection.push(nodeName);
+                                                                    state.currentMesh.lastSelection.push(nodeName);
+                                                                }
+                                                            }
+
+                                                            console.log('prev', state.currentMesh.previousSelection);
+                                                            console.log('existing', state.currentMesh.existingSelection);
+                                                        } else {
+                                                            state.action = 'CHANGESELECTION';
+                                                            state.currentMesh.existingSelection = [nodeName];
+                                                            state.currentMesh.lastSelection = [nodeName];
+                                                            setActiveClickedLi(e.currentTarget);
+                                                        }
+                                                        state.lastUpdateId++;
+                                                    }}
+                                                    onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
+                                                        state.action = 'CHANGESELECTION';
+                                                        if (e.key === 'ArrowUp' && index > 0) {
+                                                            state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                                            state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
+                                                            state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
+                                                            liRefs.current[index - 1]?.focus();
+                                                        }
+                                                        if (e.key === 'ArrowDown' && index < snap.nodeNames.length - 1) {
+                                                            state.currentMesh.previousSelection = state.currentMesh.existingSelection;
+                                                            state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
+                                                            state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
+                                                            liRefs.current[index + 1]?.focus();
+                                                        }
+                                                        state.lastUpdateId++;
+                                                    }}
+                                                    key={nodeName}
+                                                >
+                                                    <div
+                                                        className={`flex items-center gap-2 p-1 transition-all ${
+                                                            Number(activeClickedLi?.dataset.index) === index
+                                                                ? 'ml-8 select-none'
+                                                                : snap.currentMesh.lastSelection.includes(nodeName)
+                                                                  ? 'ml-4 select-none'
+                                                                  : 'ml-2'
+                                                        }`}
+                                                    >
+                                                        <TbBox className="inline-block text-3xl" />
+                                                        <span>{nodeName}</span>
+                                                    </div>
+                                                </li>
+                                            );
+                                        })}
+                                        <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
+                                            <PlusCircle /> <span>Add New Model</span>
+                                        </li>
+                                    </ul>
                                 </li>
                             ))}
-                            <PlusCircle />
+                            <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
+                                <PlusCircle /> <span>Add New Attachment</span>
+                            </li>
                         </ul>
-                    </div>
+                    </li>
                 ))}
-                <PlusCircle />
-            </div>
+                <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert">
+                    <PlusCircle /> <span>Add New Area</span>
+                </li>
+            </ul>
+
             <div className="col-start-3 flex items-center justify-between">
                 <span className="flex">
                     {(
