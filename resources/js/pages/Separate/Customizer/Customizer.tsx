@@ -283,7 +283,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                 state.currentMesh.lastSelection = [];
 
                                 if (e.shiftKey) {
-                                    state.action = 'ADDMULTIPLE';
+                                    state.action = 'CHANGESELECTION';
                                     const clickedIndex = Number(e.currentTarget.dataset.index);
                                     const lastIndex = Number(lastSingleClickedLiRef.current.dataset.index);
                                     for (let i = Math.min(lastIndex, clickedIndex); i <= Math.max(lastIndex, clickedIndex); i++) {

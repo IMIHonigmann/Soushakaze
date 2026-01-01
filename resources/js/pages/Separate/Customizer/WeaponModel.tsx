@@ -235,10 +235,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
             if (snap.action === 'ADDSINGLE') {
                 addNewCollection();
             }
-            if (snap.action === 'ADDMULTIPLE') {
-                removeOldSelection();
-                addNewCollection();
-            }
         }
         state.action = null;
         // eslint-disable-next-line react-hooks/exhaustive-deps

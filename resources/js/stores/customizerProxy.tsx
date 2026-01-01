@@ -43,7 +43,7 @@ export const state = proxy({
         underbarrel: [vec3(2, 0.45, 0), vec3(3.5, 2, -2)],
         all: [vec3(0, -0.35, 0), vec3(0, 0, 5)],
     } as Partial<Record<Area, [target: THREE.Vector3, position: THREE.Vector3]>>,
-    action: null as 'ADDSINGLE' | 'CHANGESELECTION' | 'ADDMULTIPLE' | null,
+    action: null as 'ADDSINGLE' | 'CHANGESELECTION' | null,
     lastUpdateId: 0,
     lastListSearchId: 0,
 });
