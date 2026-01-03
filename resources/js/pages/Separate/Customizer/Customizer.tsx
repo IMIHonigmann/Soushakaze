@@ -251,12 +251,19 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastListSearchId, snap.nodeNames]);
 
-    const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, boolean>>(() =>
-        Object.fromEntries(Object.keys(attachments).map((area) => [area, true])),
+    const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, { opened: boolean; selected: boolean }>>(() =>
+        Object.fromEntries(Object.keys(attachments).map((area) => [area, { opened: true, selected: false }])),
     );
-    const [openedAttTabs, setOpenedAttTabs] = useState<Record<string, boolean>>(() =>
-        Object.fromEntries(Object.values(attachments).map((atts) => atts.map((att) => [att.id, false]))),
-    );
+
+    const [openedAttTabs, setOpenedAttTabs] = useState<Record<string | number, { opened: boolean; selected: boolean }>>(() => {
+        const result: Record<string | number, { opened: boolean; selected: boolean }> = {};
+        Object.values(attachments).forEach((atts) => {
+            atts.forEach((att) => {
+                result[att.id] = { opened: true, selected: false };
+            });
+        });
+        return result;
+    });
 
     useEffect(() => {
         console.log('active', activeClickedLi);
@@ -561,19 +568,27 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     return Object.entries(attachments).map(([area, atts], areaIndex) => (
                         <li key={area}>
                             <h3
-                                onClick={() => setOpenedAreaTabs((prev) => ({ ...prev, [area]: !prev[area] }))}
+                                onClick={() =>
+                                    setOpenedAreaTabs((prev) => ({
+                                        ...prev,
+                                        [area]: {
+                                            ...prev[area],
+                                            opened: !prev[area].opened,
+                                        },
+                                    }))
+                                }
                                 className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
                             >
                                 <span className="flex items-center gap-2">
                                     <FaChevronRight
-                                        className={`${openedAreaTabs[area] ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                        className={`${openedAreaTabs[area].opened ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
                                     />
                                     <TbCamera />
                                 </span>
-                                <span className={`transition-all ${openedAreaTabs[area] ? 'ml-2' : ''}`}>{area}</span>
+                                <span className={`transition-all ${openedAreaTabs[area].opened ? 'ml-2' : ''}`}>{area}</span>
                             </h3>
                             <ul
-                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area] ? '' : 'h-0 opacity-0'}`}
+                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area].opened ? '' : 'h-0 opacity-0'}`}
                             >
                                 {atts.map((att, attIndex) => (
                                     <li key={att.id}>
@@ -590,8 +605,16 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                         >
                                             <span className="flex items-center gap-2">
                                                 <FaChevronRight
-                                                    onClick={() => setOpenedAttTabs((prev) => ({ ...prev, [att.id]: !prev[att.id] }))}
-                                                    className={`${openedAttTabs[att.id] ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
+                                                    onClick={() =>
+                                                        setOpenedAttTabs((prev) => ({
+                                                            ...prev,
+                                                            [att.id]: {
+                                                                ...prev[att.id],
+                                                                opened: !prev[att.id].opened,
+                                                            },
+                                                        }))
+                                                    }
+                                                    className={`${openedAttTabs[att.id].opened ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
                                                 />
                                                 <GiDesertEagle className="text-2xl" />
                                                 <span className="text-xl">{att.name}</span>
@@ -599,7 +622,7 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                                             <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
                                         </h4>
                                         <ul
-                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id] ? '' : 'h-0 opacity-0'} `}
+                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id].opened ? '' : 'h-0 opacity-0'} `}
                                         >
                                             {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName, modelIndex) => {
                                                 const index = `${areaIndex}-${attIndex}-${modelIndex}`;
