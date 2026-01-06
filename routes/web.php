@@ -235,7 +235,9 @@ Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->na
 
 Route::get('editor/{weaponId}', [CustomizerController::class, 'editor'])->name('editor');
 
-Route::post('sendNewEditorValues', [CustomizerController::class, 'sendnewEditorValues'])->name('send_new_editor_values');
+Route::post('/sendNewEditorValues', [CustomizerController::class, 'sendnewEditorValues'])->name('send_new_editor_values');
+
+Route::post('/sendAttachmentModelHierarchy', [CustomizerController::class, 'setAttachmentModelHierarchy'])->name('sendAttachmentModelHierarchy');
 
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 

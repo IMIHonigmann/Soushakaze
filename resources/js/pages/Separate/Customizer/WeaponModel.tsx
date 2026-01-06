@@ -8,6 +8,7 @@ Title: PPSH-41 TACTICAL
 
 import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
+import { router } from '@inertiajs/react';
 import { CameraControls, Stage, TransformControls, useGLTF } from '@react-three/drei';
 import { JSX, RefObject, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -48,12 +49,25 @@ type WorldNode = {
     visible: boolean;
 };
 
-export default function Model({ cameraControlsRef, weapon, ...props }: ModelProps) {
+export default function Model({ cameraControlsRef, weapon, attachmentModels, areaDisplays, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
     const sceneGroupRef = useRef<THREE.Group>(null);
     const selectionGroupRef = useRef<THREE.Group>(null);
+
+    useEffect(() => {
+        if (attachmentModels?.length === 0 && Object.keys(nodes).length > 0) {
+            router.post('/sendAttachmentModelHierarchy', {
+                weapon_id: weapon.id,
+                attachment_ids: null,
+                model_names: Object.keys(nodes),
+            });
+            state.dbAttachmentsToMaterialsObject = { 'Uncategorized Models': Object.keys(nodes) };
+            return;
+        }
+        state.dbAttachmentsToMaterialsObject = attachmentModels;
+    }, [attachmentModels, nodes, weapon.id]);
 
     const worldNodes = useMemo(() => {
         scene.updateMatrixWorld(true);
@@ -92,16 +106,6 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         }
     }, [materials]);
 
-    state.dbAttachmentsToMaterialsObject = useMemo(() => {
-        const map: Record<string, string[]> = {};
-        map['Foregrip'] = ['defaultMaterial_19'];
-        map['Red Dot Sight'] = ['defaultMaterial_13', 'defaultMaterial_14', 'defaultMaterial_15'];
-        map['Laser Sight'] = Array.from({ length: 10 }, (_, i) => `defaultMaterial00${i + 1}`);
-        map['Laser Sight'].push('defaultMaterial');
-
-        return map;
-    }, []);
-
     useEffect(() => {
         state.nodeNames = Object.keys(worldNodes);
     }, [worldNodes]);
@@ -112,7 +116,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
     useEffect(() => {
         if (!snap.grouped || initAppliedRef.current || !meshRefs.current) return;
 
-        Object.values(state.dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
+        Object.values(snap.dbAttachmentsToMaterialsObject).forEach((nodeNames) => {
             nodeNames.forEach((nodeName) => {
                 const n = meshRefs.current[nodeName];
                 if (n && 'visible' in n) n.visible = false;
@@ -127,7 +131,7 @@ export default function Model({ cameraControlsRef, weapon, ...props }: ModelProp
         });
 
         initAppliedRef.current = true;
-    }, [snap.grouped, snap.selected]);
+    }, [snap.dbAttachmentsToMaterialsObject, snap.grouped, snap.selected]);
 
     useEffect(() => {
         if (!snap.grouped || !meshRefs.current) return;

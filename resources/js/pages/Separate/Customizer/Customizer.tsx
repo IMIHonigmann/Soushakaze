@@ -39,7 +39,7 @@ interface Props {
     query: Record<Area, number>;
 }
 
-export default function Customizer({ weapon, maxPower, attachments, query }: Props) {
+export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels }: Props) {
     const cameraControlsRef = useRef<CameraControls>(null);
     state.grouped = attachments;
     const [isPlaying, setIsPlaying] = useState(false);
@@ -269,6 +269,11 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
         console.log('active', activeClickedLi);
     }, [activeClickedLi]);
 
+    useEffect(() => {
+        console.log('att', attachmentModels);
+        console.log('area', areaDisplays);
+    }, [areaDisplays, attachmentModels]);
+
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
@@ -339,7 +344,12 @@ export default function Customizer({ weapon, maxPower, attachments, query }: Pro
                     className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                     onClick={() => goBackTo3D('all')}
                 />
-                <CustomizerScene weapon={weapon} cameraControlsRef={cameraControlsRef}></CustomizerScene>
+                <CustomizerScene
+                    attachmentModels={attachmentModels}
+                    areaDisplays={areaDisplays}
+                    weapon={weapon}
+                    cameraControlsRef={cameraControlsRef}
+                ></CustomizerScene>
                 <div className="flex justify-center">
                     <div
                         className={`absolute bottom-10 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} px-4 transition-all duration-200`}

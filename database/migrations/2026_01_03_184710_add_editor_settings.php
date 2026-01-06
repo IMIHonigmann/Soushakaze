@@ -23,7 +23,7 @@ return new class extends Migration
         });
         Schema::create('weapon_attachment_model', function (Blueprint $table) {
             $table->id();
-            $table->string('weapon_id')->constrained();
+            $table->foreignId('weapon_id')->constrained();
             $table->foreignId('attachment_id')->nullable()->constrained();
             $table->string('model_name');
             $table->timestamps();

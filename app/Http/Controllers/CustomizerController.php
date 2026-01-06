@@ -57,10 +57,13 @@ class CustomizerController extends Controller
             ->map(function ($group) {
                 return $group->values();
             });
+
         $maxPower = DB::table('weapons')->max('power');
 
         $area_displays = DB::table('weapon_area_display')->where('weapon_id', $weaponId)->get();
-        $attachment_models = DB::table('weapon_attachment_model')->where('weapon_id', $weaponId)->get();
+        $attachment_models = DB::table('weapon_attachment_model')->where('weapon_id', $weaponId)->leftJoin('attachments', 'attachment_id', '=', 'attachments.id')->select('weapon_attachment_model.model_name', 'attachments.name as attachment_name')->get()->groupBy('attachment_name')->map(function ($group) {
+            return $group->pluck('model_name');
+        });
 
         return Inertia::render('Separate/Customizer/Customizer', [
             'weapon' => $weapon,
@@ -103,6 +106,33 @@ class CustomizerController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Editor values saved successfully'
+        ]);
+    }
+
+    public function setAttachmentModelHierarchy(Request $request)
+    {
+        $validated = $request->validate([
+            'weapon_id' => 'required|integer|exists:weapons,id',
+            'attachment_ids' => 'nullable|array',
+            'model_names' => 'required|array',
+        ]);
+
+        DB::transaction(function () use ($validated) {
+            $attachmentIds = $validated['attachment_ids'] ?? [];
+            foreach ($validated['model_names'] as $index => $model_name) {
+                DB::table('weapon_attachment_model')->insert(
+                    [
+                        'weapon_id' => $validated['weapon_id'],
+                        'attachment_id' => $attachmentIds[$index] ?? null,
+                        'model_name' => $model_name,
+                    ]
+                );
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attachment model hierarchy updated successfully'
         ]);
     }
 

@@ -29,7 +29,7 @@ function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: 
     return null;
 }
 
-function CustomizerScene({ cameraControlsRef, weapon }: Props) {
+function CustomizerScene({ cameraControlsRef, weapon, attachmentModels, areaDisplays }: Props) {
     const canvasRef = useRef(null);
     const [, setScreenshotDataURL] = useState<string | null>(null);
 
@@ -70,7 +70,14 @@ function CustomizerScene({ cameraControlsRef, weapon }: Props) {
                     >
                         {/* Add the ScreenshotHelper component inside the Canvas */}
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
-                        {WeaponModel ? <WeaponModel cameraControlsRef={cameraControlsRef} weapon={weapon} /> : null}
+                        {WeaponModel ? (
+                            <WeaponModel
+                                attachmentModels={attachmentModels}
+                                areaDisplays={areaDisplays}
+                                cameraControlsRef={cameraControlsRef}
+                                weapon={weapon}
+                            />
+                        ) : null}
                         <ContactShadows position={[0, -5, 0]} opacity={0.7} width={40} height={40} blur={2} far={5} color="#000000" />
                         <EffectComposer>
                             <SMAA />
