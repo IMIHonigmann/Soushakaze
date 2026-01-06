@@ -34,6 +34,75 @@ class CustomizerController extends Controller
             'maxPower' => $maxPower,
             'attachments' => $attachments,
             'query' => $request->query(),
+            'renderEditor' => false
+        ]);
+    }
+
+    public function editor(Request $request, int $weaponId)
+    {
+        $weapon = DB::table('weapons')
+            ->where('id', $weaponId)
+            ->first();
+        if (isset($weapon->image_blob)) {
+            $weapon->image_base64 = base64_encode($weapon->image_blob);
+            unset($weapon->image_blob);
+        }
+        $attachments = DB::table('weapons_attachments')
+            ->where('weapon_id', $weaponId)
+            ->join('attachments', 'weapons_attachments.attachment_id', '=', 'attachments.id')
+            ->orderBy('price_modifier', 'asc')
+            ->select('attachments.*')
+            ->get()
+            ->groupBy('area')
+            ->map(function ($group) {
+                return $group->values();
+            });
+        $maxPower = DB::table('weapons')->max('power');
+
+        $area_displays = DB::table('weapon_area_display')->where('weapon_id', $weaponId)->get();
+        $attachment_models = DB::table('weapon_attachment_model')->where('weapon_id', $weaponId)->get();
+
+        return Inertia::render('Separate/Customizer/Customizer', [
+            'weapon' => $weapon,
+            'maxPower' => $maxPower,
+            'attachments' => $attachments,
+            'query' => $request->query(),
+            'areaDisplays' => $area_displays,
+            'attachmentModels' => $attachment_models,
+            'renderEditor' => true
+        ]);
+    }
+
+    public function sendNewEditorValues(Request $request)
+    {
+        $validated = $request->validate([
+            'weapon_id' => 'required|integer|exists:weapon_id',
+            'target_x' => 'required|numeric',
+            'target_y' => 'required|numeric',
+            'target_z' => 'required|numeric',
+            'position_x' => 'required|numeric',
+            'position_y' => 'required|numeric',
+            'position_z' => 'required|numeric',
+        ]);
+
+        $weaponId = $validated['weapon_id'];
+
+        DB::table('weapon_area_display')
+            ->updateOrCreate(
+                ['weapon_id' => $weaponId],
+                [
+                    'target_x' => $validated['target_x'],
+                    'target_y' => $validated['target_y'],
+                    'target_z' => $validated['target_z'],
+                    'position_x' => $validated['position_x'],
+                    'position_y' => $validated['position_y'],
+                    'position_z' => $validated['position_z'],
+                ]
+            );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Editor values saved successfully'
         ]);
     }
 

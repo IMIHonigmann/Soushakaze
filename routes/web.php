@@ -232,6 +232,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::get('/customizer/{weaponId}', [CustomizerController::class, 'index'])->name('customizer');
+
+Route::get('editor/{weaponId}', [CustomizerController::class, 'editor'])->name('editor');
+
+Route::post('sendNewEditorValues', [CustomizerController::class, 'sendnewEditorValues'])->name('send_new_editor_values');
+
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
 Route::get('cart', function () {
