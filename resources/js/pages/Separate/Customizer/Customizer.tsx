@@ -222,10 +222,10 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'q') state.mode = undefined;
-            if (event.key === 'w') state.mode = 'translate';
-            if (event.key === 'e') state.mode = 'rotate';
-            if (event.key === 'r') state.mode = 'scale';
+            if (event.key === 'q' || event.key === 'Q') state.mode = undefined;
+            if (event.key === 'w' || event.key === 'W') state.mode = 'translate';
+            if (event.key === 'e' || event.key === 'E') state.mode = 'rotate';
+            if (event.key === 'r' || event.key === 'R') state.mode = 'scale';
         };
 
         window.addEventListener('keydown', handleKeyDown);
