@@ -42,7 +42,7 @@ export default function CategoryItem({ label, children }: Props) {
                 style={{
                     height: open ? `${measuredHeight}px` : '0px',
                 }}
-                className={`-skew-x-12 overflow-hidden transition-all ${open ? 'border-2' : ''} transition-[height] duration-[220ms] ease-out`}
+                className={`-skew-x-12 overflow-hidden transition-all ${open ? 'border-2' : ''} transition-[height] duration-220 ease-out`}
             >
                 {children}
             </ul>

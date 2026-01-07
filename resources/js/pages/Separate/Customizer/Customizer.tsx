@@ -37,6 +37,7 @@ interface Props {
     maxPower: number;
     attachments: Record<string, Attachment[]>;
     query: Record<Area, number>;
+    attachmentModels: Record<string, string[]>;
 }
 
 export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels }: Props) {
@@ -265,14 +266,11 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         return result;
     });
 
-    useEffect(() => {
-        console.log('active', activeClickedLi);
-    }, [activeClickedLi]);
+    const [attachmentClipboard, setAttachmentClipboard] = useState<{ attNodeArrayIdentifier: string; nodeIndex: number }[]>([]);
 
     useEffect(() => {
-        console.log('att', attachmentModels);
-        console.log('area', areaDisplays);
-    }, [areaDisplays, attachmentModels]);
+        console.log(attachmentClipboard);
+    }, [attachmentClipboard]);
 
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
@@ -611,6 +609,22 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                 console.log('fiofdafdsasafd', state.currentMesh.lastSelection);
                                                 state.lastUpdateId++;
                                             }}
+                                            onContextMenu={(e) => {
+                                                e.preventDefault();
+                                                if (attachmentClipboard.length === 0) {
+                                                    console.error('The Attachment Clipboard is empty!');
+                                                    return;
+                                                }
+                                                attachmentClipboard.forEach(({ attNodeArrayIdentifier, nodeIndex }) => {
+                                                    if (!state.dbAttachmentsToMaterialsObject[att.name])
+                                                        state.dbAttachmentsToMaterialsObject[att.name] = [];
+                                                    state.dbAttachmentsToMaterialsObject[att.name].push(
+                                                        snap.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier][nodeIndex],
+                                                    );
+                                                    state.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier].splice(nodeIndex, 1);
+                                                });
+                                                setAttachmentClipboard([]);
+                                            }}
                                             className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
                                         >
                                             <span className="flex items-center gap-2">
@@ -644,7 +658,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             liRefs.current[index] = el;
                                                         }}
                                                         tabIndex={0}
-                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'}`}
+                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard.some((item) => item.nodeIndex === modelIndex && item.attNodeArrayIdentifier === att.name) ? 'text-purple-500' : ''}`}
                                                         onClick={(e) => {
                                                             state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                                             if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
@@ -678,6 +692,10 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             }
 
                                                             state.lastUpdateId++;
+                                                        }}
+                                                        onContextMenu={(e) => {
+                                                            e.preventDefault();
+                                                            setAttachmentClipboard([{ attNodeArrayIdentifier: att.name, nodeIndex: modelIndex }]);
                                                         }}
                                                         onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
                                                             state.action = 'CHANGESELECTION';
@@ -728,6 +746,18 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert">
                     <PlusCircle /> <span>Add New Area</span>
                 </li>
+                <ul className="flex flex-col items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl uppercase select-none">
+                    <span>UNASSIGNED ATTACHMENTS</span>
+                    {snap.dbAttachmentsToMaterialsObject['']?.map((modelName: string, index) => (
+                        <li
+                            key={modelName}
+                            onClick={() => setAttachmentClipboard([{ attNodeArrayIdentifier: '', nodeIndex: index }])}
+                            className={`cursor-pointer ${attachmentClipboard.some((item) => item.nodeIndex === index && item.attNodeArrayIdentifier === '') ? 'text-purple-500' : 'hover:text-orange-500'}`}
+                        >
+                            {modelName}
+                        </li>
+                    ))}
+                </ul>
             </ul>
 
             <div className="col-start-3 flex items-center justify-between">

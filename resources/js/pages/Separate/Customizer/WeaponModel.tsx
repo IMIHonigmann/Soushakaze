@@ -37,6 +37,7 @@ type GLTFResult = GLTF & {
 type ModelProps = JSX.IntrinsicElements['group'] & {
     weapon: Weapon;
     cameraControlsRef: RefObject<CameraControls>;
+    attachmentModels: Record<string, string[]>;
 };
 
 type WorldNode = {

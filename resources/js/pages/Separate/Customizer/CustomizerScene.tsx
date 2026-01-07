@@ -9,6 +9,7 @@ import React, { memo, Suspense, useCallback, useEffect, useRef, useState } from 
 interface Props {
     cameraControlsRef: React.RefObject<any>;
     weapon: Weapon;
+    attachmentModels: Record<string, string[]>;
 }
 
 function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {
