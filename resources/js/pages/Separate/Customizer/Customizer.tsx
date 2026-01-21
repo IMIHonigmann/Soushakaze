@@ -271,7 +271,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [showContextMenu, setShowContextMenu] = useState(false);
-    const [actionFunctions, setActionFunction] = useState<Record<string, () => void>>({});
+    const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1>>({});
 
     useEffect(() => {
         const handleContextMenu = (e: MouseEvent) => {
@@ -723,8 +723,8 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                         }}
                                                         onContextMenu={() => {
                                                             setShowContextMenu(true);
-                                                            setActionFunction({
-                                                                Copy: function () {
+                                                            setActionFunctions({
+                                                                'Copy Model Selection': function () {
                                                                     setAttachmentClipboard((prev) => ({
                                                                         ...prev,
                                                                         [att.name]: [modelIndex],
@@ -738,6 +738,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                                         setAttachmentClipboard(curAttClip);
                                                                     });
                                                                 },
+                                                                'Paste Model Selection': -1,
                                                             });
                                                         }}
                                                         onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
