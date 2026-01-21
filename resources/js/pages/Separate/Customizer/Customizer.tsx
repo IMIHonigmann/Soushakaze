@@ -296,9 +296,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
-                <div
-                    className={`animate-fade-from-below *:not-first:not-last:mb-2 ${!(snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all') ? 'block' : 'hidden'}`}
-                >
+                <div className={`animate-fade-from-below *:not-first:not-last:mb-2`}>
                     <div className="text-3xl">
                         <h1 className="font-hitmarker-condensed uppercase">{snap.currentAreaSelection}</h1>
                         <h2>Camera Transforms</h2>
@@ -590,7 +588,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             </div>
             <ul
                 ref={scrollDivRef}
-                className={`animate-fade-from-above row-span-2 flex flex-col overflow-scroll p-4 ${snap.currentAreaSelection === 'other' || snap.currentAreaSelection === 'all' ? 'block' : 'hidden'}`}
+                className={`animate-fade-from-above row-span-2 flex flex-col overflow-scroll p-4`}
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {(() => {
@@ -629,29 +627,34 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                 state.currentMesh.lastSelection = [...snap.dbAttachmentsToMaterialsObject[att.name]];
                                                 state.lastUpdateId++;
                                             }}
-                                            onContextMenu={(e) => {
-                                                e.preventDefault();
-                                                if (!attachmentClipboard || Object.keys(attachmentClipboard).length === 0) {
-                                                    console.error('The Attachment Clipboard is empty!');
-                                                    return;
-                                                }
-                                                Object.entries(attachmentClipboard).forEach(([attNodeArrayIdentifier, nodeIndices]) => {
-                                                    const sortedIndices = [...nodeIndices].sort((a, b) => b - a);
-                                                    sortedIndices.forEach((nodeIndex) => {
-                                                        if (!state.dbAttachmentsToMaterialsObject[att.name])
-                                                            state.dbAttachmentsToMaterialsObject[att.name] = [];
+                                            onContextMenu={() => {
+                                                setShowContextMenu(true);
+                                                setActionFunctions({
+                                                    'Cut Model Selection': -1,
+                                                    'Paste Model Selection': () => {
+                                                        if (!attachmentClipboard || Object.keys(attachmentClipboard).length === 0) {
+                                                            console.error('The Attachment Clipboard is empty!');
+                                                            return;
+                                                        }
+                                                        Object.entries(attachmentClipboard).forEach(([attNodeArrayIdentifier, nodeIndices]) => {
+                                                            const sortedIndices = [...nodeIndices].sort((a, b) => b - a);
+                                                            sortedIndices.forEach((nodeIndex) => {
+                                                                if (!state.dbAttachmentsToMaterialsObject[att.name])
+                                                                    state.dbAttachmentsToMaterialsObject[att.name] = [];
 
-                                                        state.dbAttachmentsToMaterialsObject[att.name].push(
-                                                            snap.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier][nodeIndex],
-                                                        );
-                                                    });
+                                                                state.dbAttachmentsToMaterialsObject[att.name].push(
+                                                                    snap.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier][nodeIndex],
+                                                                );
+                                                            });
 
-                                                    sortedIndices.forEach((nodeIndex) => {
-                                                        state.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier].splice(nodeIndex, 1);
-                                                    });
+                                                            sortedIndices.forEach((nodeIndex) => {
+                                                                state.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier].splice(nodeIndex, 1);
+                                                            });
+                                                        });
+
+                                                        setAttachmentClipboard(undefined);
+                                                    },
                                                 });
-
-                                                setAttachmentClipboard(undefined);
                                             }}
                                             className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
                                         >
@@ -724,7 +727,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                         onContextMenu={() => {
                                                             setShowContextMenu(true);
                                                             setActionFunctions({
-                                                                'Copy Model Selection': function () {
+                                                                'Cut Model Selection': function () {
                                                                     setAttachmentClipboard((prev) => ({
                                                                         ...prev,
                                                                         [att.name]: [modelIndex],

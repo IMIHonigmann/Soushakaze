@@ -19,7 +19,7 @@ export default function ContextMenu({ className, x, y, actionFunctions }: Contex
                         if (typeof callback === 'function') callback();
                     }}
                 >
-                    <button>{option}</button>
+                    <button className="m-0 h-full w-full p-0">{option}</button>
                 </li>
             ))}
         </ul>
