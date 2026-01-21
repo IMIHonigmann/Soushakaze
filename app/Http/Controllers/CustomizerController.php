@@ -132,6 +132,28 @@ class CustomizerController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'Attachment model hierarchy set successfully'
+        ]);
+    }
+
+    public function overwriteAttachmentModelHierarchy(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $dbAttachmentsToMaterialsObject = json_decode($request['dbAttachmentsToMaterialsObject'], true);
+            DB::table('weapon_attachment_model')->delete();
+            foreach ($dbAttachmentsToMaterialsObject as $key => $valueArray) {
+                foreach ($valueArray as $item) {
+                    DB::table('weapon_attachment_model')->insert([
+                        'weapon_id' => $request['weapon_id'],
+                        'attachment_id' => optional(DB::table('attachments')->where('name', $key)->first())->id,
+                        'model_name' => $item
+                    ]);
+                }
+            }
+        });
+
+        return response()->json([
+            'success' => true,
             'message' => 'Attachment model hierarchy updated successfully'
         ]);
     }

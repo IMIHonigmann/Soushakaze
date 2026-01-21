@@ -6,7 +6,7 @@ import YouTubePlayer from '@/pages/YouTubePlayer';
 import { useCartStore } from '@/stores/bagStores';
 import { factoryIssueAttachment, state, vec3 } from '@/stores/customizerProxy';
 import { Area, Attachment, Weapon } from '@/types/types';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
@@ -748,9 +748,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                     </li>
                                                 );
                                             })}
-                                            <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
-                                                <PlusCircle /> <span>Add New Model</span>
-                                            </li>
                                         </ul>
                                     </li>
                                 ))}
@@ -800,7 +797,17 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                     Bounding Box Center
                     <FaChevronUp />
                 </span>
-                <span>Apply</span>
+                <button
+                    onClick={() => {
+                        router.post('/overwriteAttachmentModelHierarchy', {
+                            dbAttachmentsToMaterialsObject: JSON.stringify(snap.dbAttachmentsToMaterialsObject),
+                            weapon_id: weapon.id,
+                        });
+                    }}
+                    className="mr-2 border p-1 hover:bg-zinc-900"
+                >
+                    Apply
+                </button>
             </div>
         </div>
     );

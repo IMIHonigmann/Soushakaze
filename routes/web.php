@@ -239,6 +239,8 @@ Route::post('/sendNewEditorValues', [CustomizerController::class, 'sendnewEditor
 
 Route::post('/sendAttachmentModelHierarchy', [CustomizerController::class, 'setAttachmentModelHierarchy'])->name('sendAttachmentModelHierarchy');
 
+Route::post('/overwriteAttachmentModelHierarchy', [CustomizerController::class, 'overwriteAttachmentModelHierarchy'])->name('overwriteAttachmentModelHierarchy');
+
 Route::post('/customizer', [CustomizerController::class, 'store'])->name('customizer.store');
 
 Route::get('cart', function () {
