@@ -11,7 +11,7 @@ import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
 import { PlusCircle } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Activity, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { BsBoundingBox } from 'react-icons/bs';
 import { CiIceCream } from 'react-icons/ci';
@@ -25,6 +25,7 @@ import { MdAddShoppingCart, MdEdit, MdOutlineCameraswitch } from 'react-icons/md
 import { TbBox, TbCamera } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
+import ContextMenu from '../Editor/ContextMenu';
 import CustomizerScene from './CustomizerScene';
 
 gsap.registerPlugin(ScrambleTextPlugin);
@@ -38,6 +39,7 @@ interface Props {
     attachments: Record<string, Attachment[]>;
     query: Record<Area, number>;
     attachmentModels: Record<string, string[]>;
+    areaDisplays: any;
 }
 
 export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels }: Props) {
@@ -267,6 +269,25 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     });
 
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const [showContextMenu, setShowContextMenu] = useState(false);
+    const [actionFunctions, setActionFunction] = useState<Record<string, () => void>>({});
+
+    useEffect(() => {
+        const handleContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+            setContextMenuPosition({ x: e.clientX, y: e.clientY });
+        };
+
+        const handleClick = () => setShowContextMenu(false);
+
+        window.addEventListener('contextmenu', handleContextMenu);
+        window.addEventListener('click', handleClick);
+        return () => {
+            window.removeEventListener('contextmenu', handleContextMenu);
+            window.removeEventListener('click', handleClick);
+        };
+    }, []);
 
     useEffect(() => {
         console.log(attachmentClipboard);
@@ -549,10 +570,10 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                             </div>
                         ))}
                     </div>
+                    <div
+                        className={`${isPlaying ? '' : 'opacity-0'} pointer-events-none absolute inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10 transition-opacity duration-300`}
+                    />
                     <div className="pointer-events-auto absolute top-4 left-4 font-extrabold">
-                        <div className={`${isPlaying ? '' : 'opacity-0'} transition-opacity duration-300`}>
-                            <div className={`pointer-events-none fixed inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10`} />
-                        </div>
                         <h1 ref={weaponNameRef} className="font-hitmarker-condensed text-8xl font-extrabold text-shadow-white">
                             S0USHAK4Z3
                         </h1>
@@ -700,19 +721,23 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
 
                                                             state.lastUpdateId++;
                                                         }}
-                                                        onContextMenu={(e) => {
-                                                            e.preventDefault();
-                                                            setAttachmentClipboard((prev) => ({
-                                                                ...prev,
-                                                                [att.name]: [modelIndex],
-                                                            }));
-                                                            const curAttClip: typeof attachmentClipboard = {};
-                                                            snap.currentMesh.existingSelection.forEach((nodeName) => {
-                                                                if (!curAttClip[att.name]) curAttClip[att.name] = [];
-                                                                curAttClip[att.name].push(
-                                                                    snap.dbAttachmentsToMaterialsObject[att.name].indexOf(nodeName),
-                                                                );
-                                                                setAttachmentClipboard(curAttClip);
+                                                        onContextMenu={() => {
+                                                            setShowContextMenu(true);
+                                                            setActionFunction({
+                                                                Copy: function () {
+                                                                    setAttachmentClipboard((prev) => ({
+                                                                        ...prev,
+                                                                        [att.name]: [modelIndex],
+                                                                    }));
+                                                                    const curAttClip: typeof attachmentClipboard = {};
+                                                                    snap.currentMesh.existingSelection.forEach((nodeName) => {
+                                                                        if (!curAttClip[att.name]) curAttClip[att.name] = [];
+                                                                        curAttClip[att.name].push(
+                                                                            snap.dbAttachmentsToMaterialsObject[att.name].indexOf(nodeName),
+                                                                        );
+                                                                        setAttachmentClipboard(curAttClip);
+                                                                    });
+                                                                },
                                                             });
                                                         }}
                                                         onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
@@ -809,6 +834,9 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                     Apply
                 </button>
             </div>
+            <Activity mode={showContextMenu ? 'visible' : 'hidden'}>
+                <ContextMenu actionFunctions={actionFunctions} x={contextMenuPosition.x} y={contextMenuPosition.y} />
+            </Activity>
         </div>
     );
 

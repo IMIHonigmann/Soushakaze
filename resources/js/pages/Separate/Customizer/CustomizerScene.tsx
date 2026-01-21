@@ -10,6 +10,7 @@ interface Props {
     cameraControlsRef: React.RefObject<any>;
     weapon: Weapon;
     attachmentModels: Record<string, string[]>;
+    areaDisplays: any;
 }
 
 function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {

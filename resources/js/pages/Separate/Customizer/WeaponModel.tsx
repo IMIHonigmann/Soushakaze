@@ -38,6 +38,7 @@ type ModelProps = JSX.IntrinsicElements['group'] & {
     weapon: Weapon;
     cameraControlsRef: RefObject<CameraControls>;
     attachmentModels: Record<string, string[]>;
+    areaDisplays: any;
 };
 
 type WorldNode = {
@@ -50,7 +51,7 @@ type WorldNode = {
     visible: boolean;
 };
 
-export default function Model({ cameraControlsRef, weapon, attachmentModels, areaDisplays, ...props }: ModelProps) {
+export default function Model({ cameraControlsRef, weapon, attachmentModels, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
@@ -58,7 +59,7 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, are
     const selectionGroupRef = useRef<THREE.Group>(null);
 
     useEffect(() => {
-        if (attachmentModels?.length === 0 && Object.keys(nodes).length > 0) {
+        if (Object.keys(attachmentModels ?? {}).length === 0 && Object.keys(nodes).length > 0) {
             router.post('/sendAttachmentModelHierarchy', {
                 weapon_id: weapon.id,
                 attachment_ids: null,
