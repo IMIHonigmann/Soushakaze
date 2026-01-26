@@ -289,10 +289,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         };
     }, []);
 
-    useEffect(() => {
-        console.log(attachmentClipboard);
-    }, [attachmentClipboard]);
-
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
             <div className="row-start-1 overflow-scroll border-b">
@@ -376,6 +372,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                         >
                             {Object.entries(snap.grouped).map(([area]) => {
                                 const a = snap.selected[area];
+                                if (area === 'other' || area === 'all') return;
                                 return (
                                     <li
                                         key={area}
@@ -527,46 +524,51 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 >
                     {/* Attachment Selection List */}
                     <div>
-                        {Object.entries(snap.grouped).map(([area, attachments]) => (
-                            <div
-                                key={area}
-                                style={{
-                                    transform: `translateX(${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
-                                    opacity: snap.currentAreaSelection === area ? 1 : 0,
-                                    pointerEvents: snap.currentAreaSelection === area ? 'auto' : 'none',
-                                    right: snap.currentAreaSelection === area ? '0' : '-30%',
-                                }}
-                                className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
-                            >
-                                <div className="m-4 flex items-center justify-between">
-                                    <div className="relative">
-                                        <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">{area}</strong>
-                                        <span
-                                            className={`absolute -bottom-1 left-0 h-0.5 origin-left ${snap.currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
-                                            style={{ width: '100%' }}
+                        {Object.entries(snap.grouped).map(([area, attachments]) => {
+                            if (area === 'other' || area === 'all') return;
+                            return (
+                                <div
+                                    key={area}
+                                    style={{
+                                        transform: `translateX(${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? '20vw' : '0vw'})`,
+                                        opacity: snap.currentAreaSelection === area ? 1 : 0,
+                                        pointerEvents: snap.currentAreaSelection === area ? 'auto' : 'none',
+                                        right: snap.currentAreaSelection === area ? '0' : '-30%',
+                                    }}
+                                    className="absolute top-0 right-0 z-190 h-full border-l bg-black transition-all duration-300"
+                                >
+                                    <div className="m-4 flex items-center justify-between">
+                                        <div className="relative">
+                                            <strong className="font-hitmarker-condensed text-2xl tracking-widest uppercase select-none">
+                                                {area}
+                                            </strong>
+                                            <span
+                                                className={`absolute -bottom-1 left-0 h-0.5 origin-left ${snap.currentAreaSelection === area ? 'scale-x-100' : 'scale-x-0'} transform bg-orange-500 transition-transform duration-1000`}
+                                                style={{ width: '100%' }}
+                                            />
+                                        </div>
+                                        <IoIosReturnLeft
+                                            onClick={() => goBackTo3D('other')}
+                                            className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
                                         />
                                     </div>
-                                    <IoIosReturnLeft
-                                        onClick={() => goBackTo3D('other')}
-                                        className="hover:animate-simonsaysahh cursor-pointer rounded-full border-4 text-5xl transition-all hover:scale-110 hover:text-red-600"
-                                    />
-                                </div>
-                                <ul className="-mr-2 flex flex-col divide-y-2 *:min-w-72 *:py-4 *:pr-12 *:pl-6">
-                                    <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
-                                        <CiIceCream id="factory_issue" />
-                                    </AttachmentListElement>
-                                    {attachments.map((a) => (
-                                        <AttachmentListElement key={a.id} area={area as Area} att={a}>
-                                            {a.power_modifier > 0 && <GiCornerExplosion />}
-                                            {a.mobility_modifier > 0 && <GiFeather />}
-                                            {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                            {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                            {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                    <ul className="-mr-2 flex flex-col divide-y-2 *:min-w-72 *:py-4 *:pr-12 *:pl-6">
+                                        <AttachmentListElement area={area as Area} att={factoryIssueAttachment} sound="select_attachment">
+                                            <CiIceCream id="factory_issue" />
                                         </AttachmentListElement>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                                        {attachments.map((a) => (
+                                            <AttachmentListElement key={a.id} area={area as Area} att={a}>
+                                                {a.power_modifier > 0 && <GiCornerExplosion />}
+                                                {a.mobility_modifier > 0 && <GiFeather />}
+                                                {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
+                                                {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
+                                                {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                            </AttachmentListElement>
+                                        ))}
+                                    </ul>
+                                </div>
+                            );
+                        })}
                     </div>
                     <div
                         className={`${isPlaying ? '' : 'opacity-0'} pointer-events-none absolute inset-0 bg-linear-to-br from-blue-500/10 via-transparent to-orange-600/10 transition-opacity duration-300`}
@@ -790,18 +792,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert">
                     <PlusCircle /> <span>Add New Area</span>
                 </li>
-                <ul className="flex flex-col items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl uppercase select-none">
-                    <span>UNASSIGNED ATTACHMENTS</span>
-                    {snap.dbAttachmentsToMaterialsObject['']?.map((modelName: string, index) => (
-                        <li
-                            key={modelName}
-                            onClick={() => setAttachmentClipboard((prev) => ({ ...prev, ['']: [...(prev?.[''] ?? []), index] }))}
-                            className={`cursor-pointer ${attachmentClipboard?.['']?.includes(index) ? 'text-purple-500' : 'hover:text-orange-500'}`}
-                        >
-                            {modelName}
-                        </li>
-                    ))}
-                </ul>
             </ul>
 
             <div className="col-start-3 flex items-center justify-between">

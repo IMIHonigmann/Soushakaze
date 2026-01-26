@@ -58,6 +58,12 @@ class CustomizerController extends Controller
                 return $group->values();
             });
 
+        $placeholderAttachment = DB::table('attachments')
+            ->where('id', 21)
+            ->first();
+
+        $attachments['other'] = collect([$placeholderAttachment]);
+
         $maxPower = DB::table('weapons')->max('power');
 
         $area_displays = DB::table('weapon_area_display')->where('weapon_id', $weaponId)->get();

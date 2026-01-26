@@ -407,6 +407,18 @@ return new class extends Migration {
                 'magsize_modifier' => 0,
                 'manufacturer_id' => 7,
                 'seller_id' => 1,
+            ],
+            [
+                'name' => 'UNASSIGNED',
+                'area' => 'other',
+                'price_modifier' => 0.00,
+                'power_modifier' => 0,
+                'accuracy_modifier' => 0,
+                'mobility_modifier' => 0,
+                'handling_modifier' => 0,
+                'magsize_modifier' => 0,
+                'manufacturer_id' => 7,
+                'seller_id' => 1,
             ]
 
         ];

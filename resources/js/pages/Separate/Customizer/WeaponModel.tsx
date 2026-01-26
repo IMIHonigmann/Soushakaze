@@ -65,7 +65,7 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, ...
                 attachment_ids: null,
                 model_names: Object.keys(nodes),
             });
-            state.dbAttachmentsToMaterialsObject = { 'Uncategorized Models': Object.keys(nodes) };
+            state.dbAttachmentsToMaterialsObject = { UNASSIGNED: Object.keys(nodes) };
             return;
         }
         state.dbAttachmentsToMaterialsObject = attachmentModels;
