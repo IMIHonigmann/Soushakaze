@@ -607,6 +607,26 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                     return Object.entries(attachments).map(([area, atts], areaIndex) => (
                         <li key={area}>
                             <h3
+                                onContextMenu={() => {
+                                    setActionFunctions({
+                                        'Add New Attachment': () => {
+                                            setEditFormData({
+                                                Fields: {
+                                                    'Attachment Name': null,
+                                                    'Price Modifier': null,
+                                                    'Power Modifier': null,
+                                                    'Accuracy Modifier': null,
+                                                    'Mobility Modifier': null,
+                                                    'Handling Modifier': null,
+                                                    'Magsize Modifier': null,
+                                                    Area: null,
+                                                },
+                                                TargetType: 'Attachment',
+                                            });
+                                        },
+                                        'Edit Area Name': -1,
+                                    });
+                                }}
                                 onClick={() =>
                                     setOpenedAreaTabs((prev) => ({
                                         ...prev,
@@ -665,6 +685,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
 
                                                         setAttachmentClipboard(undefined);
                                                     },
+                                                    'Edit Model Name': -1,
                                                 });
                                             }}
                                             className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
@@ -812,26 +833,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                         </ul>
                                     </li>
                                 ))}
-                                <li
-                                    onClick={() => {
-                                        setEditFormData({
-                                            Fields: {
-                                                'Attachment Name': null,
-                                                'Price Modifier': null,
-                                                'Power Modifier': null,
-                                                'Accuracy Modifier': null,
-                                                'Mobility Modifier': null,
-                                                'Handling Modifier': null,
-                                                'Magsize Modifier': null,
-                                                Area: null,
-                                            },
-                                            TargetType: 'Attachment',
-                                        });
-                                    }}
-                                    className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert"
-                                >
-                                    <PlusCircle /> <span>Add New Attachment</span>
-                                </li>
                             </ul>
                         </li>
                     ));
