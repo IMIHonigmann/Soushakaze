@@ -26,6 +26,7 @@ import { TbBox, TbCamera } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import ContextMenu from '../Editor/ContextMenu';
+import EditForm from '../Editor/EditForm';
 import CustomizerScene from './CustomizerScene';
 
 gsap.registerPlugin(ScrambleTextPlugin);
@@ -270,8 +271,13 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
 
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-    const [showContextMenu, setShowContextMenu] = useState(false);
-    const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1>>({});
+    const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
+    const [editFormData, setEditFormData] = useState<{
+        Fields: string[];
+        ButtonName: string;
+        EditTarget: 'area' | 'attachment';
+        targetName?: string;
+    } | null>(null);
 
     useEffect(() => {
         const handleContextMenu = (e: MouseEvent) => {
@@ -279,7 +285,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             setContextMenuPosition({ x: e.clientX, y: e.clientY });
         };
 
-        const handleClick = () => setShowContextMenu(false);
+        const handleClick = () => setActionFunctions(null);
 
         window.addEventListener('contextmenu', handleContextMenu);
         window.addEventListener('click', handleClick);
@@ -630,7 +636,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                 state.lastUpdateId++;
                                             }}
                                             onContextMenu={() => {
-                                                setShowContextMenu(true);
                                                 setActionFunctions({
                                                     'Cut Model Selection': -1,
                                                     'Paste Model Selection': () => {
@@ -676,7 +681,26 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                 <GiDesertEagle className="text-2xl" />
                                                 <span className="text-xl">{att.name}</span>
                                             </span>
-                                            <MdEdit className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black" />
+                                            <MdEdit
+                                                onClick={() => {
+                                                    setEditFormData({
+                                                        Fields: [
+                                                            'Attachment Name',
+                                                            'Price Modifier',
+                                                            'Power Modifier',
+                                                            'Accuracy Modifier',
+                                                            'Mobility Modifier',
+                                                            'Handling Modifier',
+                                                            'Magsize Modifier',
+                                                            'Area',
+                                                        ],
+                                                        ButtonName: 'Add New Attachment',
+                                                        EditTarget: 'attachment',
+                                                        targetName: att.name,
+                                                    });
+                                                }}
+                                                className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black"
+                                            />
                                         </h4>
                                         <ul
                                             className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id].opened ? '' : 'h-0 opacity-0'} `}
@@ -727,7 +751,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             state.lastUpdateId++;
                                                         }}
                                                         onContextMenu={() => {
-                                                            setShowContextMenu(true);
                                                             setActionFunctions({
                                                                 'Cut Model Selection': function () {
                                                                     setAttachmentClipboard((prev) => ({
@@ -774,7 +797,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             }`}
                                                         >
                                                             <TbBox className="inline-block text-3xl" />
-                                                            <span>{nodeName}</span>
+                                                            <span className="truncate">{nodeName}</span>
                                                         </div>
                                                     </li>
                                                 );
@@ -782,7 +805,25 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                         </ul>
                                     </li>
                                 ))}
-                                <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert">
+                                <li
+                                    onClick={() => {
+                                        setEditFormData({
+                                            Fields: [
+                                                'Attachment Name',
+                                                'Price Modifier',
+                                                'Power Modifier',
+                                                'Accuracy Modifier',
+                                                'Mobility Modifier',
+                                                'Handling Modifier',
+                                                'Magsize Modifier',
+                                                'Area',
+                                            ],
+                                            ButtonName: 'Add New Attachment',
+                                            EditTarget: 'attachment',
+                                        });
+                                    }}
+                                    className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert"
+                                >
                                     <PlusCircle /> <span>Add New Attachment</span>
                                 </li>
                             </ul>
@@ -828,8 +869,11 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                     Apply
                 </button>
             </div>
-            <Activity mode={showContextMenu ? 'visible' : 'hidden'}>
-                <ContextMenu actionFunctions={actionFunctions} x={contextMenuPosition.x} y={contextMenuPosition.y} />
+
+            {actionFunctions && <ContextMenu actionFunctions={actionFunctions} x={contextMenuPosition.x} y={contextMenuPosition.y} />}
+
+            <Activity mode={editFormData ? 'visible' : 'hidden'}>
+                <EditForm setEditFormData={setEditFormData} editFormData={editFormData} attachments={attachments} />
             </Activity>
         </div>
     );
