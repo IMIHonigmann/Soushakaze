@@ -269,6 +269,11 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         return result;
     });
 
+    // use to create new tab state when adding a new attachment
+    const getTabState = (id: string | number) => {
+        return openedAttTabs[id] ?? { opened: true, selected: false };
+    };
+
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
@@ -667,15 +672,19 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                             <span className="flex items-center gap-2">
                                                 <FaChevronRight
                                                     onClick={() =>
-                                                        setOpenedAttTabs((prev) => ({
-                                                            ...prev,
-                                                            [att.id]: {
-                                                                ...prev[att.id],
-                                                                opened: !prev[att.id].opened,
-                                                            },
-                                                        }))
+                                                        setOpenedAttTabs((prev) => {
+                                                            const current = prev[att.id] ?? { opened: true, selected: false };
+                                                            getTabState(att.id);
+                                                            return {
+                                                                ...prev,
+                                                                [att.id]: {
+                                                                    ...current,
+                                                                    opened: !current.opened,
+                                                                },
+                                                            };
+                                                        })
                                                     }
-                                                    className={`${openedAttTabs[att.id].opened ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
+                                                    className={`${getTabState(att.id).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
                                                 />
                                                 <GiDesertEagle className="text-2xl" />
                                                 <span className="text-xl">{att.name}</span>
@@ -701,7 +710,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                             />
                                         </h4>
                                         <ul
-                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${openedAttTabs[att.id].opened ? '' : 'h-0 opacity-0'} `}
+                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${getTabState(att.id).opened ? '' : 'h-0 opacity-0'} `}
                                         >
                                             {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName, modelIndex) => {
                                                 const index = `${areaIndex}-${attIndex}-${modelIndex}`;

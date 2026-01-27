@@ -52,6 +52,7 @@ export default function EditForm({ editFormData, setEditFormData, attachments }:
                         if (!editFormData?.targetName) attachments[areaKey].push(newAttachment);
                         console.log('done');
                     }
+                    setEditFormData(null);
                     return;
                 }}
             >
