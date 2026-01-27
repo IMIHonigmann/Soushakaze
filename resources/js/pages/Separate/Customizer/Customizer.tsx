@@ -273,9 +273,8 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
     const [editFormData, setEditFormData] = useState<{
-        Fields: string[];
-        ButtonName: string;
-        EditTarget: 'area' | 'attachment';
+        Fields: Record<string, any>;
+        TargetType: 'Area' | 'Attachment';
         targetName?: string;
     } | null>(null);
 
@@ -684,18 +683,17 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                             <MdEdit
                                                 onClick={() => {
                                                     setEditFormData({
-                                                        Fields: [
-                                                            'Attachment Name',
-                                                            'Price Modifier',
-                                                            'Power Modifier',
-                                                            'Accuracy Modifier',
-                                                            'Mobility Modifier',
-                                                            'Handling Modifier',
-                                                            'Magsize Modifier',
-                                                            'Area',
-                                                        ],
-                                                        ButtonName: 'Add New Attachment',
-                                                        EditTarget: 'attachment',
+                                                        Fields: {
+                                                            'Attachment Name': att.name,
+                                                            'Price Modifier': att.price_modifier,
+                                                            'Power Modifier': att.power_modifier,
+                                                            'Accuracy Modifier': att.accuracy_modifier,
+                                                            'Mobility Modifier': att.mobility_modifier,
+                                                            'Handling Modifier': att.handling_modifier,
+                                                            'Magsize Modifier': att.handling_modifier,
+                                                            Area: att.area,
+                                                        },
+                                                        TargetType: 'Attachment',
                                                         targetName: att.name,
                                                     });
                                                 }}
@@ -808,18 +806,17 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                 <li
                                     onClick={() => {
                                         setEditFormData({
-                                            Fields: [
-                                                'Attachment Name',
-                                                'Price Modifier',
-                                                'Power Modifier',
-                                                'Accuracy Modifier',
-                                                'Mobility Modifier',
-                                                'Handling Modifier',
-                                                'Magsize Modifier',
-                                                'Area',
-                                            ],
-                                            ButtonName: 'Add New Attachment',
-                                            EditTarget: 'attachment',
+                                            Fields: {
+                                                'Attachment Name': null,
+                                                'Price Modifier': null,
+                                                'Power Modifier': null,
+                                                'Accuracy Modifier': null,
+                                                'Mobility Modifier': null,
+                                                'Handling Modifier': null,
+                                                'Magsize Modifier': null,
+                                                Area: null,
+                                            },
+                                            TargetType: 'Attachment',
                                         });
                                     }}
                                     className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-orange-500 uppercase select-none hover:invert"

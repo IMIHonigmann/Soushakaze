@@ -2,9 +2,8 @@ import { Area, Attachment } from '@/types/types';
 
 type Props = {
     editFormData: {
-        Fields: string[];
-        ButtonName: string;
-        EditTarget: 'area' | 'attachment';
+        Fields: Record<string, any>;
+        TargetType: 'Area' | 'Attachment';
         targetName?: string;
     } | null;
     attachments: Record<string, Attachment[]>;
@@ -24,10 +23,10 @@ export default function EditForm({ editFormData, setEditFormData, attachments }:
                     const formData = new FormData(e.currentTarget);
 
                     e.preventDefault();
-                    if (editFormData?.EditTarget === 'area') {
+                    if (editFormData?.TargetType === 'Area') {
                         return;
                     }
-                    if (editFormData?.EditTarget === 'attachment') {
+                    if (editFormData?.TargetType === 'Attachment') {
                         const areaKey = formData.get('Area') as string;
 
                         const newAttachment: Attachment = {
@@ -57,17 +56,18 @@ export default function EditForm({ editFormData, setEditFormData, attachments }:
                 }}
             >
                 <ul onClick={(e) => e.stopPropagation()} className="flex-col border bg-zinc-950 p-8">
-                    {(editFormData?.Fields ?? []).map((field) => (
+                    {Object.entries(editFormData?.Fields ?? {}).map(([field, value]) => (
                         <li className="my-1 flex justify-between" key={field}>
                             <span className="pr-8">{field}:</span>{' '}
                             <input
                                 name={field}
                                 className="border from-[#F94327] to-[#FF7D14] transition-all focus:bg-linear-to-r focus:text-black focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                                defaultValue={value}
                             />
                         </li>
                     ))}
                     <button type="submit" className="mt-6 block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert">
-                        {editFormData?.ButtonName}
+                        {editFormData?.targetName ? 'Edit' : 'Add New'} {editFormData?.TargetType}
                     </button>
                 </ul>
             </form>
