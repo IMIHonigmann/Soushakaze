@@ -65,10 +65,10 @@ export function MainCustomizer({
                 cameraControlsRef={cameraControlsRef}
             ></CustomizerScene>
             <div
-                className={`absolute bottom-0 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[75%_25%_0%]' : 'grid-cols-[60%_25%_15%]'} pointer-events-none h-full grid-rows-4 px-4 transition-all duration-200`}
+                className={`absolute bottom-0 z-101 grid w-full ${snap.currentAreaSelection === 'all' || state.currentAreaSelection === 'other' ? 'grid-cols-[70%_30%_0%]' : 'grid-cols-[52%_28%_15%]'} pointer-events-none h-full grid-rows-4 px-4 transition-all duration-200`}
             >
                 <ul
-                    className={`${snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? '' : ''} m7-auto row-start-4 mt-auto mb-10 flex max-w-full basis-48 justify-center gap-4 px-40 transition-transform`}
+                    className={`${snap.currentAreaSelection === 'other' || state.currentAreaSelection === 'all' ? '' : ''} row-start-4 mt-auto mb-10 flex max-w-full basis-48 gap-4 px-40 transition-transform`}
                 >
                     {Object.entries(snap.grouped).map(([area]) => {
                         const a = snap.selected[area];
@@ -112,8 +112,8 @@ export function MainCustomizer({
                         );
                     })}
                 </ul>
-                <div className="row-start-4 mt-auto mb-12 grid grid-cols-[80%_20%] transition-all">
-                    <div className="flex flex-col gap-y-2 uppercase">
+                <div className="row-start-4 mt-auto mb-12 grid grid-cols-[80%_20%] border bg-black py-0.5 transition-all">
+                    <div className="flex flex-col divide-y-2 uppercase *:py-0.5">
                         {statTypes.map((stat) => {
                             const skipItems = new Set(['magsize', 'price']);
                             if (skipItems.has(stat)) return;
@@ -171,14 +171,14 @@ export function MainCustomizer({
                         <div className="my-1 grid w-3/4 grid-cols-1 gap-2 font-extrabold">
                             <div>
                                 <div className="text-xs">Mags</div>
-                                <div className="-mt-1 text-4xl">{weapon.extra_mags}</div>
+                                <div className="-mt-1 text-3xl">{weapon.extra_mags}</div>
                             </div>
                             <div
                                 className={`${weapon.magsize + contextDependentStatModifier('magsize') > weapon.magsize ? 'text-lime-400' : weapon.magsize + contextDependentStatModifier('magsize') < weapon.magsize ? 'text-red-500' : ''} transition-all`}
                             >
                                 <div className="text-xs">Mag Size</div>
                                 <div className="flex">
-                                    <div className="-mt-1 text-4xl">{weapon.magsize}</div>
+                                    <div className="-mt-1 text-3xl">{weapon.magsize}</div>
                                     <div
                                         className={`${contextDependentStatModifier('magsize') !== 0 ? '' : 'translate-y-3 opacity-0'} -translate-y-1 -skew-x-12 transition-all`}
                                     >
