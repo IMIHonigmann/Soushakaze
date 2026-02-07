@@ -152,7 +152,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             <li
                 key={`attachment-${area}-${att.id}`}
                 onClick={() => handleSelect(area as Area, att, sound)}
-                className="group relative flex cursor-pointer items-center gap-4 overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
+                className="group relative cursor-pointer items-center overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
             >
                 <div
                     className={`absolute inset-0 bg-linear-to-l from-orange-500 to-transparent transition-opacity duration-200 ${snap.selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
@@ -165,8 +165,8 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                         {children}
                     </DynamicIcon>
                     <div className="text-xl">
-                        <div>{att.name}</div>
-                        {att.id !== 0 && <div className="-skew-x-12 font-extrabold">{att.price_modifier}€</div>}
+                        <div className="leading-none">{att.name}</div>
+                        {att.id !== 0 && <div className="-skew-x-12 text-lg font-extrabold">{att.price_modifier}€</div>}
                     </div>
                 </div>
             </li>
@@ -241,7 +241,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
 
         const handleClick = () => setActionFunctions(null);
 
-        // window.addEventListener('contextmenu', handleContextMenu);
+        window.addEventListener('contextmenu', handleContextMenu);
         window.addEventListener('click', handleClick);
         return () => {
             window.removeEventListener('contextmenu', handleContextMenu);
