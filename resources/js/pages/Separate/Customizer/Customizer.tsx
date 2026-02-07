@@ -1,5 +1,4 @@
 import { usePrevious } from '@/hooks/usePrevious';
-import { playLower } from '@/pages/AttAudio';
 import { useCartStore } from '@/stores/bagStores';
 import { state, vec3 } from '@/stores/customizerProxy';
 import { Area, Attachment, Weapon } from '@/types/types';
@@ -20,7 +19,6 @@ import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import ContextMenu from '../Editor/ContextMenu';
 import EditForm from '../Editor/EditForm';
-import { DynamicIcon } from './helpers';
 import { MainCustomizer } from './MainCustomizer';
 
 gsap.registerPlugin(ScrambleTextPlugin);
@@ -38,64 +36,27 @@ interface Props {
 }
 
 export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels }: Props) {
-    const cameraControlsRef = useRef<CameraControls>(null);
     state.grouped = attachments;
-    const [isPlaying, setIsPlaying] = useState(false);
-
     const { addToBag } = useCartStore((state) => state);
-
-    useEffect(() => {
-        const availableAreas = new Set(Object.keys(snap.grouped));
-        const newSelected = Object.fromEntries(Object.entries(snap.selected).filter(([area]) => availableAreas.has(area)));
-        state.selected = newSelected;
-        const queryAttachmentIds = Object.entries(query);
-        queryAttachmentIds.forEach(([area, attId]) => {
-            const att = snap.grouped[area]?.find((a) => a.id == attId);
-            if (!att) return;
-            state.selected[area] = att;
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const snap = useSnapshot(state);
-
+    const cameraControlsRef = useRef<CameraControls>(null);
     const weaponNameRef = useRef(null);
+    const liRefs = useRef<Record<string, HTMLLIElement | null>>({});
+    const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
-    useEffect(() => {
-        const tl = gsap.timeline();
-        tl.to(
-            weaponNameRef.current,
-            {
-                duration: 1.5,
-                ease: 'none',
-                scrambleText: {
-                    text: weapon.name,
-                    speed: 2,
-                    chars: 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:\'",.<>/?`~',
-                },
-            },
-            4,
-        ).to(weaponNameRef.current, {
-            duration: 1,
-            ease: 'sine.out',
-        });
-
-        return () => {
-            tl.kill();
-        };
-    }, [weapon.name]);
-
-    const updateQueryParams = (area: Area, attachmentId: number) => {
-        const url = new URL(window.location.href);
-        url.searchParams.set(area, attachmentId.toString());
-        window.history.replaceState({}, '', url);
-    };
-    const handleSelect = (area: Area, attachment: Attachment, sound = 'select_attachment_subtle') => {
-        if (snap.selected[area].id !== attachment.id) playLower(`/sounds/${sound}.mp3`);
-        state.selected[area] = attachment;
-        updateQueryParams(area, attachment.id);
-        state.currentAreaSelection = area;
-    };
+    const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
+    const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
+    const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
+    const [editFormData, setEditFormData] = useState<{
+        Fields: Record<string, any>;
+        TargetType: 'Area' | 'Attachment';
+        targetName?: string;
+    } | null>(null);
+    const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, { opened: boolean; selected: boolean }>>(() =>
+        Object.fromEntries(Object.keys(attachments).map((area) => [area, { opened: true, selected: false }])),
+    );
 
     const setCameraControls = useCallback(
         (target: THREE.Vector3, pos: THREE.Vector3) => {
@@ -137,43 +98,16 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         >;
     }, [snap.currentAreaSelection, snap.selected, statModifiers]);
 
-    function contextDependentStatModifier(stat: Stats) {
-        return contextModifiers[stat];
-    }
-
     const totalPrice = useMemo(() => {
         return Number(weapon.price) + statModifiers['price'];
     }, [statModifiers, weapon.price]);
 
-    const previousPrice = usePrevious(totalPrice);
-
-    function AttachmentListElement({ area, att, children, sound }: { area: Area; att: Attachment; children?: React.ReactNode; sound?: string }) {
-        return (
-            <li
-                key={`attachment-${area}-${att.id}`}
-                onClick={() => handleSelect(area as Area, att, sound)}
-                className="group relative cursor-pointer items-center overflow-hidden border border-transparent transition-shadow select-none hover:border-red-600 hover:shadow-[0_0_40px_rgba(249,115,22,0.9)]"
-            >
-                <div
-                    className={`absolute inset-0 bg-linear-to-l from-orange-500 to-transparent transition-opacity duration-200 ${snap.selected[area]?.id === att.id ? 'opacity-100' : 'opacity-0'}`}
-                />
-                <div className="absolute inset-0 bg-linear-to-l from-red-600 to-transparent opacity-0 transition-opacity duration-300 hover:opacity-100" />
-                <div className="pointer-events-none relative z-10 flex items-center gap-4">
-                    <DynamicIcon
-                        className={`skew-x-3 transition-transform duration-150 ease-out group-hover:scale-105 ${snap.selected[area].id === att.id ? 'scale-110' : ''}`}
-                    >
-                        {children}
-                    </DynamicIcon>
-                    <div className="text-xl">
-                        <div className="leading-none">{att.name}</div>
-                        {att.id !== 0 && <div className="-skew-x-12 text-lg font-extrabold">{att.price_modifier}€</div>}
-                    </div>
-                </div>
-            </li>
-        );
+    function contextDependentStatModifier(stat: Stats) {
+        return contextModifiers[stat];
     }
 
-    const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
+    const previousPrice = usePrevious(totalPrice);
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'q' || event.key === 'Q') state.mode = undefined;
@@ -188,10 +122,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         };
     }, []);
 
-    const liRefs = useRef<Record<string, HTMLLIElement | null>>({});
-    const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
-    const scrollDivRef = useRef<HTMLUListElement | null>(null);
-
     useEffect(() => {
         const selectedElement = Object.values(liRefs.current).find((element) => element?.dataset.index === String(snap.currentMesh.lastSelection));
         const selectedIndex = selectedElement?.dataset.index;
@@ -205,33 +135,18 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastListSearchId, snap.nodeNames]);
 
-    const [openedAreaTabs, setOpenedAreaTabs] = useState<Record<string, { opened: boolean; selected: boolean }>>(() =>
-        Object.fromEntries(Object.keys(attachments).map((area) => [area, { opened: true, selected: false }])),
-    );
-
-    const [openedAttTabs, setOpenedAttTabs] = useState<Record<string | number, { opened: boolean; selected: boolean }>>(() => {
-        const result: Record<string | number, { opened: boolean; selected: boolean }> = {};
-        Object.values(attachments).forEach((atts) => {
-            atts.forEach((att) => {
-                result[att.id] = { opened: true, selected: false };
-            });
+    useEffect(() => {
+        const availableAreas = new Set(Object.keys(snap.grouped));
+        const newSelected = Object.fromEntries(Object.entries(snap.selected).filter(([area]) => availableAreas.has(area)));
+        state.selected = newSelected;
+        const queryAttachmentIds = Object.entries(query);
+        queryAttachmentIds.forEach(([area, attId]) => {
+            const att = snap.grouped[area]?.find((a) => a.id == attId);
+            if (!att) return;
+            state.selected[area] = att;
         });
-        return result;
-    });
-
-    // use to create new tab state when adding a new attachment
-    const getTabState = (id: string | number) => {
-        return openedAttTabs[id] ?? { opened: true, selected: false };
-    };
-
-    const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
-    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-    const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
-    const [editFormData, setEditFormData] = useState<{
-        Fields: Record<string, any>;
-        TargetType: 'Area' | 'Attachment';
-        targetName?: string;
-    } | null>(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const handleContextMenu = (e: MouseEvent) => {
@@ -248,6 +163,45 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             window.removeEventListener('click', handleClick);
         };
     }, []);
+
+    useEffect(() => {
+        const tl = gsap.timeline();
+        tl.to(
+            weaponNameRef.current,
+            {
+                duration: 1.5,
+                ease: 'none',
+                scrambleText: {
+                    text: weapon.name,
+                    speed: 2,
+                    chars: 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:\'",.<>/?`~',
+                },
+            },
+            4,
+        ).to(weaponNameRef.current, {
+            duration: 1,
+            ease: 'sine.out',
+        });
+
+        return () => {
+            tl.kill();
+        };
+    }, [weapon.name]);
+
+    // use to create new tab state when adding a new attachment
+    const getTabState = (id: string | number) => {
+        return openedAttTabs[id] ?? { opened: true, selected: false };
+    };
+
+    const [openedAttTabs, setOpenedAttTabs] = useState<Record<string | number, { opened: boolean; selected: boolean }>>(() => {
+        const result: Record<string | number, { opened: boolean; selected: boolean }> = {};
+        Object.values(attachments).forEach((atts) => {
+            atts.forEach((att) => {
+                result[att.id] = { opened: true, selected: false };
+            });
+        });
+        return result;
+    });
 
     return (
         <div className="grid h-[98.5svh] w-[99svw] grid-cols-[17%_3%_80%] grid-rows-[35%_60%_5%] gap-2 bg-zinc-950 p-2 *:rounded-xl *:border [&>*:not(:nth-child(n+2):nth-child(-n+3),:last-child)]:p-2">
@@ -322,11 +276,8 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 statModifiers={statModifiers}
                 addToBag={addToBag}
                 totalPrice={totalPrice}
-                AttachmentListElement={AttachmentListElement}
-                isPlaying={isPlaying}
                 weaponNameRef={weaponNameRef}
                 previousPrice={previousPrice}
-                setIsPlaying={setIsPlaying}
             />
             <ul
                 ref={scrollDivRef}

@@ -5,6 +5,7 @@ import YouTubePlayer from '@/pages/YouTubePlayer';
 import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
 import { Area } from '@/types/types';
 import { Link } from 'lucide-react';
+import { useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
@@ -12,9 +13,10 @@ import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBu
 import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import { useSnapshot } from 'valtio';
+import { AttachmentListElement } from './AttachmentListElement';
 import { statTypes } from './Customizer';
 import CustomizerScene from './CustomizerScene';
-import { DynamicIcon } from './helpers';
+import { DynamicIcon } from './DynamicIcon';
 
 type MainCustomizerProps = {
     attachmentModels: any;
@@ -28,9 +30,6 @@ type MainCustomizerProps = {
     totalPrice: any;
     previousPrice: any;
     weaponNameRef: any;
-    isPlaying: boolean;
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-    AttachmentListElement: React.ComponentType<any>;
 };
 
 export function MainCustomizer({
@@ -45,12 +44,10 @@ export function MainCustomizer({
     totalPrice,
     previousPrice,
     weaponNameRef,
-    isPlaying,
-    setIsPlaying,
-    AttachmentListElement,
 }: MainCustomizerProps) {
     const snap = useSnapshot(state);
     const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
+    const [isPlaying, setIsPlaying] = useState(false);
 
     return (
         <div className="relative row-span-2 overflow-hidden">
