@@ -129,7 +129,7 @@ class CustomizerController extends Controller
                 DB::table('weapon_attachment_model')->insert(
                     [
                         'weapon_id' => $validated['weapon_id'],
-                        'attachment_id' => $attachmentIds[$index] ?? null,
+                        'attachment_id' => $attachmentIds[$index] ?? DB::table('attachments')->where('name', 'UNASSIGNED')->first()?->id,
                         'model_name' => $model_name,
                     ]
                 );

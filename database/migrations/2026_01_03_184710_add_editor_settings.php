@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('weapon_area_display', function (Blueprint $table) {
             $table->foreignId('weapon_id')->primary()->constrained();
+            $table->foreignId('attachmentId')->nullable();
             $table->decimal('target_x', 10, 3);
             $table->decimal('target_y', 10, 3);
             $table->decimal('target_z', 10, 3);
