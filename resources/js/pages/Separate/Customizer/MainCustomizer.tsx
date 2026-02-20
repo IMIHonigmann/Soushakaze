@@ -110,7 +110,7 @@ export function MainCustomizer({
                     })}
                 </ul>
                 <div className="row-start-4 mt-auto mb-12 grid grid-cols-[80%_20%] border bg-black py-0.5 transition-all">
-                    <div className="flex flex-col divide-y-2 uppercase *:py-0.5">
+                    <div className="flex flex-col divide-y uppercase *:py-0.5">
                         {statTypes.map((stat) => {
                             const skipItems = new Set(['magsize', 'price']);
                             if (skipItems.has(stat)) return;

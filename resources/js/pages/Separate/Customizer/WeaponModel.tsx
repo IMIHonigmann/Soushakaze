@@ -52,7 +52,7 @@ type WorldNode = {
 };
 
 export default function Model({ cameraControlsRef, weapon, attachmentModels, ...props }: ModelProps) {
-    const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/scene.glb`) as unknown as GLTFResult;
+    const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/Main/scene.gltf`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
     const sceneGroupRef = useRef<THREE.Group>(null);
@@ -315,7 +315,7 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, ...
             </Stage>
             {snap.mode && (
                 <TransformControls
-                    object={selectionGroupRef.current ?? undefined}
+                    object={(snap.clickedSidebarTab === 1 ? sceneGroupRef.current : selectionGroupRef.current) ?? undefined}
                     mode={snap.mode}
                     onMouseDown={() => (state.cameraControlsEnabled = false)}
                     onMouseUp={() => (state.cameraControlsEnabled = true)}

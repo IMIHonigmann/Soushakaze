@@ -14,7 +14,7 @@ import { GiDesertEagle } from 'react-icons/gi';
 import { IconType } from 'react-icons/lib';
 import { LuMousePointer, LuMove3D, LuRotate3D, LuScale3D } from 'react-icons/lu';
 import { MdEdit } from 'react-icons/md';
-import { TbBox, TbCamera } from 'react-icons/tb';
+import { TbAdjustments, TbBox, TbCamera } from 'react-icons/tb';
 import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import ContextMenu from '../Editor/ContextMenu';
@@ -47,7 +47,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
-    const [clickedSidebarTab, setClickedSidebarTab] = useState(0);
     const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
     const [editFormData, setEditFormData] = useState<{
         Fields: Record<string, any>;
@@ -256,15 +255,17 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 </div>
             </div>
             <ul className="row-span-full flex flex-col gap-1 p-1">
-                {[1, 2, 3, 4, 5].map((num, index) => (
-                    <li
-                        onClick={() => setClickedSidebarTab(index)}
-                        key={num}
-                        className={`flex aspect-square items-center justify-center rounded-lg border transition-colors duration-150 ${clickedSidebarTab === index ? 'bg-red-600' : 'cursor-pointer bg-zinc-900 hover:bg-orange-500'}`}
-                    >
-                        <span>{num}</span>
-                    </li>
-                ))}
+                {Object.entries({ 1: <TbBox />, 2: <TbAdjustments />, 3: <TbBox />, 4: <TbBox />, 5: <TbBox /> }).map(
+                    ([key, logoComponent], index) => (
+                        <li
+                            onClick={() => (state.clickedSidebarTab = index)}
+                            key={key}
+                            className={`flex aspect-square items-center justify-center rounded-lg border transition-colors duration-150 ${snap.clickedSidebarTab === index ? 'bg-red-600' : 'cursor-pointer bg-zinc-900 hover:bg-orange-500'} text-4xl`}
+                        >
+                            {logoComponent}
+                        </li>
+                    ),
+                )}
             </ul>
             <MainCustomizer
                 attachmentModels={attachmentModels}

@@ -46,4 +46,5 @@ export const state = proxy({
     action: null as 'ADDSINGLE' | 'CHANGESELECTION' | null,
     lastUpdateId: 0,
     lastListSearchId: 0,
+    clickedSidebarTab: 0,
 });
