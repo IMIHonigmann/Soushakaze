@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import { useSnapshot } from 'valtio';
 import ContextMenu from '../Editor/ContextMenu';
 import EditForm from '../Editor/EditForm';
+import { changeMeshSelection } from '../Editor/helpers';
 import { MainCustomizer } from './MainCustomizer';
 
 gsap.registerPlugin(ScrambleTextPlugin);
@@ -334,13 +335,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                 {atts.map((att, attIndex) => (
                                     <li key={att.id}>
                                         <h4
-                                            onClick={() => {
-                                                state.action = 'CHANGESELECTION';
-                                                state.currentMesh.previousSelection = [...snap.currentMesh.existingSelection];
-                                                state.currentMesh.existingSelection = [...snap.dbAttachmentsToMaterialsObject[att.name]];
-                                                state.currentMesh.lastSelection = [...snap.dbAttachmentsToMaterialsObject[att.name]];
-                                                state.lastUpdateId++;
-                                            }}
+                                            onClick={() => changeMeshSelection([...snap.dbAttachmentsToMaterialsObject[att.name]])}
                                             onContextMenu={() => {
                                                 setActionFunctions({
                                                     'Cut Model Selection': -1,
@@ -427,12 +422,8 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                         tabIndex={0}
                                                         className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard?.[att.name]?.includes(modelIndex) ? 'opacity-50' : ''}`}
                                                         onClick={(e) => {
-                                                            state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                                             if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
-                                                            state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
-                                                            state.currentMesh.existingSelection = [];
-                                                            state.currentMesh.lastSelection = [];
-                                                            state.action = 'CHANGESELECTION';
+                                                            changeMeshSelection([]);
 
                                                             if (e.shiftKey) {
                                                                 const clickedIndex = e.currentTarget.dataset.index;
@@ -478,22 +469,6 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                                 },
                                                                 'Paste Model Selection': -1,
                                                             });
-                                                        }}
-                                                        onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
-                                                            state.action = 'CHANGESELECTION';
-                                                            if (e.key === 'ArrowUp') {
-                                                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                                                // state.currentMesh.existingSelection = [snap.nodeNames[index - 1]];
-                                                                // state.currentMesh.lastSelection = [snap.nodeNames[index - 1]];
-                                                                // liRefs.current[index - 1]?.focus();
-                                                            }
-                                                            if (e.key === 'ArrowDown') {
-                                                                state.currentMesh.previousSelection = state.currentMesh.existingSelection;
-                                                                // state.currentMesh.existingSelection = [snap.nodeNames[index + 1]];
-                                                                // state.currentMesh.lastSelection = [snap.nodeNames[index + 1]];
-                                                                // liRefs.current[index + 1]?.focus();
-                                                            }
-                                                            state.lastUpdateId++;
                                                         }}
                                                         key={nodeName}
                                                     >

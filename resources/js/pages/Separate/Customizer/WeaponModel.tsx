@@ -14,6 +14,7 @@ import { JSX, RefObject, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 import { useSnapshot } from 'valtio';
+import { addSingleMeshToSelection, changeMeshSelection } from '../Editor/helpers';
 
 type GLTFResult = GLTF & {
     nodes: Record<string, THREE.Mesh>;
@@ -270,17 +271,12 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, ...
                                     scale={n.scale}
                                     onDoubleClick={(e) => {
                                         e.stopPropagation();
-                                        state.currentMesh.previousSelection = [...state.currentMesh.existingSelection];
                                         if (e.shiftKey) {
-                                            state.currentMesh.existingSelection.push(e.object.name);
-                                            state.action = 'ADDSINGLE';
+                                            addSingleMeshToSelection(e.object.name);
                                         } else {
-                                            state.currentMesh.existingSelection = [e.object.name];
-                                            state.action = 'CHANGESELECTION';
+                                            changeMeshSelection([e.object.name]);
                                             state.lastListSearchId++;
                                         }
-                                        state.currentMesh.lastSelection = [e.object.name];
-                                        state.lastUpdateId++;
                                     }}
                                     onPointerEnter={(e) => {
                                         e.stopPropagation();
