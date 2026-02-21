@@ -66,10 +66,21 @@ class CustomizerController extends Controller
 
         $maxPower = DB::table('weapons')->max('power');
 
-        $area_displays = DB::table('weapon_area_display')->where('weapon_id', $weaponId)->get();
-        $attachment_models = DB::table('weapon_attachment_model')->where('weapon_id', $weaponId)->leftJoin('attachments', 'attachment_id', '=', 'attachments.id')->select('weapon_attachment_model.model_name', 'attachments.name as attachment_name')->get()->groupBy('attachment_name')->map(function ($group) {
-            return $group->pluck('model_name');
-        });
+        $area_displays = DB::table('weapon_area_display')
+            ->where('weapon_id', $weaponId)
+            ->get();
+        $attachment_models = DB::table('weapon_attachment_model')
+            ->where('weapon_id', $weaponId)
+            ->leftJoin('attachments', 'attachment_id', '=', 'attachments.id')
+            ->select('weapon_attachment_model.model_name', 'attachments.name as attachment_name')
+            ->get()
+            ->groupBy('attachment_name')
+            ->map(function ($group) {
+                return $group->pluck('model_name');
+            });
+        $rest_transforms = DB::table('weapon_rest_transforms')
+            ->where('weapon_id', $weaponId)
+            ->first();
 
         return Inertia::render('Separate/Customizer/Customizer', [
             'weapon' => $weapon,
@@ -78,6 +89,7 @@ class CustomizerController extends Controller
             'query' => $request->query(),
             'areaDisplays' => $area_displays,
             'attachmentModels' => $attachment_models,
+            'restTransforms' => $rest_transforms,
             'renderEditor' => true
         ]);
     }
@@ -120,7 +132,7 @@ class CustomizerController extends Controller
         $validated = $request->validate([
             'weapon_id' => 'required|integer|exists:weapons,id',
             'attachment_ids' => 'nullable|array',
-            'model_names' => 'required|array',
+            'model_names' => 'required|array'
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -144,23 +156,52 @@ class CustomizerController extends Controller
 
     public function overwriteAttachmentModelHierarchy(Request $request)
     {
-        DB::transaction(function () use ($request) {
-            $dbAttachmentsToMaterialsObject = json_decode($request['dbAttachmentsToMaterialsObject'], true);
+        $validated = $request->validate([
+            'weapon_id' => 'required|integer|exists:weapons,id',
+            'dbAttachmentsToMaterialsObject' => 'required|string',
+            'rest_transforms' => 'required|array'
+        ]);
+
+        DB::transaction(function () use ($validated) {
+            $dbAttachmentsToMaterialsObject = json_decode($validated['dbAttachmentsToMaterialsObject'], true);
             DB::table('weapon_attachment_model')->delete();
             foreach ($dbAttachmentsToMaterialsObject as $key => $valueArray) {
                 foreach ($valueArray as $item) {
                     DB::table('weapon_attachment_model')->insert([
-                        'weapon_id' => $request['weapon_id'],
+                        'weapon_id' => $validated['weapon_id'],
                         'attachment_id' => optional(DB::table('attachments')->where('name', $key)->first())->id,
                         'model_name' => $item
                     ]);
                 }
             }
+
+            $restTransforms = $validated['rest_transforms'];
+
+            DB::table('weapon_rest_transforms')->updateOrInsert(
+                [
+                    'weapon_id' => $validated['weapon_id'],
+                ],
+                [
+                    'position_x' => $restTransforms['position_x'],
+                    'position_y' => $restTransforms['position_y'],
+                    'position_z' => $restTransforms['position_z'],
+                    'rotation_x' => $restTransforms['rotation_x'],
+                    'rotation_y' => $restTransforms['rotation_y'],
+                    'rotation_z' => $restTransforms['rotation_z'],
+                    'scale_x' => $restTransforms['scale_x'],
+                    'scale_y' => $restTransforms['scale_y'],
+                    'scale_z' => $restTransforms['scale_z'],
+                    'updated_at' => now(),
+                    'created_at' => $restTransforms['created_at'] ?? now(),
+                ]
+            );
         });
 
         return response()->json([
             'success' => true,
-            'message' => 'Attachment model hierarchy updated successfully'
+            'message' => 'Attachment model hierarchy updated successfully',
+            'operation' => 'overwrite',
+            'rest_transforms' => $request->rest_transforms
         ]);
     }
 

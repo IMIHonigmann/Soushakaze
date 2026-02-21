@@ -47,4 +47,5 @@ export const state = proxy({
     lastUpdateId: 0,
     lastListSearchId: 0,
     clickedSidebarTab: 0,
+    lastApplyIndex: 0,
 });

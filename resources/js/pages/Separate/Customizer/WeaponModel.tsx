@@ -6,6 +6,7 @@ Source: https://sketchfab.com/3d-models/ppsh-41-tactical-d7d785b781a94df5b9a4956
 Title: PPSH-41 TACTICAL
 */
 
+import { CustomizerProps } from '@/pages/Separate/Customizer/Customizer';
 import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
@@ -37,9 +38,10 @@ type GLTFResult = GLTF & {
 
 type ModelProps = JSX.IntrinsicElements['group'] & {
     weapon: Weapon;
-    cameraControlsRef: RefObject<CameraControls>;
-    attachmentModels: Record<string, string[]>;
-    areaDisplays: any;
+    cameraControlsRef: RefObject<CameraControls | null>;
+    attachmentModels: CustomizerProps['attachmentModels'];
+    areaDisplays: CustomizerProps['areaDisplays'];
+    restTransforms: CustomizerProps['restTransforms'];
 };
 
 type WorldNode = {
@@ -52,7 +54,7 @@ type WorldNode = {
     visible: boolean;
 };
 
-export default function Model({ cameraControlsRef, weapon, attachmentModels, ...props }: ModelProps) {
+export default function Model({ cameraControlsRef, weapon, attachmentModels, restTransforms, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/Main/scene.gltf`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
@@ -241,6 +243,29 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, ...
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastUpdateId]);
 
+    useEffect(() => {
+        if (!sceneGroupRef.current || snap.lastApplyIndex === 0) return;
+        const newRestTransforms = {
+            position_x: sceneGroupRef.current.position.x,
+            position_y: sceneGroupRef.current.position.y,
+            position_z: sceneGroupRef.current.position.z,
+            rotation_x: sceneGroupRef.current.rotation.x,
+            rotation_y: sceneGroupRef.current.rotation.y,
+            rotation_z: sceneGroupRef.current.rotation.z,
+            scale_x: sceneGroupRef.current.scale.x,
+            scale_y: sceneGroupRef.current.scale.y,
+            scale_z: sceneGroupRef.current.scale.z,
+        } as typeof restTransforms;
+        console.log('bruh', snap.lastApplyIndex, restTransforms);
+
+        router.post('/overwriteAttachmentModelHierarchy', {
+            dbAttachmentsToMaterialsObject: JSON.stringify(snap.dbAttachmentsToMaterialsObject),
+            weapon_id: weapon.id,
+            rest_transforms: newRestTransforms,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [snap.lastApplyIndex]);
+
     return (
         <>
             <Stage environment="studio" intensity={0.2} castShadow={true} shadows preset="upfront">
@@ -255,7 +280,12 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, ...
                         onControlEnd={() => handleControlEnd()}
                     />
                     <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
-                        <group rotation={[0, 0, 0]} ref={sceneGroupRef}>
+                        <group
+                            position={[restTransforms.position_x ?? 0, restTransforms.position_y ?? 0, restTransforms.position_z ?? 0]}
+                            rotation={[restTransforms.rotation_x ?? 0, restTransforms.rotation_y ?? 0, restTransforms.rotation_z ?? 0]}
+                            scale={[restTransforms.scale_x ?? 0, restTransforms.scale_y ?? 0, restTransforms.scale_z ?? 0]}
+                            ref={sceneGroupRef}
+                        >
                             {Object.entries(worldNodes).map(([nodeName, n]) => (
                                 <mesh
                                     name={nodeName}

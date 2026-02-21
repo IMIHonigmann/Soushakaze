@@ -2,7 +2,6 @@ import { usePrevious } from '@/hooks/usePrevious';
 import { useCartStore } from '@/stores/bagStores';
 import { state, vec3 } from '@/stores/customizerProxy';
 import { Area, Attachment, Weapon } from '@/types/types';
-import { router } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/all';
@@ -27,16 +26,46 @@ gsap.registerPlugin(ScrambleTextPlugin);
 export const statTypes = ['power', 'accuracy', 'mobility', 'handling', 'magsize', 'price'] as const;
 export type Stats = (typeof statTypes)[number];
 
-interface Props {
+export type WeaponRestTransform = {
+    weapon_id: number;
+    position_x: number;
+    position_y: number;
+    position_z: number;
+    rotation_x: number;
+    rotation_y: number;
+    rotation_z: number;
+    scale_x: number;
+    scale_y: number;
+    scale_z: number;
+    created_at?: string;
+    updated_at?: string;
+};
+
+export interface CustomizerProps {
     weapon: Weapon;
     maxPower: number;
     attachments: Record<string, Attachment[]>;
     query: Record<Area, number>;
     attachmentModels: Record<string, string[]>;
-    areaDisplays: any;
+    areaDisplays: Record<
+        string,
+        {
+            weapon_id: number;
+            attachmentId?: number | null;
+            target_x: number;
+            target_y: number;
+            target_z: number;
+            position_x: number;
+            position_y: number;
+            position_z: number;
+            created_at?: string;
+            updated_at?: string;
+        }
+    >;
+    restTransforms: WeaponRestTransform;
 }
 
-export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels }: Props) {
+export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels, restTransforms }: CustomizerProps) {
     state.grouped = attachments;
     const { addToBag } = useCartStore((state) => state);
     const snap = useSnapshot(state);
@@ -270,6 +299,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             </ul>
             <MainCustomizer
                 attachmentModels={attachmentModels}
+                restTransforms={restTransforms}
                 areaDisplays={areaDisplays}
                 weapon={weapon}
                 cameraControlsRef={cameraControlsRef}
@@ -521,15 +551,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                     Bounding Box Center
                     <FaChevronUp />
                 </span>
-                <button
-                    onClick={() => {
-                        router.post('/overwriteAttachmentModelHierarchy', {
-                            dbAttachmentsToMaterialsObject: JSON.stringify(snap.dbAttachmentsToMaterialsObject),
-                            weapon_id: weapon.id,
-                        });
-                    }}
-                    className="mr-2 border p-1 hover:bg-zinc-900"
-                >
+                <button onClick={() => state.lastApplyIndex++} className="mr-2 border p-1 hover:bg-zinc-900">
                     Apply
                 </button>
             </div>

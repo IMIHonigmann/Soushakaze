@@ -3,9 +3,10 @@ import { playLower } from '@/pages/AttAudio';
 import Count from '@/pages/Counter';
 import YouTubePlayer from '@/pages/YouTubePlayer';
 import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
-import { Area } from '@/types/types';
+import { Area, Weapon } from '@/types/types';
+import { CameraControls } from '@react-three/drei';
 import { Link } from 'lucide-react';
-import { useState } from 'react';
+import { RefObject, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
@@ -14,15 +15,15 @@ import { IoIosReturnLeft } from 'react-icons/io';
 import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
 import { useSnapshot } from 'valtio';
 import { AttachmentListElement } from './AttachmentListElement';
-import { statTypes } from './Customizer';
+import { CustomizerProps, statTypes } from './Customizer';
 import CustomizerScene from './CustomizerScene';
 import { DynamicIcon } from './DynamicIcon';
 
 type MainCustomizerProps = {
-    attachmentModels: any;
-    areaDisplays: any;
-    weapon: any;
-    cameraControlsRef: any;
+    attachmentModels: CustomizerProps['attachmentModels'];
+    areaDisplays: CustomizerProps['areaDisplays'];
+    weapon: Weapon;
+    cameraControlsRef: RefObject<CameraControls | null>;
     statModifiers: any;
     contextDependentStatModifier: any;
     addToBag: any;
@@ -30,6 +31,7 @@ type MainCustomizerProps = {
     totalPrice: any;
     previousPrice: any;
     weaponNameRef: any;
+    restTransforms: CustomizerProps['restTransforms'];
 };
 
 export function MainCustomizer({
@@ -44,6 +46,7 @@ export function MainCustomizer({
     totalPrice,
     previousPrice,
     weaponNameRef,
+    restTransforms,
 }: MainCustomizerProps) {
     const snap = useSnapshot(state);
     const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
@@ -56,6 +59,7 @@ export function MainCustomizer({
                 onClick={() => goBackTo3D('all')}
             />
             <CustomizerScene
+                restTransforms={restTransforms}
                 attachmentModels={attachmentModels}
                 areaDisplays={areaDisplays}
                 weapon={weapon}

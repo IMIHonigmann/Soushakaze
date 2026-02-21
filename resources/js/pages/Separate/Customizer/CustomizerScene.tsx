@@ -1,16 +1,18 @@
 import WeaponModel from '@/pages/Separate/Customizer/WeaponModel';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
-import { ContactShadows } from '@react-three/drei';
+import { CameraControls, ContactShadows } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Bloom, ChromaticAberration, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import React, { memo, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { CustomizerProps } from './Customizer';
 
 interface Props {
-    cameraControlsRef: React.RefObject<any>;
+    cameraControlsRef: React.RefObject<CameraControls | null>;
     weapon: Weapon;
-    attachmentModels: Record<string, string[]>;
-    areaDisplays: any;
+    attachmentModels: CustomizerProps['attachmentModels'];
+    areaDisplays: CustomizerProps['areaDisplays'];
+    restTransforms: CustomizerProps['restTransforms'];
 }
 
 function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: string) => void }) {
@@ -31,7 +33,7 @@ function ScreenshotHelper({ onScreenshotReady }: { onScreenshotReady: (dataURL: 
     return null;
 }
 
-function CustomizerScene({ cameraControlsRef, weapon, attachmentModels, areaDisplays }: Props) {
+function CustomizerScene({ cameraControlsRef, weapon, attachmentModels, areaDisplays, restTransforms }: Props) {
     const canvasRef = useRef(null);
     const [, setScreenshotDataURL] = useState<string | null>(null);
 
@@ -74,6 +76,7 @@ function CustomizerScene({ cameraControlsRef, weapon, attachmentModels, areaDisp
                         <ScreenshotHelper onScreenshotReady={handleScreenshot} />
                         {WeaponModel ? (
                             <WeaponModel
+                                restTransforms={restTransforms}
                                 attachmentModels={attachmentModels}
                                 areaDisplays={areaDisplays}
                                 cameraControlsRef={cameraControlsRef}
