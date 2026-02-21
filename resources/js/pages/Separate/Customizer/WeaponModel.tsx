@@ -279,62 +279,61 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
                         maxPolarAngle={Math.PI / 1.8}
                         onControlEnd={() => handleControlEnd()}
                     />
-                    <group {...props} dispose={null} rotation={[0, Math.PI / 2, 0]} scale={0.115} position={[0.75, 0.25, 0]}>
-                        <group
-                            position={[restTransforms.position_x ?? 0, restTransforms.position_y ?? 0, restTransforms.position_z ?? 0]}
-                            rotation={[restTransforms.rotation_x ?? 0, restTransforms.rotation_y ?? 0, restTransforms.rotation_z ?? 0]}
-                            scale={[restTransforms.scale_x ?? 0, restTransforms.scale_y ?? 0, restTransforms.scale_z ?? 0]}
-                            ref={sceneGroupRef}
-                        >
-                            {Object.entries(worldNodes).map(([nodeName, n]) => (
-                                <mesh
-                                    name={nodeName}
-                                    ref={(el) => (meshRefs.current[nodeName] = el)}
-                                    key={n.uuid}
-                                    castShadow
-                                    receiveShadow
-                                    position={n.position}
-                                    rotation={n.rotation}
-                                    geometry={n.geometry}
-                                    material={n.material}
-                                    visible={meshRefs.current[nodeName]?.visible ?? true}
-                                    scale={n.scale}
-                                    onDoubleClick={(e) => {
-                                        e.stopPropagation();
-                                        if (e.shiftKey) {
-                                            addSingleMeshToSelection(e.object.name);
-                                        } else {
-                                            changeMeshSelection([e.object.name]);
-                                            state.lastListSearchId++;
-                                        }
-                                    }}
-                                    onPointerEnter={(e) => {
-                                        e.stopPropagation();
-                                        const mesh = e.object as THREE.Mesh;
-                                        ensureUniqueMaterial(mesh);
-                                        const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-                                        if (!mesh.userData.__originalColor) {
-                                            mesh.userData.__originalColor = (mat as any).color.clone();
-                                        }
-                                        (mat as any).color.set(HOVER_COLOR);
-                                        if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
-                                    }}
-                                    onPointerLeave={(e) => {
-                                        const mesh = e.object as THREE.Mesh;
-                                        const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-                                        const original: THREE.Color | undefined = mesh.userData.__originalColor;
+                    <group
+                        {...props}
+                        position={[restTransforms.position_x ?? 0, restTransforms.position_y ?? 0, restTransforms.position_z ?? 0]}
+                        rotation={[restTransforms.rotation_x ?? 0, restTransforms.rotation_y ?? 0, restTransforms.rotation_z ?? 0]}
+                        scale={[restTransforms.scale_x ?? 0, restTransforms.scale_y ?? 0, restTransforms.scale_z ?? 0]}
+                        ref={sceneGroupRef}
+                    >
+                        {Object.entries(worldNodes).map(([nodeName, n]) => (
+                            <mesh
+                                name={nodeName}
+                                ref={(el) => (meshRefs.current[nodeName] = el)}
+                                key={n.uuid}
+                                castShadow
+                                receiveShadow
+                                position={n.position}
+                                rotation={n.rotation}
+                                geometry={n.geometry}
+                                material={n.material}
+                                visible={meshRefs.current[nodeName]?.visible ?? true}
+                                scale={n.scale}
+                                onDoubleClick={(e) => {
+                                    e.stopPropagation();
+                                    if (e.shiftKey) {
+                                        addSingleMeshToSelection(e.object.name);
+                                    } else {
+                                        changeMeshSelection([e.object.name]);
+                                        state.lastListSearchId++;
+                                    }
+                                }}
+                                onPointerEnter={(e) => {
+                                    e.stopPropagation();
+                                    const mesh = e.object as THREE.Mesh;
+                                    ensureUniqueMaterial(mesh);
+                                    const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+                                    if (!mesh.userData.__originalColor) {
+                                        mesh.userData.__originalColor = (mat as any).color.clone();
+                                    }
+                                    (mat as any).color.set(HOVER_COLOR);
+                                    if (typeof document !== 'undefined') document.body.style.cursor = 'pointer';
+                                }}
+                                onPointerLeave={(e) => {
+                                    const mesh = e.object as THREE.Mesh;
+                                    const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+                                    const original: THREE.Color | undefined = mesh.userData.__originalColor;
 
-                                        if (snap.currentMesh.existingSelection.includes(mesh.name)) {
-                                            (mat as any).color.set(SELECTED_COLOR);
-                                        } else if (original) {
-                                            (mat as any).color.copy(original);
-                                        }
+                                    if (snap.currentMesh.existingSelection.includes(mesh.name)) {
+                                        (mat as any).color.set(SELECTED_COLOR);
+                                    } else if (original) {
+                                        (mat as any).color.copy(original);
+                                    }
 
-                                        if (typeof document !== 'undefined') document.body.style.cursor = 'auto';
-                                    }}
-                                />
-                            ))}
-                        </group>
+                                    if (typeof document !== 'undefined') document.body.style.cursor = 'auto';
+                                }}
+                            />
+                        ))}
                     </group>
                 </group>
                 <group ref={selectionGroupRef}></group>

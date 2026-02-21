@@ -36,7 +36,7 @@ return new class extends Migration
             $table->decimal('position_y', 10, 3)->default(0);
             $table->decimal('position_z', 10, 3)->default(0);
             $table->decimal('rotation_x', 10, 3)->default(0);
-            $table->decimal('rotation_y', 10, 3)->default(0);
+            $table->decimal('rotation_y', 10, 3)->default(value: pi() / 2);
             $table->decimal('rotation_z', 10, 3)->default(0);
             $table->decimal('scale_x', 10, 3)->default(1);
             $table->decimal('scale_y', 10, 3)->default(1);
@@ -47,15 +47,15 @@ return new class extends Migration
         DB::table('weapon_rest_transforms')->insert([
             [
                 'weapon_id' => 6,
-                'position_x' => 0.000,
-                'position_y' => 0.000,
+                'position_x' => 0.750,
+                'position_y' => 0.250,
                 'position_z' => 0.000,
                 'rotation_x' => 0.000,
-                'rotation_y' => 0.000,
+                'rotation_y' => pi() / 2,
                 'rotation_z' => 0.000,
-                'scale_x' => 1.000,
-                'scale_y' => 1.000,
-                'scale_z' => 1.000,
+                'scale_x' => 0.115,
+                'scale_y' => 0.115,
+                'scale_z' => 0.115,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -65,11 +65,11 @@ return new class extends Migration
                 'position_y' => -2.000,
                 'position_z' => 3.250,
                 'rotation_x' => 10.000,
-                'rotation_y' => 20.000,
+                'rotation_y' => pi() / 2,
                 'rotation_z' => 30.000,
-                'scale_x' => 1.000,
-                'scale_y' => 1.000,
-                'scale_z' => 1.000,
+                'scale_x' => 2.000,
+                'scale_y' => 2.000,
+                'scale_z' => 2.000,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
