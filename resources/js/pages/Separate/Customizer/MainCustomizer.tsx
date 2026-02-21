@@ -6,7 +6,7 @@ import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
 import { Area, Weapon } from '@/types/types';
 import { CameraControls } from '@react-three/drei';
 import { Link } from 'lucide-react';
-import { RefObject, useState } from 'react';
+import { RefObject, useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
@@ -51,9 +51,25 @@ export function MainCustomizer({
     const snap = useSnapshot(state);
     const myPlaylist: string[] = ['53S_ZAvWT3o', '9knRIIQGUb4', 'XGLYpYoXkWw', '5Duje_sZko8', 'HMuYfScGpbE'];
     const [isPlaying, setIsPlaying] = useState(false);
+    const [fullscreen, setFullscreen] = useState(false);
+
+    useEffect(() => {
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (e.ctrlKey && e.key === ' ' && !e.repeat) {
+                e.preventDefault();
+                setFullscreen((prev) => !prev);
+                console.log(fullscreen);
+            }
+        };
+        addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            removeEventListener('keydown', handleKeyPress);
+        };
+    }, [fullscreen]);
 
     return (
-        <div className="relative row-span-2 overflow-hidden">
+        <div className={`relative ${fullscreen ? 'col-span-full row-span-full' : 'row-span-2'} overflow-hidden`}>
             <MdOutlineCameraswitch
                 className={`scale absolute top-4 right-4 z-70 cursor-pointer text-7xl transition-transform duration-300 ${snap.currentAreaSelection === 'all' ? 'translate-x-20 scale-50' : 'translate-x-0 hover:scale-125 hover:rotate-360 hover:ease-out'}`}
                 onClick={() => goBackTo3D('all')}
