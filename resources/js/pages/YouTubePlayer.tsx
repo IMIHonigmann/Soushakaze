@@ -114,7 +114,7 @@ const YouTubePlayer = ({ videoIds = [], className, isPlaying, setIsPlaying }: Pr
                     onReady={onReady}
                     onEnd={onEnd}
                 />
-                <div className="mb-2 flex items-center text-xl *:px-2">
+                <div className="mb-2 flex items-center text-xl *:px-1">
                     <FaCompactDisc
                         key={currentIndex}
                         className={`text-5xl ${isPlaying ? 'animate-spin-720 text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.8)] ease-in-out' : 'animate-ping transition-all duration-1000'}`}

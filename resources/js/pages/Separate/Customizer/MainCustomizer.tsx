@@ -4,15 +4,15 @@ import Count from '@/pages/Counter';
 import YouTubePlayer from '@/pages/YouTubePlayer';
 import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
 import { Area, Weapon } from '@/types/types';
+import { Link } from '@inertiajs/react';
 import { CameraControls } from '@react-three/drei';
-import { Link } from 'lucide-react';
 import { RefObject, useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { CiIceCream } from 'react-icons/ci';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 import { GiBlackHandShield, GiCornerExplosion, GiCrosshair, GiFeather, GiHeavyBullets } from 'react-icons/gi';
 import { IoIosReturnLeft } from 'react-icons/io';
-import { MdAddShoppingCart, MdOutlineCameraswitch } from 'react-icons/md';
+import { MdOutlineCameraswitch, MdShoppingCartCheckout } from 'react-icons/md';
 import { useSnapshot } from 'valtio';
 import { AttachmentListElement } from './AttachmentListElement';
 import { CustomizerProps, statTypes } from './Customizer';
@@ -256,7 +256,7 @@ export function MainCustomizer({
                 </div>
             </div>
             <Link
-                className="group duration-all absolute top-1/2 -right-40 z-99 flex skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 *:px-2 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]"
+                className="group duration-all pointer-events-auto absolute top-1/2 -right-48 z-99 flex h-16 w-64 skew-x-12 cursor-pointer items-center divide-x-2 border bg-zinc-950 p-2 pr-4 transition-all duration-200 *:px-2 hover:-right-2 hover:border-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.7)]"
                 onClick={() =>
                     addToBag({
                         customizedWeaponId: makeSelectionKey(weapon.id, { ...snap.selected }),
@@ -268,10 +268,8 @@ export function MainCustomizer({
                 }
                 href={route('cart')}
             >
-                <MdAddShoppingCart className="-skew-x-12 text-6xl" />
-                <span className="ml-2 translate-x-[60vw] -skew-x-12 text-xl font-extrabold transition-transform duration-300 group-hover:translate-x-0">
-                    ADD TO CART
-                </span>
+                <MdShoppingCartCheckout className="-skew-x-12 text-5xl" />
+                <span className="-skew-x-12">ADD TO CART</span>
             </Link>
 
             <div
