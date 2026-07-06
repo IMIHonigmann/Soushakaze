@@ -54,7 +54,7 @@ type WorldNode = {
     visible: boolean;
 };
 
-export default function Model({ cameraControlsRef, weapon, attachmentModels, restTransforms, ...props }: ModelProps) {
+export default function Model({ cameraControlsRef, weapon, attachmentModels, restTransforms = {} as CustomizerProps['restTransforms'], ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/Main/scene.gltf`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
@@ -283,7 +283,7 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
                         {...props}
                         position={[restTransforms.position_x ?? 0, restTransforms.position_y ?? 0, restTransforms.position_z ?? 0]}
                         rotation={[restTransforms.rotation_x ?? 0, restTransforms.rotation_y ?? 0, restTransforms.rotation_z ?? 0]}
-                        scale={[restTransforms.scale_x ?? 0, restTransforms.scale_y ?? 0, restTransforms.scale_z ?? 0]}
+                        scale={[restTransforms.scale_x ?? 1, restTransforms.scale_y ?? 1, restTransforms.scale_z ?? 1]}
                         ref={sceneGroupRef}
                     >
                         {Object.entries(worldNodes).map(([nodeName, n]) => (

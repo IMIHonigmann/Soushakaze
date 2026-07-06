@@ -29,11 +29,30 @@ class CustomizerController extends Controller
             });
         $maxPower = DB::table('weapons')->max('power');
 
+        $area_displays = DB::table('weapon_area_display')
+            ->where('weapon_id', $weaponId)
+            ->get();
+        $attachment_models = DB::table('weapon_attachment_model')
+            ->where('weapon_id', $weaponId)
+            ->leftJoin('attachments', 'attachment_id', '=', 'attachments.id')
+            ->select('weapon_attachment_model.model_name', 'attachments.name as attachment_name')
+            ->get()
+            ->groupBy('attachment_name')
+            ->map(function ($group) {
+                return $group->pluck('model_name');
+            });
+        $rest_transforms = DB::table('weapon_rest_transforms')
+            ->where('weapon_id', $weaponId)
+            ->first();
+
         return Inertia::render('Separate/Customizer/Customizer', [
             'weapon' => $weapon,
             'maxPower' => $maxPower,
             'attachments' => $attachments,
             'query' => $request->query(),
+            'areaDisplays' => $area_displays,
+            'attachmentModels' => $attachment_models,
+            'restTransforms' => $rest_transforms,
             'renderEditor' => false
         ]);
     }
