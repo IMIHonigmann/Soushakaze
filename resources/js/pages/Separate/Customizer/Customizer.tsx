@@ -66,7 +66,15 @@ export interface CustomizerProps {
 }
 
 export default function Customizer({ weapon, maxPower, attachments, query, areaDisplays, attachmentModels, restTransforms }: CustomizerProps) {
-    state.grouped = attachments;
+    // Seed the shared attachment groups once per weapon. Guarded by a ref so local
+    // edits (add/rename attachment or area) are not wiped on subsequent renders,
+    // while still re-seeding when navigating to a different weapon.
+    const seededWeaponId = useRef<number | null>(null);
+    if (seededWeaponId.current !== weapon.id) {
+        state.grouped = attachments;
+        seededWeaponId.current = weapon.id;
+    }
+
     const { addToBag } = useCartStore((state) => state);
     const snap = useSnapshot(state);
     const cameraControlsRef = useRef<CameraControls>(null);
@@ -74,7 +82,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const liRefs = useRef<Record<string, HTMLLIElement | null>>({});
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
-    const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, number[]>>();
+    const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, string[]>>();
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
     const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
@@ -134,6 +142,31 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     function contextDependentStatModifier(stat: Stats) {
         return contextModifiers[stat];
     }
+
+    // Move the clipboard's node names into `targetAttName`, removing them from their
+    // source attachments. Dedupes on paste so a node is never added twice (and heals
+    // any pre-existing duplicates in the target).
+    const pasteModelSelection = (targetAttName: string) => {
+        if (!attachmentClipboard || Object.keys(attachmentClipboard).length === 0) {
+            console.error('The Attachment Clipboard is empty!');
+            return;
+        }
+        if (!state.dbAttachmentsToMaterialsObject[targetAttName]) {
+            state.dbAttachmentsToMaterialsObject[targetAttName] = [];
+        }
+        const target = state.dbAttachmentsToMaterialsObject[targetAttName];
+        Object.entries(attachmentClipboard).forEach(([sourceAttName, nodeNames]) => {
+            nodeNames.forEach((nodeName) => {
+                if (sourceAttName !== targetAttName) {
+                    state.dbAttachmentsToMaterialsObject[sourceAttName] = (
+                        state.dbAttachmentsToMaterialsObject[sourceAttName] ?? []
+                    ).filter((n) => n !== nodeName);
+                }
+                if (!target.includes(nodeName)) target.push(nodeName);
+            });
+        });
+        setAttachmentClipboard(undefined);
+    };
 
     const previousPrice = usePrevious(totalPrice);
 
@@ -220,6 +253,11 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     // use to create new tab state when adding a new attachment
     const getTabState = (id: string | number) => {
         return openedAttTabs[id] ?? { opened: true, selected: false };
+    };
+
+    // same, but for area groups that may be added/renamed after mount
+    const getAreaTabState = (area: string) => {
+        return openedAreaTabs[area] ?? { opened: true, selected: false };
     };
 
     const [openedAttTabs, setOpenedAttTabs] = useState<Record<string | number, { opened: boolean; selected: boolean }>>(() => {
@@ -317,7 +355,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {(() => {
-                    return Object.entries(attachments).map(([area, atts], areaIndex) => (
+                    return Object.entries(snap.grouped).map(([area, atts], areaIndex) => (
                         <li key={area}>
                             <h3
                                 onContextMenu={() => {
@@ -332,20 +370,26 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                     'Mobility Modifier': null,
                                                     'Handling Modifier': null,
                                                     'Magsize Modifier': null,
-                                                    Area: null,
+                                                    Area: area,
                                                 },
                                                 TargetType: 'Attachment',
                                             });
                                         },
-                                        'Edit Area Name': -1,
+                                        'Edit Area Name': () => {
+                                            setEditFormData({
+                                                Fields: { 'Area Name': area },
+                                                TargetType: 'Area',
+                                                targetName: area,
+                                            });
+                                        },
                                     });
                                 }}
                                 onClick={() =>
                                     setOpenedAreaTabs((prev) => ({
                                         ...prev,
                                         [area]: {
-                                            ...prev[area],
-                                            opened: !prev[area].opened,
+                                            ...getAreaTabState(area),
+                                            opened: !getAreaTabState(area).opened,
                                         },
                                     }))
                                 }
@@ -353,14 +397,14 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                             >
                                 <span className="flex items-center gap-2">
                                     <FaChevronRight
-                                        className={`${openedAreaTabs[area].opened ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                        className={`${getAreaTabState(area).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
                                     />
                                     <TbCamera />
                                 </span>
-                                <span className={`transition-all ${openedAreaTabs[area].opened ? 'ml-2' : ''}`}>{area}</span>
+                                <span className={`transition-all ${getAreaTabState(area).opened ? 'ml-2' : ''}`}>{area}</span>
                             </h3>
                             <ul
-                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${openedAreaTabs[area].opened ? '' : 'h-0 opacity-0'}`}
+                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${getAreaTabState(area).opened ? '' : 'h-0 opacity-0'}`}
                             >
                                 {atts.map((att, attIndex) => (
                                     <li key={att.id}>
@@ -368,31 +412,28 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                             onClick={() => changeMeshSelection([...snap.dbAttachmentsToMaterialsObject[att.name]])}
                                             onContextMenu={() => {
                                                 setActionFunctions({
-                                                    'Cut Model Selection': -1,
-                                                    'Paste Model Selection': () => {
-                                                        if (!attachmentClipboard || Object.keys(attachmentClipboard).length === 0) {
-                                                            console.error('The Attachment Clipboard is empty!');
-                                                            return;
-                                                        }
-                                                        Object.entries(attachmentClipboard).forEach(([attNodeArrayIdentifier, nodeIndices]) => {
-                                                            const sortedIndices = [...nodeIndices].sort((a, b) => b - a);
-                                                            sortedIndices.forEach((nodeIndex) => {
-                                                                if (!state.dbAttachmentsToMaterialsObject[att.name])
-                                                                    state.dbAttachmentsToMaterialsObject[att.name] = [];
-
-                                                                state.dbAttachmentsToMaterialsObject[att.name].push(
-                                                                    snap.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier][nodeIndex],
-                                                                );
-                                                            });
-
-                                                            sortedIndices.forEach((nodeIndex) => {
-                                                                state.dbAttachmentsToMaterialsObject[attNodeArrayIdentifier].splice(nodeIndex, 1);
-                                                            });
+                                                    'Cut Model Selection': () => {
+                                                        setAttachmentClipboard({
+                                                            [att.name]: [...(snap.dbAttachmentsToMaterialsObject[att.name] ?? [])],
                                                         });
-
-                                                        setAttachmentClipboard(undefined);
                                                     },
-                                                    'Edit Model Name': -1,
+                                                    'Paste Model Selection': () => pasteModelSelection(att.name),
+                                                    'Edit Model Name': () => {
+                                                        setEditFormData({
+                                                            Fields: {
+                                                                'Attachment Name': att.name,
+                                                                'Price Modifier': att.price_modifier,
+                                                                'Power Modifier': att.power_modifier,
+                                                                'Accuracy Modifier': att.accuracy_modifier,
+                                                                'Mobility Modifier': att.mobility_modifier,
+                                                                'Handling Modifier': att.handling_modifier,
+                                                                'Magsize Modifier': att.magsize_modifier,
+                                                                Area: att.area,
+                                                            },
+                                                            TargetType: 'Attachment',
+                                                            targetName: att.name,
+                                                        });
+                                                    },
                                                 });
                                             }}
                                             className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
@@ -427,7 +468,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             'Accuracy Modifier': att.accuracy_modifier,
                                                             'Mobility Modifier': att.mobility_modifier,
                                                             'Handling Modifier': att.handling_modifier,
-                                                            'Magsize Modifier': att.handling_modifier,
+                                                            'Magsize Modifier': att.magsize_modifier,
                                                             Area: att.area,
                                                         },
                                                         TargetType: 'Attachment',
@@ -450,7 +491,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                             liRefs.current[index] = el;
                                                         }}
                                                         tabIndex={0}
-                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard?.[att.name]?.includes(modelIndex) ? 'opacity-50' : ''}`}
+                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard?.[att.name]?.includes(nodeName) ? 'opacity-50' : ''}`}
                                                         onClick={(e) => {
                                                             if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
                                                             changeMeshSelection([]);
@@ -484,20 +525,14 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                                         onContextMenu={() => {
                                                             setActionFunctions({
                                                                 'Cut Model Selection': function () {
-                                                                    setAttachmentClipboard((prev) => ({
-                                                                        ...prev,
-                                                                        [att.name]: [modelIndex],
-                                                                    }));
-                                                                    const curAttClip: typeof attachmentClipboard = {};
-                                                                    snap.currentMesh.existingSelection.forEach((nodeName) => {
-                                                                        if (!curAttClip[att.name]) curAttClip[att.name] = [];
-                                                                        curAttClip[att.name].push(
-                                                                            snap.dbAttachmentsToMaterialsObject[att.name].indexOf(nodeName),
-                                                                        );
-                                                                        setAttachmentClipboard(curAttClip);
-                                                                    });
+                                                                    // Cut the whole active selection when the right-clicked
+                                                                    // node is part of it, otherwise just this node.
+                                                                    const selection = snap.currentMesh.existingSelection.includes(nodeName)
+                                                                        ? [...snap.currentMesh.existingSelection]
+                                                                        : [nodeName];
+                                                                    setAttachmentClipboard({ [att.name]: selection });
                                                                 },
-                                                                'Paste Model Selection': -1,
+                                                                'Paste Model Selection': () => pasteModelSelection(att.name),
                                                             });
                                                         }}
                                                         key={nodeName}
@@ -524,7 +559,10 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                         </li>
                     ));
                 })()}
-                <li className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert">
+                <li
+                    onClick={() => setEditFormData({ Fields: { 'Area Name': '' }, TargetType: 'Area' })}
+                    className="flex cursor-pointer items-center gap-2 rounded-sm p-2 font-hitmarker-condensed text-3xl text-orange-500 uppercase select-none hover:invert"
+                >
                     <PlusCircle /> <span>Add New Area</span>
                 </li>
             </ul>
@@ -559,7 +597,7 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
             {actionFunctions && <ContextMenu actionFunctions={actionFunctions} x={contextMenuPosition.x} y={contextMenuPosition.y} />}
 
             <Activity mode={editFormData ? 'visible' : 'hidden'}>
-                <EditForm setEditFormData={setEditFormData} editFormData={editFormData} attachments={attachments} />
+                <EditForm setEditFormData={setEditFormData} editFormData={editFormData} />
             </Activity>
         </div>
     );
