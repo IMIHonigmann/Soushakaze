@@ -1,6 +1,7 @@
 import { Attachment, Weapon } from '@/types/types';
 import { useEffect, useState } from 'react';
 import { FaTruck } from 'react-icons/fa6';
+import Layout from '../layouts/MainLayout';
 
 type Order = {
     id: string;
@@ -27,7 +28,7 @@ type Props = {
     orders: WeaponsPerOrder[];
 };
 
-export default function OrderHistory({ user, orders }: Props) {
+export default function OrderHistory({ orders }: Props) {
     console.log(orders);
     const [orderProgress, setOrderProgress] = useState<Record<string, number>>({});
 
@@ -52,9 +53,10 @@ export default function OrderHistory({ user, orders }: Props) {
     }, [orders]);
 
     return (
-        <ul>
-            {orders.map((order, index) => (
-                <li className="m-4 border p-4">
+        <Layout>
+            <ul>
+                {orders.map((order, index) => (
+                    <li className="m-4 border p-4" key={order.id}>
                     <div>Order Date: {order.created_at}</div>
                     <div>Expected Arrival Date: {order.expected_arrival_date}</div>
                     <div className="relative h-4 -skew-x-12 border-2 bg-white p-2">
@@ -75,7 +77,8 @@ export default function OrderHistory({ user, orders }: Props) {
                         </div>
                     ))}
                 </li>
-            ))}
-        </ul>
+                ))}
+            </ul>
+        </Layout>
     );
 }

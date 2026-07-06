@@ -1,4 +1,5 @@
 import { FaCamera } from 'react-icons/fa';
+import Layout from '../layouts/MainLayout';
 
 type User = {
     id: number;
@@ -15,22 +16,24 @@ type Props = {
 
 export default function Profile({ user }: Props) {
     return (
-        <div>
-            <h2>Welcome back {user.name}</h2>
-            <span className="inline-block rounded-full border-2 p-8">
-                <FaCamera />
-            </span>
-            <li className="mb-5">
-                <strong>Joined in:</strong> {new Date(user.created_at).toLocaleDateString()}
-            </li>
-            <ul>
-                <li>
-                    <strong>Email:</strong> {user.email}
+        <Layout>
+            <div>
+                <h2>Welcome back {user.name}</h2>
+                <span className="inline-block rounded-full border-2 p-8">
+                    <FaCamera />
+                </span>
+                <li className="mb-5">
+                    <strong>Joined in:</strong> {new Date(user.created_at).toLocaleDateString()}
                 </li>
-                <li>
-                    <strong>Email Verified At:</strong> {user.email_verified_at ?? 'Not verified'}
-                </li>
-            </ul>
-        </div>
+                <ul>
+                    <li>
+                        <strong>Email:</strong> {user.email}
+                    </li>
+                    <li>
+                        <strong>Email Verified At:</strong> {user.email_verified_at ?? 'Not verified'}
+                    </li>
+                </ul>
+            </div>
+        </Layout>
     );
 }

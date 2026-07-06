@@ -57,6 +57,7 @@ class ProductsController extends Controller
         $qPowerLower = trim((string) $request->query('power_lowerlimit', ''));
         $qWeaponTypes = $request->query('weaponTypes', []);
         $qOnSale = $request->query('on_sale', '');
+        $qSort = trim((string) $request->query('sort', ''));
         if (is_string($qWeaponTypes)) {
             $qWeaponTypes = [$qWeaponTypes];
         }
@@ -76,6 +77,7 @@ class ProductsController extends Controller
             ->when($qPowerUpper !== '', fn($query) => $query->where('power', '<=', $qPowerUpper))
             ->when($qOnSale == 1, fn($query) => $query->where('price_modification_coefficient', '<', 1.00)->where('next_sale_startdate', '<=', now())->where('next_sale_enddate', '>=', now()))
             ->when(count($qCheckedWeaponTypes) > 0, fn($query) => $query->whereIn('type', $qCheckedWeaponTypes))
+            ->when($qSort === 'newest', fn($query) => $query->orderByDesc('weapons.created_at'))
             ->join('manufacturers', 'manufacturer_id', '=', 'manufacturers.id')
             ->join('sellers', 'seller_id', '=', 'sellers.id')
             ->select('weapons.*', 'manufacturers.name as manufacturer_name', 'sellers.name as seller_name')

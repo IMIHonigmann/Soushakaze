@@ -1,4 +1,4 @@
-import { state } from '@/stores/customizerProxy';
+import { factoryIssueAttachment, state } from '@/stores/customizerProxy';
 import { Area, Attachment } from '@/types/types';
 
 type Props = {
@@ -29,14 +29,17 @@ export default function EditForm({ editFormData, setEditFormData }: Props) {
                         const newName = (formData.get('Area Name') as string)?.trim();
                         if (newName) {
                             if (editFormData.targetName) {
-                                // rename: move the existing group to the new key
+                                // rename: move the existing group and its selection to the new key
                                 if (newName !== editFormData.targetName && !state.grouped[newName]) {
                                     state.grouped[newName] = state.grouped[editFormData.targetName] ?? [];
+                                    state.selected[newName] = state.selected[editFormData.targetName] ?? factoryIssueAttachment;
                                     delete state.grouped[editFormData.targetName];
+                                    delete state.selected[editFormData.targetName];
                                 }
                             } else if (!state.grouped[newName]) {
-                                // create a new, empty area group
+                                // create a new, empty area group with an empty (factory issue) selection
                                 state.grouped[newName] = [];
+                                state.selected[newName] = factoryIssueAttachment;
                             }
                         }
                         setEditFormData(null);

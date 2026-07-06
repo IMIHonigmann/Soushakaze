@@ -43,11 +43,13 @@ export default function Navbar({ formRef, upperSearchInputRef }: Props) {
                 <Link href={route('front-page')} className="cursor-pointer text-4xl font-extrabold">
                     <MorphingLogo />
                 </Link>
-                <nav className="flex justify-between [&>*]:hover:text-orange-500 [&>*]:hover:underline [&>*]:hover:transition-colors">
+                <nav className="flex justify-between [&>*]:cursor-pointer [&>*]:hover:text-orange-500 [&>*]:hover:underline [&>*]:hover:transition-colors">
+                    <Link href={route('front-page')}>Start</Link>
                     <Link href={route('queried-products')}>Shop</Link>
                     <Link href={route('queried-products', { on_sale: '1' })}>On Sale</Link>
-                    <span>New Arrivals</span>
-                    <span>Brands</span>
+                    <Link href={route('queried-products', { sort: 'newest' })}>New Arrivals</Link>
+                    <Link href={route('products')}>Brands</Link>
+                    <Link href="/profile">Profile</Link>
                 </nav>
                 <div className="flex items-center justify-between gap-6">
                     <input

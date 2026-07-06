@@ -107,11 +107,11 @@ export function MainCustomizer({
                                                 <AiOutlinePlus className="text-6xl" />
                                             ) : (
                                                 <DynamicIcon className="scale-125">
-                                                    {a.power_modifier > 0 && <GiCornerExplosion />}
-                                                    {a.mobility_modifier > 0 && <GiFeather />}
-                                                    {a.accuracy_modifier > 0 && <GiCrosshair className="z-2" />}
-                                                    {a.handling_modifier > 0 && <GiBlackHandShield className="z-3" />}
-                                                    {a.magsize_modifier > 0 && <GiHeavyBullets />}
+                                                    {(a?.power_modifier ?? 0) > 0 && <GiCornerExplosion />}
+                                                    {(a?.mobility_modifier ?? 0) > 0 && <GiFeather />}
+                                                    {(a?.accuracy_modifier ?? 0) > 0 && <GiCrosshair className="z-2" />}
+                                                    {(a?.handling_modifier ?? 0) > 0 && <GiBlackHandShield className="z-3" />}
+                                                    {(a?.magsize_modifier ?? 0) > 0 && <GiHeavyBullets />}
                                                 </DynamicIcon>
                                             )}
                                         </div>
