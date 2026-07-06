@@ -11,7 +11,7 @@ import { state } from '@/stores/customizerProxy';
 import { Weapon } from '@/types/types';
 import { router } from '@inertiajs/react';
 import { CameraControls, Stage, TransformControls, useGLTF } from '@react-three/drei';
-import { JSX, RefObject, useEffect, useMemo, useRef } from 'react';
+import { JSX, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTF } from 'three-stdlib';
 import { useSnapshot } from 'valtio';
@@ -54,7 +54,17 @@ type WorldNode = {
     visible: boolean;
 };
 
-export default function Model({ cameraControlsRef, weapon, attachmentModels, restTransforms = {} as CustomizerProps['restTransforms'], ...props }: ModelProps) {
+type TransformSnapshot = {
+    object: THREE.Object3D;
+    position: THREE.Vector3;
+    quaternion: THREE.Quaternion;
+    scale: THREE.Vector3;
+};
+
+const isTypingTarget = (e: KeyboardEvent) =>
+    e.target instanceof HTMLElement && (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName) || e.target.isContentEditable);
+
+export default function Model({ cameraControlsRef, weapon, attachmentModels, restTransforms, ...props }: ModelProps) {
     const { nodes, materials, scene } = useGLTF(`/3DModels/${weapon.name}/Main/scene.gltf`) as unknown as GLTFResult;
 
     const meshRefs = useRef<Record<string, THREE.Mesh | null>>({});
@@ -117,6 +127,82 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
 
     const snap = useSnapshot(state);
     const initAppliedRef = useRef(false);
+
+    // Hold Ctrl while dragging the gizmo to snap (0.25 units / 15° / 0.1 scale steps).
+    const [snapping, setSnapping] = useState(false);
+
+    // Undo/redo for gizmo drags: a snapshot of the dragged object's local transform is
+    // pushed on drag start, Ctrl+Z / Ctrl+Shift+Z swap the live transform with the stack.
+    const undoStack = useRef<TransformSnapshot[]>([]);
+    const redoStack = useRef<TransformSnapshot[]>([]);
+
+    useEffect(() => {
+        const captureTransform = (object: THREE.Object3D): TransformSnapshot => ({
+            object,
+            position: object.position.clone(),
+            quaternion: object.quaternion.clone(),
+            scale: object.scale.clone(),
+        });
+
+        const restoreTransform = (from: RefObject<TransformSnapshot[]>, to: RefObject<TransformSnapshot[]>) => {
+            const entry = from.current.pop();
+            if (!entry) return;
+            to.current.push(captureTransform(entry.object));
+            entry.object.position.copy(entry.position);
+            entry.object.quaternion.copy(entry.quaternion);
+            entry.object.scale.copy(entry.scale);
+            entry.object.updateMatrixWorld(true);
+        };
+
+        const frameSelection = () => {
+            const box = new THREE.Box3();
+            state.currentMesh.existingSelection.forEach((name) => {
+                const mesh = meshRefs.current[name];
+                if (mesh) box.expandByObject(mesh);
+            });
+            if (box.isEmpty() && sceneGroupRef.current) box.setFromObject(sceneGroupRef.current);
+            if (box.isEmpty()) return;
+            cameraControlsRef.current?.fitToBox(box, true, { paddingLeft: 0.5, paddingRight: 0.5, paddingTop: 0.5, paddingBottom: 0.5 });
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Control') setSnapping(true);
+            if (isTypingTarget(e)) return;
+            if (e.ctrlKey && (e.key === 'z' || e.key === 'Z')) {
+                e.preventDefault();
+                if (e.shiftKey) restoreTransform(redoStack, undoStack);
+                else restoreTransform(undoStack, redoStack);
+            }
+            if (e.ctrlKey && (e.key === 'y' || e.key === 'Y')) {
+                e.preventDefault();
+                restoreTransform(redoStack, undoStack);
+            }
+            if (!e.ctrlKey && (e.key === 'f' || e.key === 'F')) frameSelection();
+        };
+        const handleKeyUp = (e: KeyboardEvent) => {
+            if (e.key === 'Control') setSnapping(false);
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [cameraControlsRef]);
+
+    const pushUndoSnapshot = () => {
+        const target = state.clickedSidebarTab === 1 ? sceneGroupRef.current : selectionGroupRef.current;
+        if (!target) return;
+        undoStack.current.push({
+            object: target,
+            position: target.position.clone(),
+            quaternion: target.quaternion.clone(),
+            scale: target.scale.clone(),
+        });
+        if (undoStack.current.length > 50) undoStack.current.shift();
+        redoStack.current = [];
+    };
 
     useEffect(() => {
         if (!snap.grouped || initAppliedRef.current || !meshRefs.current) return;
@@ -243,6 +329,42 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [snap.lastUpdateId]);
 
+    // Normalize the saved rest transform into stable array references. Passed declaratively
+    // (so <Stage> frames the transformed model at mount), but memoized so re-renders during
+    // a gizmo drag don't re-apply them and fling the model out of view.
+    // Values must be coerced: MySQL decimal columns arrive as strings ("0.750"), and a
+    // string position makes TransformControls' position.add() concatenate instead of add,
+    // producing NaN matrices that make the model vanish on the first gizmo drag.
+    const rest = useMemo(() => {
+        const num = (v: number | undefined, fallback: number) => {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : fallback;
+        };
+        return {
+            position: [num(restTransforms?.position_x, 0), num(restTransforms?.position_y, 0), num(restTransforms?.position_z, 0)] as [
+                number,
+                number,
+                number,
+            ],
+            rotation: [num(restTransforms?.rotation_x, 0), num(restTransforms?.rotation_y, 0), num(restTransforms?.rotation_z, 0)] as [
+                number,
+                number,
+                number,
+            ],
+            scale: [num(restTransforms?.scale_x, 1), num(restTransforms?.scale_y, 1), num(restTransforms?.scale_z, 1)] as [number, number, number],
+        };
+    }, [
+        restTransforms?.position_x,
+        restTransforms?.position_y,
+        restTransforms?.position_z,
+        restTransforms?.rotation_x,
+        restTransforms?.rotation_y,
+        restTransforms?.rotation_z,
+        restTransforms?.scale_x,
+        restTransforms?.scale_y,
+        restTransforms?.scale_z,
+    ]);
+
     useEffect(() => {
         if (!sceneGroupRef.current || snap.lastApplyIndex === 0) return;
         const newRestTransforms = {
@@ -256,7 +378,6 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
             scale_y: sceneGroupRef.current.scale.y,
             scale_z: sceneGroupRef.current.scale.z,
         } as typeof restTransforms;
-        console.log('bruh', snap.lastApplyIndex, restTransforms);
 
         router.post('/overwriteAttachmentModelHierarchy', {
             dbAttachmentsToMaterialsObject: JSON.stringify(snap.dbAttachmentsToMaterialsObject),
@@ -279,13 +400,7 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
                         maxPolarAngle={Math.PI / 1.8}
                         onControlEnd={() => handleControlEnd()}
                     />
-                    <group
-                        {...props}
-                        position={[restTransforms.position_x ?? 0, restTransforms.position_y ?? 0, restTransforms.position_z ?? 0]}
-                        rotation={[restTransforms.rotation_x ?? 0, restTransforms.rotation_y ?? 0, restTransforms.rotation_z ?? 0]}
-                        scale={[restTransforms.scale_x ?? 1, restTransforms.scale_y ?? 1, restTransforms.scale_z ?? 1]}
-                        ref={sceneGroupRef}
-                    >
+                    <group {...props} position={rest.position} rotation={rest.rotation} scale={rest.scale} ref={sceneGroupRef}>
                         {Object.entries(worldNodes).map(([nodeName, n]) => (
                             <mesh
                                 name={nodeName}
@@ -342,7 +457,13 @@ export default function Model({ cameraControlsRef, weapon, attachmentModels, res
                 <TransformControls
                     object={(snap.clickedSidebarTab === 1 ? sceneGroupRef.current : selectionGroupRef.current) ?? undefined}
                     mode={snap.mode}
-                    onMouseDown={() => (state.cameraControlsEnabled = false)}
+                    translationSnap={snapping ? 0.25 : null}
+                    rotationSnap={snapping ? Math.PI / 12 : null}
+                    scaleSnap={snapping ? 0.1 : null}
+                    onMouseDown={() => {
+                        state.cameraControlsEnabled = false;
+                        pushUndoSnapshot();
+                    }}
                     onMouseUp={() => (state.cameraControlsEnabled = true)}
                 />
             )}

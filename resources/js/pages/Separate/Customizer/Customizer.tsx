@@ -1,6 +1,6 @@
 import { usePrevious } from '@/hooks/usePrevious';
 import { useCartStore } from '@/stores/bagStores';
-import { state, vec3 } from '@/stores/customizerProxy';
+import { DEFAULT_CAMERA_POSITIONS, state, vec3 } from '@/stores/customizerProxy';
 import { Area, Attachment, Weapon } from '@/types/types';
 import { CameraControls } from '@react-three/drei';
 import { gsap } from 'gsap';
@@ -83,6 +83,10 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
     const scrollDivRef = useRef<HTMLUListElement | null>(null);
 
     const [attachmentClipboard, setAttachmentClipboard] = useState<Record<string, string[]>>();
+    const [nodeSearch, setNodeSearch] = useState('');
+    // Bumped by the camera Reset button so the uncontrolled transform inputs re-mount
+    // and pick up the restored defaults.
+    const [camFormVersion, setCamFormVersion] = useState(0);
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const [actionFunctions, setActionFunctions] = useState<Record<string, (() => void) | -1> | null>(null);
     const [activeClickedLi, setActiveClickedLi] = useState<HTMLLIElement | null>(null);
@@ -158,9 +162,9 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
         Object.entries(attachmentClipboard).forEach(([sourceAttName, nodeNames]) => {
             nodeNames.forEach((nodeName) => {
                 if (sourceAttName !== targetAttName) {
-                    state.dbAttachmentsToMaterialsObject[sourceAttName] = (
-                        state.dbAttachmentsToMaterialsObject[sourceAttName] ?? []
-                    ).filter((n) => n !== nodeName);
+                    state.dbAttachmentsToMaterialsObject[sourceAttName] = (state.dbAttachmentsToMaterialsObject[sourceAttName] ?? []).filter(
+                        (n) => n !== nodeName,
+                    );
                 }
                 if (!target.includes(nodeName)) target.push(nodeName);
             });
@@ -170,8 +174,13 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
 
     const previousPrice = usePrevious(totalPrice);
 
+    const searchTerm = nodeSearch.trim().toLowerCase();
+    const nodeMatchesSearch = (nodeName: string) => nodeName.toLowerCase().includes(searchTerm);
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null;
+            if (target && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable)) return;
             if (event.key === 'q' || event.key === 'Q') state.mode = undefined;
             if (event.key === 'w' || event.key === 'W') state.mode = 'translate';
             if (event.key === 'e' || event.key === 'E') state.mode = 'rotate';
@@ -298,28 +307,37 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                                 <h3>{element}:</h3>
                                 <span className="grid grid-cols-3 gap-4 *:border">
                                     {(['x', 'y', 'z'] as const).map((axis) => (
-                                        <>
-                                            <input
-                                                key={`${snap.currentAreaSelection}-${element}-X`}
-                                                placeholder="0"
-                                                type="number"
-                                                style={{ MozAppearance: 'textfield' }}
-                                                onSelect={(e) => e.currentTarget.select()}
-                                                defaultValue={snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''}
-                                                onBlur={(e) => {
-                                                    handleCamChange(e, axis);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') handleCamChange(e, axis);
-                                                }}
-                                            />
-                                        </>
+                                        <input
+                                            key={`${snap.currentAreaSelection}-${element}-${axis}-${camFormVersion}`}
+                                            placeholder="0"
+                                            type="number"
+                                            style={{ MozAppearance: 'textfield' }}
+                                            onSelect={(e) => e.currentTarget.select()}
+                                            defaultValue={snap.CAMERA_POSITIONS[snap.currentAreaSelection]?.[index]?.[axis]?.toString() ?? ''}
+                                            onBlur={(e) => {
+                                                handleCamChange(e, axis);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleCamChange(e, axis);
+                                            }}
+                                        />
                                     ))}
                                 </span>
                             </div>
                         );
                     })}
-                    <button className="block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert">Reset</button>
+                    <button
+                        onClick={() => {
+                            const def = DEFAULT_CAMERA_POSITIONS[snap.currentAreaSelection];
+                            if (!def) return;
+                            state.CAMERA_POSITIONS[snap.currentAreaSelection] = [def[0].clone(), def[1].clone()];
+                            setCameraControls(def[0], def[1]);
+                            setCamFormVersion((v) => v + 1);
+                        }}
+                        className="block w-full rounded-sm bg-orange-500 p-2 text-black transition-all hover:invert"
+                    >
+                        Reset
+                    </button>
                 </div>
             </div>
             <ul className="row-span-full flex flex-col gap-1 p-1">
@@ -354,210 +372,228 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                 className={`animate-fade-from-above row-span-2 flex flex-col overflow-scroll p-4`}
                 style={{ scrollBehavior: 'smooth' }}
             >
+                <li className="sticky top-0 z-10 -mx-2 mb-2 bg-zinc-950 px-2 pb-2">
+                    <input
+                        type="search"
+                        value={nodeSearch}
+                        onChange={(e) => setNodeSearch(e.target.value)}
+                        placeholder="Search mesh nodes..."
+                        className="w-full rounded-sm border border-zinc-600 bg-zinc-900 p-2 focus:border-orange-500 focus:outline-none"
+                    />
+                </li>
                 {(() => {
-                    return Object.entries(snap.grouped).map(([area, atts], areaIndex) => (
-                        <li key={area}>
-                            <h3
-                                onContextMenu={() => {
-                                    setActionFunctions({
-                                        'Add New Attachment': () => {
-                                            setEditFormData({
-                                                Fields: {
-                                                    'Attachment Name': null,
-                                                    'Price Modifier': null,
-                                                    'Power Modifier': null,
-                                                    'Accuracy Modifier': null,
-                                                    'Mobility Modifier': null,
-                                                    'Handling Modifier': null,
-                                                    'Magsize Modifier': null,
-                                                    Area: area,
-                                                },
-                                                TargetType: 'Attachment',
-                                            });
-                                        },
-                                        'Edit Area Name': () => {
-                                            setEditFormData({
-                                                Fields: { 'Area Name': area },
-                                                TargetType: 'Area',
-                                                targetName: area,
-                                            });
-                                        },
-                                    });
-                                }}
-                                onClick={() =>
-                                    setOpenedAreaTabs((prev) => ({
-                                        ...prev,
-                                        [area]: {
-                                            ...getAreaTabState(area),
-                                            opened: !getAreaTabState(area).opened,
-                                        },
-                                    }))
-                                }
-                                className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
-                            >
-                                <span className="flex items-center gap-2">
-                                    <FaChevronRight
-                                        className={`${getAreaTabState(area).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
-                                    />
-                                    <TbCamera />
-                                </span>
-                                <span className={`transition-all ${getAreaTabState(area).opened ? 'ml-2' : ''}`}>{area}</span>
-                            </h3>
-                            <ul
-                                className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${getAreaTabState(area).opened ? '' : 'h-0 opacity-0'}`}
-                            >
-                                {atts.map((att, attIndex) => (
-                                    <li key={att.id}>
-                                        <h4
-                                            onClick={() => changeMeshSelection([...snap.dbAttachmentsToMaterialsObject[att.name]])}
-                                            onContextMenu={() => {
-                                                setActionFunctions({
-                                                    'Cut Model Selection': () => {
-                                                        setAttachmentClipboard({
-                                                            [att.name]: [...(snap.dbAttachmentsToMaterialsObject[att.name] ?? [])],
-                                                        });
+                    return Object.entries(snap.grouped).map(([area, atts], areaIndex) => {
+                        if (searchTerm && !atts.some((att) => (snap.dbAttachmentsToMaterialsObject[att.name] ?? []).some(nodeMatchesSearch)))
+                            return null;
+                        return (
+                            <li key={area}>
+                                <h3
+                                    onContextMenu={() => {
+                                        setActionFunctions({
+                                            'Add New Attachment': () => {
+                                                setEditFormData({
+                                                    Fields: {
+                                                        'Attachment Name': null,
+                                                        'Price Modifier': null,
+                                                        'Power Modifier': null,
+                                                        'Accuracy Modifier': null,
+                                                        'Mobility Modifier': null,
+                                                        'Handling Modifier': null,
+                                                        'Magsize Modifier': null,
+                                                        Area: area,
                                                     },
-                                                    'Paste Model Selection': () => pasteModelSelection(att.name),
-                                                    'Edit Model Name': () => {
-                                                        setEditFormData({
-                                                            Fields: {
-                                                                'Attachment Name': att.name,
-                                                                'Price Modifier': att.price_modifier,
-                                                                'Power Modifier': att.power_modifier,
-                                                                'Accuracy Modifier': att.accuracy_modifier,
-                                                                'Mobility Modifier': att.mobility_modifier,
-                                                                'Handling Modifier': att.handling_modifier,
-                                                                'Magsize Modifier': att.magsize_modifier,
-                                                                Area: att.area,
-                                                            },
-                                                            TargetType: 'Attachment',
-                                                            targetName: att.name,
-                                                        });
-                                                    },
+                                                    TargetType: 'Attachment',
                                                 });
-                                            }}
-                                            className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
-                                        >
-                                            <span className="flex items-center gap-2">
-                                                <FaChevronRight
-                                                    onClick={() =>
-                                                        setOpenedAttTabs((prev) => {
-                                                            const current = prev[att.id] ?? { opened: true, selected: false };
-                                                            getTabState(att.id);
-                                                            return {
-                                                                ...prev,
-                                                                [att.id]: {
-                                                                    ...current,
-                                                                    opened: !current.opened,
-                                                                },
-                                                            };
-                                                        })
-                                                    }
-                                                    className={`${getTabState(att.id).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
-                                                />
-                                                <GiDesertEagle className="text-2xl" />
-                                                <span className="text-xl">{att.name}</span>
-                                            </span>
-                                            <MdEdit
-                                                onClick={() => {
-                                                    setEditFormData({
-                                                        Fields: {
-                                                            'Attachment Name': att.name,
-                                                            'Price Modifier': att.price_modifier,
-                                                            'Power Modifier': att.power_modifier,
-                                                            'Accuracy Modifier': att.accuracy_modifier,
-                                                            'Mobility Modifier': att.mobility_modifier,
-                                                            'Handling Modifier': att.handling_modifier,
-                                                            'Magsize Modifier': att.magsize_modifier,
-                                                            Area: att.area,
-                                                        },
-                                                        TargetType: 'Attachment',
-                                                        targetName: att.name,
-                                                    });
-                                                }}
-                                                className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black"
-                                            />
-                                        </h4>
-                                        <ul
-                                            className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${getTabState(att.id).opened ? '' : 'h-0 opacity-0'} `}
-                                        >
-                                            {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName, modelIndex) => {
-                                                const index = `${areaIndex}-${attIndex}-${modelIndex}`;
-                                                return (
-                                                    <li
-                                                        data-index={index}
-                                                        data-nodename={nodeName}
-                                                        ref={(el) => {
-                                                            liRefs.current[index] = el;
-                                                        }}
-                                                        tabIndex={0}
-                                                        className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard?.[att.name]?.includes(nodeName) ? 'opacity-50' : ''}`}
-                                                        onClick={(e) => {
-                                                            if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
-                                                            changeMeshSelection([]);
-
-                                                            if (e.shiftKey) {
-                                                                const clickedIndex = e.currentTarget.dataset.index;
-                                                                const thirdClickedNumber = Number(clickedIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3]);
-                                                                const activeIndex = activeClickedLi?.dataset.index;
-                                                                const thirdNumber = Number(activeIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3]);
-                                                                for (
-                                                                    let i = Math.min(thirdNumber, thirdClickedNumber);
-                                                                    i <= Math.max(thirdNumber, thirdClickedNumber);
-                                                                    i++
-                                                                ) {
-                                                                    const nodeName =
-                                                                        liRefs.current[`${areaIndex}-${attIndex}-${i}`]?.dataset.nodename;
-                                                                    console.log('found?', nodeName);
-                                                                    if (nodeName) {
-                                                                        state.currentMesh.existingSelection.push(nodeName);
-                                                                        state.currentMesh.lastSelection.push(nodeName);
-                                                                    }
-                                                                }
-                                                            } else {
-                                                                state.currentMesh.existingSelection = [nodeName];
-                                                                state.currentMesh.lastSelection = [nodeName];
-                                                                setActiveClickedLi(e.currentTarget);
+                                            },
+                                            'Edit Area Name': () => {
+                                                setEditFormData({
+                                                    Fields: { 'Area Name': area },
+                                                    TargetType: 'Area',
+                                                    targetName: area,
+                                                });
+                                            },
+                                        });
+                                    }}
+                                    onClick={() =>
+                                        setOpenedAreaTabs((prev) => ({
+                                            ...prev,
+                                            [area]: {
+                                                ...getAreaTabState(area),
+                                                opened: !getAreaTabState(area).opened,
+                                            },
+                                        }))
+                                    }
+                                    className="flex cursor-pointer items-center gap-2 rounded-sm border-b-2 p-2 font-hitmarker-condensed text-3xl uppercase select-none hover:bg-red-600"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <FaChevronRight
+                                            className={`${getAreaTabState(area).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300`}
+                                        />
+                                        <TbCamera />
+                                    </span>
+                                    <span className={`transition-all ${getAreaTabState(area).opened ? 'ml-2' : ''}`}>{area}</span>
+                                </h3>
+                                <ul
+                                    className={`overflow-scroll transition-all duration-300 ease-out *:ml-6 ${getAreaTabState(area).opened || searchTerm ? '' : 'h-0 opacity-0'}`}
+                                >
+                                    {atts.map((att, attIndex) =>
+                                        searchTerm && !(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).some(nodeMatchesSearch) ? null : (
+                                            <li key={att.id}>
+                                                <h4
+                                                    onClick={() => changeMeshSelection([...snap.dbAttachmentsToMaterialsObject[att.name]])}
+                                                    onContextMenu={() => {
+                                                        setActionFunctions({
+                                                            'Cut Model Selection': () => {
+                                                                setAttachmentClipboard({
+                                                                    [att.name]: [...(snap.dbAttachmentsToMaterialsObject[att.name] ?? [])],
+                                                                });
+                                                            },
+                                                            'Paste Model Selection': () => pasteModelSelection(att.name),
+                                                            'Edit Model Name': () => {
+                                                                setEditFormData({
+                                                                    Fields: {
+                                                                        'Attachment Name': att.name,
+                                                                        'Price Modifier': att.price_modifier,
+                                                                        'Power Modifier': att.power_modifier,
+                                                                        'Accuracy Modifier': att.accuracy_modifier,
+                                                                        'Mobility Modifier': att.mobility_modifier,
+                                                                        'Handling Modifier': att.handling_modifier,
+                                                                        'Magsize Modifier': att.magsize_modifier,
+                                                                        Area: att.area,
+                                                                    },
+                                                                    TargetType: 'Attachment',
+                                                                    targetName: att.name,
+                                                                });
+                                                            },
+                                                        });
+                                                    }}
+                                                    className={`group flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-sm p-2 transition-transform duration-300 ease-out hover:bg-red-600`}
+                                                >
+                                                    <span className="flex items-center gap-2">
+                                                        <FaChevronRight
+                                                            onClick={() =>
+                                                                setOpenedAttTabs((prev) => {
+                                                                    const current = prev[att.id] ?? { opened: true, selected: false };
+                                                                    getTabState(att.id);
+                                                                    return {
+                                                                        ...prev,
+                                                                        [att.id]: {
+                                                                            ...current,
+                                                                            opened: !current.opened,
+                                                                        },
+                                                                    };
+                                                                })
                                                             }
-
-                                                            state.lastUpdateId++;
-                                                        }}
-                                                        onContextMenu={() => {
-                                                            setActionFunctions({
-                                                                'Cut Model Selection': function () {
-                                                                    // Cut the whole active selection when the right-clicked
-                                                                    // node is part of it, otherwise just this node.
-                                                                    const selection = snap.currentMesh.existingSelection.includes(nodeName)
-                                                                        ? [...snap.currentMesh.existingSelection]
-                                                                        : [nodeName];
-                                                                    setAttachmentClipboard({ [att.name]: selection });
+                                                            className={`${getTabState(att.id).opened ? 'rotate-90' : ''} text-lg transition-transform duration-300 hover:bg-black`}
+                                                        />
+                                                        <GiDesertEagle className="text-2xl" />
+                                                        <span className="text-xl">{att.name}</span>
+                                                    </span>
+                                                    <MdEdit
+                                                        onClick={() => {
+                                                            setEditFormData({
+                                                                Fields: {
+                                                                    'Attachment Name': att.name,
+                                                                    'Price Modifier': att.price_modifier,
+                                                                    'Power Modifier': att.power_modifier,
+                                                                    'Accuracy Modifier': att.accuracy_modifier,
+                                                                    'Mobility Modifier': att.mobility_modifier,
+                                                                    'Handling Modifier': att.handling_modifier,
+                                                                    'Magsize Modifier': att.magsize_modifier,
+                                                                    Area: att.area,
                                                                 },
-                                                                'Paste Model Selection': () => pasteModelSelection(att.name),
+                                                                TargetType: 'Attachment',
+                                                                targetName: att.name,
                                                             });
                                                         }}
-                                                        key={nodeName}
-                                                    >
-                                                        <div
-                                                            className={`flex items-center gap-2 p-1 transition-all ${
-                                                                activeClickedLi?.dataset.nodename === nodeName
-                                                                    ? 'ml-8 select-none'
-                                                                    : snap.currentMesh.lastSelection.includes(nodeName)
-                                                                      ? 'ml-4 select-none'
-                                                                      : 'ml-2'
-                                                            }`}
-                                                        >
-                                                            <TbBox className="inline-block text-3xl" />
-                                                            <span className="truncate">{nodeName}</span>
-                                                        </div>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
-                    ));
+                                                        className="hidden border p-0.5 opacity-0 transition-all group-hover:inline-block group-hover:opacity-100 hover:bg-black"
+                                                    />
+                                                </h4>
+                                                <ul
+                                                    className={`ml-6 overflow-hidden transition-all duration-300 ease-out ${getTabState(att.id).opened || searchTerm ? '' : 'h-0 opacity-0'} `}
+                                                >
+                                                    {(snap.dbAttachmentsToMaterialsObject[att.name] ?? []).map((nodeName, modelIndex) => {
+                                                        if (searchTerm && !nodeMatchesSearch(nodeName)) return null;
+                                                        const index = `${areaIndex}-${attIndex}-${modelIndex}`;
+                                                        return (
+                                                            <li
+                                                                data-index={index}
+                                                                data-nodename={nodeName}
+                                                                ref={(el) => {
+                                                                    liRefs.current[index] = el;
+                                                                }}
+                                                                tabIndex={0}
+                                                                className={`rounded-sm select-none ${activeClickedLi?.dataset.nodename === nodeName ? 'bg-purple-500 text-black' : snap.currentMesh.existingSelection.includes(nodeName) ? 'bg-orange-500 text-black' : 'cursor-pointer hover:bg-red-600'} ${attachmentClipboard?.[att.name]?.includes(nodeName) ? 'opacity-50' : ''}`}
+                                                                onClick={(e) => {
+                                                                    if (!activeClickedLi) setActiveClickedLi(e.currentTarget);
+                                                                    changeMeshSelection([]);
+
+                                                                    if (e.shiftKey) {
+                                                                        const clickedIndex = e.currentTarget.dataset.index;
+                                                                        const thirdClickedNumber = Number(
+                                                                            clickedIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3],
+                                                                        );
+                                                                        const activeIndex = activeClickedLi?.dataset.index;
+                                                                        const thirdNumber = Number(activeIndex?.match(/(\d+)-(\d+)-(\d+)$/)?.[3]);
+                                                                        for (
+                                                                            let i = Math.min(thirdNumber, thirdClickedNumber);
+                                                                            i <= Math.max(thirdNumber, thirdClickedNumber);
+                                                                            i++
+                                                                        ) {
+                                                                            const nodeName =
+                                                                                liRefs.current[`${areaIndex}-${attIndex}-${i}`]?.dataset.nodename;
+                                                                            console.log('found?', nodeName);
+                                                                            if (nodeName) {
+                                                                                state.currentMesh.existingSelection.push(nodeName);
+                                                                                state.currentMesh.lastSelection.push(nodeName);
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        state.currentMesh.existingSelection = [nodeName];
+                                                                        state.currentMesh.lastSelection = [nodeName];
+                                                                        setActiveClickedLi(e.currentTarget);
+                                                                    }
+
+                                                                    state.lastUpdateId++;
+                                                                }}
+                                                                onContextMenu={() => {
+                                                                    setActionFunctions({
+                                                                        'Cut Model Selection': function () {
+                                                                            // Cut the whole active selection when the right-clicked
+                                                                            // node is part of it, otherwise just this node.
+                                                                            const selection = snap.currentMesh.existingSelection.includes(nodeName)
+                                                                                ? [...snap.currentMesh.existingSelection]
+                                                                                : [nodeName];
+                                                                            setAttachmentClipboard({ [att.name]: selection });
+                                                                        },
+                                                                        'Paste Model Selection': () => pasteModelSelection(att.name),
+                                                                    });
+                                                                }}
+                                                                key={nodeName}
+                                                            >
+                                                                <div
+                                                                    className={`flex items-center gap-2 p-1 transition-all ${
+                                                                        activeClickedLi?.dataset.nodename === nodeName
+                                                                            ? 'ml-8 select-none'
+                                                                            : snap.currentMesh.lastSelection.includes(nodeName)
+                                                                              ? 'ml-4 select-none'
+                                                                              : 'ml-2'
+                                                                    }`}
+                                                                >
+                                                                    <TbBox className="inline-block text-3xl" />
+                                                                    <span className="truncate">{nodeName}</span>
+                                                                </div>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </li>
+                                        ),
+                                    )}
+                                </ul>
+                            </li>
+                        );
+                    });
                 })()}
                 <li
                     onClick={() => setEditFormData({ Fields: { 'Area Name': '' }, TargetType: 'Area' })}
@@ -583,6 +619,9 @@ export default function Customizer({ weapon, maxPower, attachments, query, areaD
                             onClick={() => (state.mode = mode as typeof state.mode)}
                         />
                     ))}
+                    <span className="ml-4 self-center text-xs text-zinc-500 select-none">
+                        Q/W/E/R modes &middot; hold Ctrl to snap &middot; F frame selection &middot; Ctrl+Z undo
+                    </span>
                 </span>
                 <span className="m-4 flex items-center gap-2 rounded-xl border p-2">
                     <BsBoundingBox />
